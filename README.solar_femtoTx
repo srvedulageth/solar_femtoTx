@@ -1,0 +1,5 @@
+1. Install Vivado (You may need to add Vivado path to .bashrc source /tools/Xilinx/Vivado/2024.2/settings64.sh)
+2. https://github.com/srvedulageth/solar_femtoTx.git
+3. cd solar_femtoTx
+4. make runsim TC=uart
+5. make syn 
