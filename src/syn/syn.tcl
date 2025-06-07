@@ -18,7 +18,8 @@
 #
 
 # We targeting an Artix-7 speed grade -3 FPGA for synthesis.
-create_project project_1 -part xc7a75tcsg324-3
+#create_project project_1 -part xc7a75tcsg324-3
+create_project project_1 -part xc7a100tcsg324-1
 
 # Add RTL files and includes for synthesis.
 add_files -scan_for_includes {
@@ -61,6 +62,11 @@ add_files -scan_for_includes {
 ../../src/rtl/zap_dcache.sv \
 ../../src/rtl/zap_btb.sv \
 ../../src/rtl/zap_ram_simple_ben.sv\
+../../src/ips/uart16550/rtl/verilog/uart.v\
+../../src/ips/timer/timer.v\
+../../src/ips/vic/vic.v\
+../../src/ips/uart_tx_dumper/uart_tx_dumper.v\
+../../src/testbench/zap_soc.v\
 }
 
 # Create a sources_1 fileset.
@@ -75,8 +81,8 @@ add_files -fileset constrs_1 -norecurse ../../src/syn/syn.xdc
 # the GUI.
 #
 synth_design \
--top zap_top \
--part xc7a75tcsg324-3 \
+-top zap_soc \
+-part xc7a100tcsg324-1 \
 -gated_clock_conversion auto \
 -directive PerformanceOptimized \
 -retiming \

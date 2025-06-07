@@ -44,6 +44,10 @@ my $REG_HIER                    = "u_chip_top.u_zap_top.u_zap_core.u_zap_writeba
 my $IVL_OPTIONS  = " -Isrc/rtl ";
    $IVL_OPTIONS .= "   src/rtl/*.sv ";
    $IVL_OPTIONS .= " -Iobj/ts/$TEST ";
+   $IVL_OPTIONS .= "   src/ips/uart16550/rtl/verilog/uart.v ";
+   $IVL_OPTIONS .= "   src/ips/uart_tx_dumper/uart_tx_dumper.v ";
+   $IVL_OPTIONS .= "   src/ips/timer/timer.v ";
+   $IVL_OPTIONS .= "   src/ips/vic/vic.v ";
    $IVL_OPTIONS .= "   src/testbench/*.v ";
    $IVL_OPTIONS .= " -GBP_ENTRIES=$BP ";
    $IVL_OPTIONS .= " -GFIFO_DEPTH=$FIFO ";
