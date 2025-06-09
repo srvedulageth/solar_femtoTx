@@ -72,7 +72,7 @@
 //
 
 `include "ethmac_defines.v"
-`include "timescale.v"
+//`include "ethmac_timescale.v"
 
 module eth_spram_256x32(
 	// Generic synchronous single-port RAM interface

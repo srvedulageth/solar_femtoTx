@@ -21,15 +21,15 @@
 #define UART_H
 
         // Non virtualized addresses for UART0
-        #define UART0_DLAB1   ((char*)0xFFFFFFE0)
-        #define UART0_DLAB2   ((char*)0xFFFFFFE1)
-        #define UART0_THR     ((char*)0xFFFFFFE0)
-        #define UART0_RBR     ((char*)0xFFFFFFE0)
-        #define UART0_IER     ((char*)0xFFFFFFE1)
-        #define UART0_FCR     ((char*)0xFFFFFFE2)
-        #define UART0_LCR     ((char*)0xFFFFFFE3)
-        #define UART0_LSR     ((char*)0xFFFFFFE5)
-        #define VIC_INT_CLEAR ( (int*)0xFFFFFFA8)
+        #define UART0_DLAB1   ((char*)0xFFFEFFE0)
+        #define UART0_DLAB2   ((char*)0xFFFEFFE1)
+        #define UART0_THR     ((char*)0xFFFEFFE0)
+        #define UART0_RBR     ((char*)0xFFFEFFE0)
+        #define UART0_IER     ((char*)0xFFFEFFE1)
+        #define UART0_FCR     ((char*)0xFFFEFFE2)
+        #define UART0_LCR     ((char*)0xFFFEFFE3)
+        #define UART0_LSR     ((char*)0xFFFEFFE5)
+        #define VIC_INT_CLEAR ( (int*)0xFFFEFFA8)
 
         // Initialization functions.
         void UARTInit(void);

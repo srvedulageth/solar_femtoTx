@@ -82,7 +82,7 @@
 //
 
 
-`include "timescale.v"
+//`include "ethmac_timescale.v"
 
 
 module eth_maccontrol (MTxClk, MRxClk, TxReset, RxReset, TPauseRq, TxDataIn, TxStartFrmIn, TxUsedDataIn, 

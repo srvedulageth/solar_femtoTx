@@ -91,7 +91,7 @@
 //
 //
 
-`include "timescale.v"
+//`include "ethmac_timescale.v"
 
 
 module eth_txethmac (MTxClk, Reset, TxStartFrm, TxEndFrm, TxUnderRun, TxData, CarrierSense, 

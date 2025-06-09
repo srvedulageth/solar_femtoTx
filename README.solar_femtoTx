@@ -1,5 +1,13 @@
-1. Install Vivado (You may need to add Vivado path to .bashrc source /tools/Xilinx/Vivado/2024.2/settings64.sh)
-2. https://github.com/srvedulageth/solar_femtoTx.git
-3. cd solar_femtoTx
-4. make runsim TC=uart
-5. make syn 
+1. Installing and Santity Checking
+   a. Install Vivado (You may need to add Vivado path to .bashrc i.e. put "source /tools/Xilinx/Vivado/2024.2/settings64.sh" in 
+      .bashrc)
+   b. https://github.com/srvedulageth/solar_femtoTx.git
+   c. cd solar_femtoTx
+   d. make runsim TC=uart
+   e. make syn 
+
+2. Changing Address Ranges
+   a. Change in zap_soc.v
+   b. Change in src/tc/<testcase>/<testcase.s> and <testcase.h>
+3. Instantiated EthMac from https://github.com/freecores/ethmac.git
+

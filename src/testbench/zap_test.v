@@ -17,13 +17,6 @@
 // 02110-1301, USA.
 //
 
-//
-// UART0  address space FFFFFFE0 to FFFFFFFF
-// Timer0 address space FFFFFFC0 to FFFFFFDF
-// VIC0   address space FFFFFFA0 to FFFFFFBF
-// UART1  address space FFFFFF80 to FFFFFF9F
-// Timer1 address space FFFFFF60 to FFFFFF7F
-//
 
 module zap_test (
         input  wire            i_clk,

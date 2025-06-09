@@ -79,7 +79,7 @@
 //
 //
 
-`include "timescale.v"
+//`include "ethmac_timescale.v"
 
 
 module eth_rxcounters 

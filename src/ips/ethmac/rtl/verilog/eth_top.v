@@ -239,7 +239,7 @@
 
 
 `include "ethmac_defines.v"
-`include "timescale.v"
+//`include "ethmac_timescale.v"
 
 
 module eth_top
