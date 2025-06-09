@@ -66,6 +66,32 @@ add_files -scan_for_includes {
 ../../src/ips/timer/timer.v\
 ../../src/ips/vic/vic.v\
 ../../src/ips/uart_tx_dumper/uart_tx_dumper.v\
+../../src/ips/ethmac/rtl/verilog/eth_clockgen.v \
+../../src/ips/ethmac/rtl/verilog/eth_cop.v \
+../../src/ips/ethmac/rtl/verilog/eth_crc.v \
+../../src/ips/ethmac/rtl/verilog/eth_fifo.v \
+../../src/ips/ethmac/rtl/verilog/eth_maccontrol.v \
+../../src/ips/ethmac/rtl/verilog/ethmac_defines.v \
+../../src/ips/ethmac/rtl/verilog/eth_macstatus.v \
+../../src/ips/ethmac/rtl/verilog/eth_miim.v \
+../../src/ips/ethmac/rtl/verilog/eth_outputcontrol.v \
+../../src/ips/ethmac/rtl/verilog/eth_random.v \
+../../src/ips/ethmac/rtl/verilog/eth_receivecontrol.v \
+../../src/ips/ethmac/rtl/verilog/eth_registers.v \
+../../src/ips/ethmac/rtl/verilog/eth_register.v \
+../../src/ips/ethmac/rtl/verilog/eth_rxaddrcheck.v \
+../../src/ips/ethmac/rtl/verilog/eth_rxcounters.v \
+../../src/ips/ethmac/rtl/verilog/eth_rxethmac.v \
+../../src/ips/ethmac/rtl/verilog/eth_rxstatem.v \
+../../src/ips/ethmac/rtl/verilog/eth_shiftreg.v \
+../../src/ips/ethmac/rtl/verilog/eth_spram_256x32.v \
+../../src/ips/ethmac/rtl/verilog/eth_transmitcontrol.v \
+../../src/ips/ethmac/rtl/verilog/eth_txcounters.v \
+../../src/ips/ethmac/rtl/verilog/eth_txethmac.v \
+../../src/ips/ethmac/rtl/verilog/eth_txstatem.v \
+../../src/ips/ethmac/rtl/verilog/eth_wishbone.v \
+../../src/ips/ethmac/rtl/verilog/xilinx_dist_ram_16x32.v \
+../../src/ips/ethmac/rtl/verilog/eth_top.v \
 ../../src/testbench/zap_soc.v\
 }
 
