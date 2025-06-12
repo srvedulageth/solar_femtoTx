@@ -1,0 +1,43 @@
+#!/bin/sh -f 
+xvlog -work work \
+-i .././../../bench/verilog \
+-i ../../../../rtl/verilog \
+../../../../rtl/verilog/eth_clockgen.v \
+../../../../rtl/verilog/eth_crc.v \
+../../../../rtl/verilog/ethmac_defines.v \
+../../../../rtl/verilog/xilinx_dist_ram_16x32.v \
+../../../../rtl/verilog/eth_fifo.v \
+../../../../rtl/verilog/eth_maccontrol.v \
+../../../../rtl/verilog/eth_macstatus.v \
+../../../../rtl/verilog/eth_miim.v \
+../../../../rtl/verilog/eth_outputcontrol.v \
+../../../../rtl/verilog/eth_random.v \
+../../../../rtl/verilog/eth_receivecontrol.v \
+../../../../rtl/verilog/eth_register.v \
+../../../../rtl/verilog/eth_registers.v \
+../../../../rtl/verilog/eth_rxaddrcheck.v \
+../../../../rtl/verilog/eth_rxcounters.v \
+../../../../rtl/verilog/eth_rxethmac.v \
+../../../../rtl/verilog/eth_rxstatem.v \
+../../../../rtl/verilog/eth_shiftreg.v \
+../../../../rtl/verilog/eth_spram_256x32.v \
+../../../../rtl/verilog/ethmac.v \
+../../../../rtl/verilog/timescale.v \
+../../../../rtl/verilog/eth_transmitcontrol.v \
+../../../../rtl/verilog/eth_txcounters.v \
+../../../../rtl/verilog/eth_txethmac.v \
+../../../../rtl/verilog/eth_txstatem.v \
+../../../../rtl/verilog/eth_wishbone.v \
+../../../../bench/verilog/eth_phy.v \
+../../../../bench/verilog/eth_phy_defines.v \
+../../../../bench/verilog/tb_eth_defines.v \
+../../../../bench/verilog/tb_ethernet.v \
+../../../../bench/verilog/wb_bus_mon.v \
+../../../../bench/verilog/wb_master_behavioral.v \
+../../../../bench/verilog/wb_master32.v \
+../../../../bench/verilog/wb_model_defines.v \
+../../../../bench/verilog/wb_slave_behavioral.v \
+/tools/Xilinx/Vivado/2024.2/ids_lite/ISE/verilog/src/unisims/RAMB4_S16_S16.v \
+/tools/Xilinx/Vivado/2024.2/ids_lite/ISE/verilog/src/unisims/RAMB4_S8.v \
+/tools/Xilinx/Vivado/2024.2/ids_lite/ISE/verilog/src/unisims/RAM16X1D.v
+xvlog -work glbl /tools/Xilinx/Vivado/2024.2/ids_lite/ISE/verilog/src/glbl.v

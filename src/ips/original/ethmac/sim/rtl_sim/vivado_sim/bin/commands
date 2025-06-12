@@ -1,0 +1,3 @@
+#xvlog -prj ethmac.prj
+./run_list.scr
+xelab work.tb_ethernet glbl.glbl -debug typical -snapshot my_sim
