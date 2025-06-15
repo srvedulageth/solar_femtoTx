@@ -238,7 +238,7 @@ u_zap_top
 // ===============================
 // Eth MAC
 // ===============================
-eth_top eth_top(
+ethmac ethmac(
 
   // WISHBONE common
   .wb_clk_i(i_clk),

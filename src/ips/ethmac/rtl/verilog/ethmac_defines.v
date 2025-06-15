@@ -182,11 +182,13 @@
 
 `define ETH_MBIST_CTRL_WIDTH 3        // width of MBIST control bus
 
+`ifdef SYNTHESIS
 // Ethernet implemented in Xilinx Chips (uncomment following lines)
 `define ETH_FIFO_XILINX             // Use Xilinx distributed ram for tx and rx fifo
 `define ETH_XILINX_RAMB4            // Selection of the used memory for Buffer descriptors
                                       // Core is going to be implemented in Virtex FPGA and contains Virtex 
                                       // specific elements. 
+`endif
 
 // Ethernet implemented in Altera Chips (uncomment following lines)
 //`define ETH_ALTERA_ALTSYNCRAM

@@ -91,7 +91,7 @@ add_files -scan_for_includes {
 ../../src/ips/ethmac/rtl/verilog/eth_txstatem.v \
 ../../src/ips/ethmac/rtl/verilog/eth_wishbone.v \
 ../../src/ips/ethmac/rtl/verilog/xilinx_dist_ram_16x32.v \
-../../src/ips/ethmac/rtl/verilog/eth_top.v \
+../../src/ips/ethmac/rtl/verilog/ethmac.v \
 ../../src/testbench/zap_soc.v\
 }
 
@@ -116,6 +116,7 @@ synth_design \
 -resource_sharing off \
 -no_lc \
 -shreg_min_size 5 \
+-verilog_define SYNTHESIS=1 \
 -mode out_of_context
 
 #
