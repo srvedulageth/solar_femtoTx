@@ -23,7 +23,9 @@ use warnings;
 
 my $TEST                        = $ARGV[0];
 my $HT                          = $ARGV[1];
-my %Config                      = do "./src/ts/$TEST/Config.cfg";
+#my %Config                      = do "./src/ts/$TEST/Config.cfg";
+my $Config_ref = do "./src/ts/$TEST/Config.cfg";
+my %Config = %{$Config_ref};  # Dereference the returned hashref
 my $ONLY_CORE                   = $Config{'ONLY_CORE'};
 my $DUMP_SIZE                   = $Config{'DUMP_SIZE'};
 my $MAX_CLOCK_CYCLES            = $Config{'MAX_CLOCK_CYCLES'};
