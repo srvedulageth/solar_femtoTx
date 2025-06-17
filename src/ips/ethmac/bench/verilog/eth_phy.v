@@ -63,7 +63,7 @@
 //
 //
 
-`include "timescale.v"
+//`include "timescale.v"
 `include "eth_phy_defines.v"
 `include "tb_eth_defines.v"
 module eth_phy // This PHY model simulate simplified Intel LXT971A PHY

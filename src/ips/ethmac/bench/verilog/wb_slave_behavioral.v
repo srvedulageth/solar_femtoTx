@@ -56,7 +56,7 @@
 //
 //
 
-`include "timescale.v"
+//`include "timescale.v"
 `include "wb_model_defines.v"
 module WB_SLAVE_BEHAVIORAL
 (
