@@ -80,7 +80,7 @@ mov r11, #13
 mov r12, #14
 mov r14, #15
 
-.set TIMER_BASE_ADDRESS, 0xFFFFFFC0
+.set TIMER_BASE_ADDRESS, 0xFFFEFFC0
 
 # Restart timer
 ldr r0,=TIMER_BASE_ADDRESS    // Timer base address.
@@ -88,7 +88,7 @@ add r0, r0, #12
 mov r1, #1
 str r1, [r0]                  // Restart the timer.
 
-.set VIC_BASE_ADDRESS,  0xFFFFFFA0
+.set VIC_BASE_ADDRESS,  0xFFFEFFA0
 .set CLEAR_ALL_PENDING, 0xFFFFFFFF
 
 # Clear interrupt in VIC.
@@ -126,7 +126,7 @@ mov r12, #14
 # Corrupt return address. OK to do since we pushed to stack.
 mov r14, #15
 
-.set TIMER_BASE_ADDRESS, 0xFFFFFFC0
+.set TIMER_BASE_ADDRESS, 0xFFFEFFC0
 
 # Restart timer
 ldr r0,=TIMER_BASE_ADDRESS    // Timer base address.
@@ -134,7 +134,7 @@ add r0, r0, #12
 mov r1, #1
 str r1, [r0]                  // Restart the timer.
 
-.set VIC_BASE_ADDRESS,  0xFFFFFFA0
+.set VIC_BASE_ADDRESS,  0xFFFEFFA0
 .set CLEAR_ALL_PENDING, 0xFFFFFFFF
 
 # Clear interrupt in VIC.

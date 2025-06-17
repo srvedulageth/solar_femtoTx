@@ -25,12 +25,14 @@ int fact (int);
 void main (void)
 {
         char *x = (char *)2000;
-        float *y = (float*) 2004;
+        float *y = (float*) 2004; //'d 2004 = 'h 7D4
+        float *z = (float*) 0xffff0000; //EthMAC Base Address. Just want to check basic access to EthMac.
         x[0] = 5;
         x[1] = fact(x[0]);
         x[2] = 255;
         x[3] = 255;
         *y = 3.14;
+        *z = 0xDEADBEEF;
 }
 
 int fact (int x)
