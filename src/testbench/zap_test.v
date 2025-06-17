@@ -142,6 +142,27 @@ uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(i_clk), .i_line(o_uart[0]),
 uart_tx_dumper u_uart_tx_dumper_dev1 (  .i_clk(i_clk), .i_line(o_uart[1]),
                                         .UART_SR_DAV(UART_SR_DAV_1), .UART_SR(UART_SR_1) );
 
+wire          mtx_clk;  // This goes to PHY
+wire          mrx_clk;  // This goes to PHY
+
+wire   [3:0]  MTxD;
+wire          MTxEn;
+wire          MTxErr;
+
+wire   [3:0]  MRxD;     // This goes to PHY
+wire          MRxDV;    // This goes to PHY
+wire          MRxErr;   // This goes to PHY
+wire          MColl;    // This goes to PHY
+wire          MCrs;     // This goes to PHY
+
+wire          Mdi_I;
+wire          Mdo_O;
+wire          Mdo_OE;
+tri           Mdio_IO;
+wire          Mdc_O;
+
+wire wb_rst = i_reset;
+
 // DUT
 zap_soc #(
         .FIFO_DEPTH(FIFO_DEPTH),
@@ -159,12 +180,29 @@ zap_soc #(
         .BE_32_ENABLE(BE_32_ENABLE),
         .ONLY_CORE(ONLY_CORE)
 ) u_chip_top (
+        // Clk and rst
         .SYS_CLK  (i_clk),
         .SYS_RST  (i_reset),
+
+        // UART 0
         .UART0_RXD(i_uart[0]),
         .UART0_TXD(o_uart[0]),
+
+        // UART 1
         .UART1_RXD(i_uart[1]),
         .UART1_TXD(o_uart[1]),
+
+        //TX
+        .mtx_clk_pad_i(mtx_clk), .mtxd_pad_o(MTxD), .mtxen_pad_o(MTxEn), .mtxerr_pad_o(MTxErr),
+
+        //RX
+        .mrx_clk_pad_i(mrx_clk), .mrxd_pad_i(MRxD), .mrxdv_pad_i(MRxDV), .mrxerr_pad_i(MRxErr),
+        .mcoll_pad_i(MColl),    .mcrs_pad_i(MCrs),
+
+        // MIIM
+        .mdc_pad_o(Mdc_O), .md_pad_i(Mdi_I), .md_pad_o(Mdo_O), .md_padoe_o(Mdo_OE),
+
+        //Wishbone External Master Interface
         .int_sel  (i_int_sel),
         .I_IRQ    (28'd0),
         .I_FIQ    (1'd0),
@@ -177,6 +215,7 @@ zap_soc #(
         .I_WB_ACK (i_wb_ack),
         .I_WB_DAT (i_wb_dat),
         .O_WB_CTI(o_wb_cti)
+
 );
 
 integer sim_ctr = 0;
@@ -234,5 +273,24 @@ wire [31:0] r36  =  `REG_HIER.mem[36];
 wire [31:0] r37  =  `REG_HIER.mem[37];
 wire [31:0] r38  =  `REG_HIER.mem[38];
 wire [31:0] r39  =  `REG_HIER.mem[39];
+
+eth_phy eth_phy
+(
+  // WISHBONE reset
+  .m_rst_n_i(!wb_rst),
+
+  // MAC TX
+  .mtx_clk_o(mtx_clk),    .mtxd_i(MTxD),    .mtxen_i(MTxEn),    .mtxerr_i(MTxErr),
+
+  // MAC RX
+  .mrx_clk_o(mrx_clk),    .mrxd_o(MRxD),    .mrxdv_o(MRxDV),    .mrxerr_o(MRxErr),
+  .mcoll_o(MColl),        .mcrs_o(MCrs),
+
+  // MIIM
+  .mdc_i(Mdc_O),          .md_io(Mdio_IO),
+
+  // SYSTEM
+  .phy_log(phy_log_file_desc)
+);
 
 endmodule //zap_test

@@ -73,18 +73,18 @@ parameter ONLY_CORE                     = 0
 );
 
 // Peripheral addresses.
-localparam ETHMAC_LO                    = 32'hFFFF0000;
-localparam ETHMAC_HI                    = 32'hFFFFFFFF;
-localparam UART0_LO                     = 32'hFFFEFFE0;
-localparam UART0_HI                     = 32'hFFFEFFFF;
-localparam TIMER0_LO                    = 32'hFFFEFFC0;
-localparam TIMER0_HI                    = 32'hFFFEFFDF;
-localparam VIC_LO                       = 32'hFFFEFFA0;
-localparam VIC_HI                       = 32'hFFFEFFBF;
-localparam UART1_LO                     = 32'hFFFEFF80;
-localparam UART1_HI                     = 32'hFFFEFF9F;
 localparam TIMER1_LO                    = 32'hFFFEFF60;
 localparam TIMER1_HI                    = 32'hFFFEFF7F;
+localparam UART1_LO                     = 32'hFFFEFF80;
+localparam UART1_HI                     = 32'hFFFEFF9F;
+localparam VIC_LO                       = 32'hFFFEFFA0;
+localparam VIC_HI                       = 32'hFFFEFFBF;
+localparam TIMER0_LO                    = 32'hFFFEFFC0;
+localparam TIMER0_HI                    = 32'hFFFEFFDF;
+localparam UART0_LO                     = 32'hFFFEFFE0;
+localparam UART0_HI                     = 32'hFFFEFFFF;
+localparam ETHMAC_LO                    = 32'hFFFF0000;
+localparam ETHMAC_HI                    = 32'hFFFFFFFF;
 
 // Internal signals.
 wire            i_clk    = SYS_CLK;

@@ -45,7 +45,9 @@ my $IVL_OPTIONS  = " -Isrc/rtl ";
    $IVL_OPTIONS .= "   src/rtl/*.sv ";
    $IVL_OPTIONS .= " -Iobj/ts/$TEST ";
    $IVL_OPTIONS .= " -Isrc/ips/ethmac/rtl/verilog ";
+   $IVL_OPTIONS .= " -Isrc/ips/ethmac/bench/verilog ";
    $IVL_OPTIONS .= "   src/ips/ethmac/rtl/verilog/*.v ";
+   $IVL_OPTIONS .= "   src/ips/ethmac/bench/verilog/eth_phy.v ";
    $IVL_OPTIONS .= "   src/ips/uart16550/rtl/verilog/uart.v ";
    $IVL_OPTIONS .= "   src/ips/uart_tx_dumper/uart_tx_dumper.v ";
    $IVL_OPTIONS .= "   src/ips/timer/timer.v ";
@@ -127,7 +129,7 @@ if ( $HT == 1 )
 }
 
 my $cmd =
-"verilator -O3 $HT -Wno-lint --cc --exe --assert  --build ../../../src/testbench/zap_test.cpp --Mdir obj/ts/$TEST --top zap_test $IVL_OPTIONS --x-assign unique --x-initial unique --error-limit 1 ";
+"verilator --timing -O3 $HT -Wno-lint --cc --exe --assert  --build ../../../src/testbench/zap_test.cpp --Mdir obj/ts/$TEST --top zap_test $IVL_OPTIONS --x-assign unique --x-initial unique --error-limit 1 ";
 
 print "$cmd\n";
 die "Error: Failed to build executable." if system("$cmd");
