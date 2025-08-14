@@ -22,6 +22,10 @@
 // cycle.  Instructions that fail condition checks are invalidated here.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_alu_main #(
         parameter logic [31:0] PHY_REGS  = 32'd46, // Number of physical registers.
         parameter logic [31:0] ALU_OPS   = 32'd32, // Number of arithmetic operations.

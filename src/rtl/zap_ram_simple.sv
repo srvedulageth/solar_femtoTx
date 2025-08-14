@@ -23,6 +23,9 @@
 // the latest write data to a colliding address is picked up onto the
 // output.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_ram_simple #(
         parameter logic [31:0] WIDTH = 32'd32,

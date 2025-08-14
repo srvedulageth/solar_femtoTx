@@ -19,7 +19,9 @@
 // TLB management unit for the ZAP processor. The TLB units use single cycle
 // clearing memories since TLBs are shallow.
 //
-
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_tlb #(
 

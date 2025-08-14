@@ -21,6 +21,9 @@
 //  using an incrementing burst on the Wishbone bus for maximum efficiency
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 `include "zap_defines.svh"
 
 module zap_cache_fsm   #(

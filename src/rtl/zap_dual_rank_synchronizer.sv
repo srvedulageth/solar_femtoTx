@@ -20,6 +20,10 @@
 // place these close esp. when using multibit synchros.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_dual_rank_synchronizer
 #(
         parameter logic [31:0] WIDTH = 32'd1

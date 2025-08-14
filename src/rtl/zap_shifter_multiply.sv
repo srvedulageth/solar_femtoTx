@@ -19,6 +19,9 @@
 // This unit handles 32x32=32/64 multiplication using an FSM using
 // a 17x17 signed array multiplier. Takes 5 cycles per 32x32+64 operation.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_shifter_multiply
 #(

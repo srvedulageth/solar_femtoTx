@@ -20,6 +20,10 @@
 // This is the instruction cache. Not that i_wr = 0.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_cache #( // INSTRUCTION CACHE
 
 parameter [31:0] CACHE_SIZE             = 32'd1024,

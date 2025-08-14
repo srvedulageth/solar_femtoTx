@@ -21,6 +21,9 @@
 // be used to connect I and D caches to a common interface. Take note of
 // special interface requirements based on ONLY_CORE parameter.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_wb_merger #(
 

@@ -24,6 +24,10 @@
 
 // NOT FOR SYNTHESIS
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                 input logic      [36-1:0]        i_instruction,  // 36-bit instruction into decode.
                 input logic                      i_dav,          // Instruction valid.
@@ -205,11 +209,11 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                 integer imm_amt, ror_amt;
 
                                 opcode   = `ZAP_DECOMPILE_COPCODE;
-                                cc       = `ZAP_DECOMPILE_CCC;
+                                cc       = {16'h 0, `ZAP_DECOMPILE_CCC};
                                 dest_reg = `ZAP_DECOMPILE_CRD;
                                 src_reg  = `ZAP_DECOMPILE_CRN;
-                                imm_amt  = $unsigned(i_instruction[7:0]);
-                                ror_amt  = $unsigned(i_instruction[11:8]);
+                                imm_amt  = {24'h 0, $unsigned(i_instruction[7:0])};
+                                ror_amt  = {28'h 0, $unsigned(i_instruction[11:8])};
 
                                 $sformat(o_decompile, "%s%s %s,%s,%0d ROR %0d", opcode, cc, dest_reg, src_reg, imm_amt, ror_amt);
                         end
@@ -223,7 +227,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                 integer shamt;
 
                                 opcode      = `ZAP_DECOMPILE_COPCODE;
-                                cc          = `ZAP_DECOMPILE_CCC;
+                                cc          = {16'h 0, `ZAP_DECOMPILE_CCC};
                                 dest_reg    = `ZAP_DECOMPILE_CRD;
                                 src_reg     = `ZAP_DECOMPILE_CRN;
                                 shtype      = `ZAP_DECOMPILE_CSHTYPE;
@@ -242,7 +246,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                 integer shamt;
 
                                 opcode      = `ZAP_DECOMPILE_COPCODE;
-                                cc          = `ZAP_DECOMPILE_CCC;
+                                cc          = {16'h 0, `ZAP_DECOMPILE_CCC};
                                 dest_reg    = `ZAP_DECOMPILE_CRD;
                                 src_reg     = `ZAP_DECOMPILE_CRN;
                                 shtype      = `ZAP_DECOMPILE_CSHTYPE;
@@ -297,7 +301,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                         {1'd1, 1'd1}: $sformat(o_decompile,"LDR%s  %s[U=%0d %s,%s]!", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex with writeback
                                         {1'd1, 1'd0}: $sformat(o_decompile,"LDR%s  %s[U=%0d %s,%s]" , `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex without writeback
                                         {1'd0, 1'd0}: $sformat(o_decompile,"LDR%s  %s[U=%0d %s],%s" , `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Post index
-                                        {1'd1, 1'd1}: $sformat(o_decompile,"LDR%s T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        default: $sformat(o_decompile,"LDR%s T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
                                         endcase
                                         end
                                         else
@@ -306,7 +310,8 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                         {1'd1, 1'd1}: $sformat(o_decompile,"LDR%sB  %s[U=%0d %s,%s]!", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex with writeback
                                         {1'd1, 1'd0}: $sformat(o_decompile,"LDR%sB  %s[U=%0d %s,%s]" , `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex without writeback
                                         {1'd0, 1'd0}: $sformat(o_decompile,"LDR%sB  %s[U=%0d %s],%s" , `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Post index
-                                        {1'd1, 1'd1}: $sformat(o_decompile,"LDR%sB T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        //{1'd1, 1'd1}: $sformat(o_decompile,"LDR%sB T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        default: $sformat(o_decompile,"LDR%sB T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
                                         endcase
                                         end
                                 else
@@ -316,7 +321,8 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                         {1'd1, 1'd1}: $sformat(o_decompile,"STR%s  %s[U=%0d %s,%s]!", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex with writeback
                                         {1'd1, 1'd0}: $sformat(o_decompile,"STR%s  %s[U=%0d %s,%s]",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex without writeback
                                         {1'd0, 1'd0}: $sformat(o_decompile,"STR%s  %s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Post index
-                                        {1'd1, 1'd1}: $sformat(o_decompile,"STR%s T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        //{1'd1, 1'd1}: $sformat(o_decompile,"STR%s T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        default: $sformat(o_decompile,"STR%s T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
                                         endcase
                                         end
                                         else
@@ -325,7 +331,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                         {1'd1, 1'd1}: $sformat(o_decompile,"STR%sB  %s[U=%0d %s,%s]!", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex with writeback
                                         {1'd1, 1'd0}: $sformat(o_decompile,"STR%sB  %s[U=%0d %s,%s]",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex without writeback
                                         {1'd0, 1'd0}: $sformat(o_decompile,"STR%sB  %s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Post index
-                                        {1'd1, 1'd1}: $sformat(o_decompile,"STR%sB T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        default: $sformat(o_decompile,"STR%sB T%s[U=%0d %s],%s",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,U,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
                                         endcase
                                         end
                         end
@@ -347,7 +353,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                         {1'd1, 1'd1}: $sformat(o_decompile,"LDR%s %s[%s,%0d]!", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex with writeback
                                         {1'd1, 1'd0}: $sformat(o_decompile,"LDR%s %s[%s,%0d]" , `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex without writeback
                                         {1'd0, 1'd0}: $sformat(o_decompile,"LDR%s %s[%s],%0d" , `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Post index
-                                        {1'd1, 1'd1}: $sformat(o_decompile,"LDR%s T%s[%s],%0d", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        default: $sformat(o_decompile,"LDR%s T%s[%s],%0d", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
                                         endcase
                                         end
                                         else
@@ -356,7 +362,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                         {1'd1, 1'd1}: $sformat(o_decompile,"LDR%sB %s[%s,%0d]!", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex with writeback
                                         {1'd1, 1'd0}: $sformat(o_decompile,"LDR%sB %s[%s,%0d]" , `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex without writeback
                                         {1'd0, 1'd0}: $sformat(o_decompile,"LDR%sB %s[%s],%0d" , `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Post index
-                                        {1'd1, 1'd1}: $sformat(o_decompile,"LDR%sB T%s[%s],%0d", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        default: $sformat(o_decompile,"LDR%sB T%s[%s],%0d", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
                                         endcase
                                         end
                                 else
@@ -366,7 +372,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                         {1'd1, 1'd1}: $sformat(o_decompile,"STR%s %s[%s,%0d]!", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex with writeback
                                         {1'd1, 1'd0}: $sformat(o_decompile,"STR%s %s[%s,%0d]",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex without writeback
                                         {1'd0, 1'd0}: $sformat(o_decompile,"STR%s %s[%s],%0d",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Post index
-                                        {1'd1, 1'd1}: $sformat(o_decompile,"STR%s T%s[%s],%0d", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        default: $sformat(o_decompile,"STR%s T%s[%s],%0d", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
                                         endcase
                                         end
                                         else
@@ -375,7 +381,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                         {1'd1, 1'd1}: $sformat(o_decompile,"STR%sB %s[%s,%0d]!", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex with writeback
                                         {1'd1, 1'd0}: $sformat(o_decompile,"STR%sB %s[%s,%0d]",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Preindex without writeback
                                         {1'd0, 1'd0}: $sformat(o_decompile,"STR%sB %s[%s],%0d",  `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset); // Post index
-                                        {1'd1, 1'd1}: $sformat(o_decompile,"STR%sB T%s[%s],%0d", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
+                                        default: $sformat(o_decompile,"STR%sB T%s[%s],%0d", `ZAP_DECOMPILE_CCC,`ZAP_DECOMPILE_CRD1,`ZAP_DECOMPILE_CRN1, ls_iss_offset);// Force user view of memory.
                                         endcase
                                         end
 
@@ -400,6 +406,7 @@ module zap_decompile #(parameter [31:0] INS_WDT = 32'd36) (
                                 `ZAP_DECOMPILE_XUMLAL: $sformat(o_decompile, "UMLAL %s:%s+=%s*%s",i_instruction[19:16], i_instruction[15:12], i_instruction[3:0], i_instruction[11:8] );
                                 `ZAP_DECOMPILE_XSMULL: $sformat(o_decompile, "SMULL %s:%s=%s*%s" ,i_instruction[19:16], i_instruction[15:12], i_instruction[3:0], i_instruction[11:8] );
                                 `ZAP_DECOMPILE_XSMLAL: $sformat(o_decompile, "SMLAL %s:%s+=%s*%s",i_instruction[19:16], i_instruction[15:12], i_instruction[3:0], i_instruction[11:8] );
+                                default: $sformat(o_decompile, "UMULL %s:%s=%s*%s" ,i_instruction[19:16], i_instruction[15:12], i_instruction[3:0], i_instruction[11:8] );
                               endcase
                         end
                         endtask

@@ -22,6 +22,10 @@
 // bulk invalidation to happen in a single cycle.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_mem_inv_block #(
         parameter [31:0] DEPTH = 32,
         parameter [31:0] WIDTH = 32   // Not including valid bit.

@@ -20,6 +20,9 @@
 // This is the top level cache module that contains the MMU and cache.
 // This is the data cache.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_dcache #(
 

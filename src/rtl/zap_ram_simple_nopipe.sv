@@ -22,6 +22,9 @@
 //  is a standard read first memory. This memory provides a read latency
 //  of 1 cycle.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_ram_simple_nopipe #(
         parameter logic [31:0] WIDTH = 32'd32,

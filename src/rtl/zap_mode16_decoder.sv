@@ -20,6 +20,9 @@
 // not logically organized so as to save on encoding and thus the functs
 // seem a bit complex.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_mode16_decoder (
         // Input from I-cache.

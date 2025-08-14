@@ -25,6 +25,10 @@
 // to ensure incorrect registers are not read.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_issue_main
 #(
         // Parameters.

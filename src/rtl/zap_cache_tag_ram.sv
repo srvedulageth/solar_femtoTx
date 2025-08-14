@@ -24,6 +24,9 @@
 // depending on the cache controller.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 `include "zap_defines.svh"
 
 module zap_cache_tag_ram #(
@@ -495,12 +498,13 @@ input [CACHE_SIZE/CACHE_LINE-1:0]          Dirty
         logic [4:0]                                enc;
         logic [W-1:0]                              shamt;
         logic [31:0]                               sum;
-        logic [(CACHE_SIZE/CACHE_LINE) - 16 - 1:0] unused1;
+        //logic [(CACHE_SIZE/CACHE_LINE) - 16 - 1:0] unused1;
+        logic [(128 - 16) - 1:0] unused1;
         logic                                      unused0;
 
         sum                 = 32'd0;
         shamt               = {blk_ctr, 4'd0};
-        {unused1,dirty_new} = Dirty >> shamt;
+        {unused1, dirty_new} = Dirty >> shamt;
         enc                 = pri_enc(dirty_new[15:0]);
         sum[W:0]            = {1'd0, shamt[W-1:0]} + {1'd0, {{(W-5){1'd0}}, enc}};
         unused0             = |{sum[31:$clog2(CACHE_SIZE/CACHE_LINE)]};
@@ -517,10 +521,12 @@ function automatic [4:0] baggage (
 
         logic [CACHE_SIZE/CACHE_LINE-1:0] w_dirty;
         logic [15:0] val;
-        logic [(CACHE_SIZE/CACHE_LINE) - 16 - 1:0] unused1;
+        //logic [(CACHE_SIZE/CACHE_LINE) - 16 - 1:0] unused1;
+        logic [(128 - 16) - 1:0] unused1;
 
         w_dirty        = Dirty >> {blk_ctr, 4'd0};
-        {unused1, val} = w_dirty;
+        //{unused1, val} = w_dirty;
+        val = w_dirty;
 
         return pri_enc(val);
 

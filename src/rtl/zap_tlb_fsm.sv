@@ -18,6 +18,9 @@
 //
 // An automatic page fetching system.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 `include "zap_defines.svh"
 

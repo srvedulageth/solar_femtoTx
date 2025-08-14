@@ -20,6 +20,10 @@
 // consists of an async FIFO wrapped around with some control logic.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_fifo #(parameter [31:0] WDT = 32, DEPTH = 8) (
 
 // Clock and reset.
