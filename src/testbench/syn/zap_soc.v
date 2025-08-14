@@ -58,15 +58,6 @@ parameter ONLY_CORE                     = 0
 wire int_sel;
 assign int_sel = 'b 1;
 
-`ifdef SYNTHESIS
-   reg [23:0] count = 0;
-    assign led_0 = count[23];
-    assign led_1 = count[22];
-    assign led_2 = count[21];
-    assign led_3 = count[20];
-    always @(posedge SYS_CLK) count <= count + 1;
-`endif
-
 // Peripheral addresses.
 `ifdef DUAL_UART
 localparam TIMER1_LO                    = 32'hFFFFFF60;
@@ -84,7 +75,7 @@ localparam VIC_HI                       = 32'hFFFFFFBF;
 
 // Internal signals.
 wire            i_clk    = SYS_CLK;
-wire            i_reset  = SYS_RST;
+wire            i_reset  = ~SYS_RST;
 
 `ifdef DUAL_UART
 wire [1:0]      uart_in;
@@ -336,4 +327,14 @@ ram_wb
               .ack_o(data_wb_ack_ram),
               .cti_i(3'b 000)
             );
+
+`ifdef SYNTHESIS
+   reg [23:0] count = 0;
+    assign led_0 = count[23];
+    assign led_1 = count[22];
+    assign led_2 = count[21];
+    //assign led_3 = count[20];
+    assign led_3 = ~uart_out[0:0];
+    always @(posedge SYS_CLK) count <= count + 1;
+`endif
 endmodule // zap_soc

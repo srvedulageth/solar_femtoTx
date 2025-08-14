@@ -16,93 +16,75 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 // 02110-1301, USA.
 //
+//`timescale 1ps/1ps
+`include "timescale.v"
 
-
-module zap_test (
-        input  wire            i_clk,
-        input  wire            i_reset,
-        input  wire            i_int_sel,
-
-        output reg             o_sim_ok = 1'd0,
-        output reg             o_sim_err = 1'd0,
-
-        output reg             o_wb_stb,
-        output reg             o_wb_cyc,
-        output reg     [31:0]  o_wb_adr,
-        output reg     [3:0]   o_wb_sel,
-        output reg             o_wb_we,
-        output reg     [31:0]  o_wb_dat,
-        output reg      [2:0]  o_wb_cti,
-        input  wire            i_wb_ack,
-        input  wire    [31:0]  i_wb_dat,
-
-        input  wire    [7:0]   i_mem [65536-1:0],
-
-        output wire            UART_SR_DAV_0,
-        output wire            UART_SR_DAV_1,
-        output wire    [7:0]   UART_SR_0,
-        output wire    [7:0]   UART_SR_1
-);
-
-initial
-begin
-        $dumpfile("zap.vcd");
-        $dumpvars;
-end
-
-parameter DATA_SECTION_TLB_ENTRIES      = 4;
-parameter DATA_LPAGE_TLB_ENTRIES        = 8;
-parameter DATA_SPAGE_TLB_ENTRIES        = 16;
-parameter DATA_FPAGE_TLB_ENTRIES        = 32;
-parameter DATA_CACHE_SIZE               = 1024;
-parameter CODE_SECTION_TLB_ENTRIES      = 4;
-parameter CODE_LPAGE_TLB_ENTRIES        = 8;
-parameter CODE_SPAGE_TLB_ENTRIES        = 16;
-parameter CODE_FPAGE_TLB_ENTRIES        = 32;
-parameter CODE_CACHE_SIZE               = 1024;
-parameter FIFO_DEPTH                    = 4;
-parameter BP_ENTRIES                    = 1024;
-parameter ONLY_CORE                     = 0;
-parameter BE_32_ENABLE                  = 0;
-
+module zap_test;
 
 localparam STRING_LENGTH                = 12;
 
+reg i_clk = 0;
+initial begin
+   forever #5 i_clk = ~i_clk; //100MHz
+end
+
+reg clk_baud_19200 = 0;
+initial begin
+  //forever #2605 clk_baud_19200 = ~clk_baud_19200;
+  forever #26040 clk_baud_19200 = ~clk_baud_19200;
+end
+
+reg i_reset;
+initial begin
+  i_reset = 'b 1;
+  repeat(10) @(posedge i_clk);
+  #1;
+  i_reset = 'b 0;
+end
+
+`ifdef DUAL_UART
 reg [1:0]                  i_uart = 2'b11;
 reg [1:0]                  o_uart;
-reg [31:0]                 i;
+`else
+reg [0:0]                  i_uart = 'b1;
+reg [0:0]                  o_uart;
+`endif
+
 reg [3:0]                  clk_ctr = 4'd0;
-reg [STRING_LENGTH*8-1:0]  uart_string = "DLROW OLLEH ";
-reg [6:0]                  uart_ctr    = 6'd10;
+//reg [STRING_LENGTH*8-1:0]  uart_string = "DLROW OLLEH ";
+reg [STRING_LENGTH*8-1:0]  uart_string = "OLLEH ";
+reg [6:0]                  uart_ctr    = 7'd10;
 reg [31:0]                 btrace      = 32'd0;
-reg [31:0]                 mem [65536/4-1:0]; // 16K words.
 reg                        uart_done = 1'd0;
-reg [8:0]                  uart_init_done = 8'd0;
+//reg [8:0]                  uart_init_done = 9'd0;
+reg [3:0]                  uart_init_done = 4'd0;
+
+wire            UART_SR_DAV_0;
+wire    [7:0]   UART_SR_0;
+`ifdef DUAL_UART
+wire            UART_SR_DAV_1;
+wire    [7:0]   UART_SR_1;
+`endif
 
 // Divided clocks.
 reg clk_2 = 1'd0, clk_4 = 1'd0, clk_8 = 1'd0, clk_16 = 1'd0;
 
 // Digital clock dividers.
-always @ ( posedge i_clk )
-        clk_2 = clk_2 + 1;
+always @ ( posedge i_clk ) clk_2 = clk_2 + 1;
+always @ ( posedge clk_2 ) clk_4 = clk_4 + 1;
+always @ ( posedge clk_4 ) clk_8 = clk_8 + 1;
+always @ ( posedge clk_8 ) clk_16 = clk_16 + 1;
 
-always @ ( posedge clk_2 )
-        clk_4 = clk_4 + 1;
-
-always @ ( posedge clk_4 )
-        clk_8 = clk_8 + 1;
-
-always @ ( posedge clk_8 )
-        clk_16 = clk_16 + 1;
-
-always @ ( posedge clk_16 )
+//always @ ( posedge clk_16 )
+always @ ( posedge clk_baud_19200 )
 begin
         if ( !(&uart_init_done) )
                 uart_init_done <= uart_init_done + 1;
 end
 
 // UART data into the core.
-always @ ( posedge clk_16 ) if ( !uart_done && (&uart_init_done) )
+//always @ ( posedge clk_16 ) if ( !uart_done && (&uart_init_done) )
+always @ ( posedge clk_baud_19200 ) if ( !uart_done && (&uart_init_done) )
 begin
         if ( uart_ctr <= 8 )
         begin
@@ -129,41 +111,31 @@ begin
         end
 end
 
-// Create memory for easy analysis.
-always @ (*)
-begin
-        for(int i=0;i<65536;i=i+4)
-                mem[i/4] = {i_mem[i+3], i_mem[i+2], i_mem[i+1], i_mem[i]};
-end
-
 // UART TX related. Data out of core.
-uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(i_clk), .i_line(o_uart[0]),
+//uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(i_clk), .i_line(o_uart[0]),
+uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(clk_baud_19200), .i_line(o_uart[0]),
                                         .UART_SR_DAV(UART_SR_DAV_0), .UART_SR(UART_SR_0) );
+`ifdef DUAL_UART
 uart_tx_dumper u_uart_tx_dumper_dev1 (  .i_clk(i_clk), .i_line(o_uart[1]),
                                         .UART_SR_DAV(UART_SR_DAV_1), .UART_SR(UART_SR_1) );
-
-wire          mtx_clk;  // This goes to PHY
-wire          mrx_clk;  // This goes to PHY
-
-wire   [3:0]  MTxD;
-wire          MTxEn;
-wire          MTxErr;
-
-wire   [3:0]  MRxD;     // This goes to PHY
-wire          MRxDV;    // This goes to PHY
-wire          MRxErr;   // This goes to PHY
-wire          MColl;    // This goes to PHY
-wire          MCrs;     // This goes to PHY
-
-wire          Mdi_I;
-wire          Mdo_O;
-wire          Mdo_OE;
-tri           Mdio_IO;
-wire          Mdc_O;
-
-wire wb_rst = i_reset;
+`endif
 
 // DUT
+parameter DATA_SECTION_TLB_ENTRIES      = 4;
+parameter DATA_LPAGE_TLB_ENTRIES        = 8;
+parameter DATA_SPAGE_TLB_ENTRIES        = 16;
+parameter DATA_FPAGE_TLB_ENTRIES        = 32;
+parameter DATA_CACHE_SIZE               = 1024;
+parameter CODE_SECTION_TLB_ENTRIES      = 4;
+parameter CODE_LPAGE_TLB_ENTRIES        = 8;
+parameter CODE_SPAGE_TLB_ENTRIES        = 16;
+parameter CODE_FPAGE_TLB_ENTRIES        = 32;
+parameter CODE_CACHE_SIZE               = 1024;
+parameter FIFO_DEPTH                    = 4;
+parameter BP_ENTRIES                    = 1024;
+parameter ONLY_CORE                     = 0;
+parameter BE_32_ENABLE                  = 0;
+
 zap_soc #(
         .FIFO_DEPTH(FIFO_DEPTH),
         .BP_ENTRIES(BP_ENTRIES),
@@ -186,111 +158,34 @@ zap_soc #(
 
         // UART 0
         .UART0_RXD(i_uart[0]),
-        .UART0_TXD(o_uart[0]),
+        .UART0_TXD(o_uart[0])
 
+`ifdef DUAL_UART
+        ,
         // UART 1
         .UART1_RXD(i_uart[1]),
-        .UART1_TXD(o_uart[1]),
-
-        //TX
-        .mtx_clk_pad_i(mtx_clk), .mtxd_pad_o(MTxD), .mtxen_pad_o(MTxEn), .mtxerr_pad_o(MTxErr),
-
-        //RX
-        .mrx_clk_pad_i(mrx_clk), .mrxd_pad_i(MRxD), .mrxdv_pad_i(MRxDV), .mrxerr_pad_i(MRxErr),
-        .mcoll_pad_i(MColl),    .mcrs_pad_i(MCrs),
-
-        // MIIM
-        .mdc_pad_o(Mdc_O), .md_pad_i(Mdi_I), .md_pad_o(Mdo_O), .md_padoe_o(Mdo_OE),
+        .UART1_TXD(o_uart[1])
+`endif
 
         //Wishbone External Master Interface
-        .int_sel  (i_int_sel),
-        .I_IRQ    (28'd0),
-        .I_FIQ    (1'd0),
-        .O_WB_STB (o_wb_stb),
-        .O_WB_CYC (o_wb_cyc),
-        .O_WB_DAT (o_wb_dat),
-        .O_WB_ADR (o_wb_adr),
-        .O_WB_SEL (o_wb_sel),
-        .O_WB_WE  (o_wb_we),
-        .I_WB_ACK (i_wb_ack),
-        .I_WB_DAT (i_wb_dat),
-        .O_WB_CTI(o_wb_cti)
-
+        //.int_sel  ('b 1)
 );
 
-integer sim_ctr = 0;
-
-always @ ( posedge i_clk )
-begin
-        sim_ctr <= sim_ctr + 1;
-
-        if ( sim_ctr == `MAX_CLOCK_CYCLES )
-        begin
-                o_sim_ok <= 1'd1;
-
-                `include "zap_check.vh"
-        end
+initial begin
+  $dumpfile("zap.vcd");
+  $dumpvars(0);
 end
 
-// Expose the CPU registers.
-wire [31:0] r0   =  `REG_HIER.mem[0];
-wire [31:0] r1   =  `REG_HIER.mem[1];
-wire [31:0] r2   =  `REG_HIER.mem[2];
-wire [31:0] r3   =  `REG_HIER.mem[3];
-wire [31:0] r4   =  `REG_HIER.mem[4];
-wire [31:0] r5   =  `REG_HIER.mem[5];
-wire [31:0] r6   =  `REG_HIER.mem[6];
-wire [31:0] r7   =  `REG_HIER.mem[7];
-wire [31:0] r8   =  `REG_HIER.mem[8];
-wire [31:0] r9   =  `REG_HIER.mem[9];
-wire [31:0] r10  =  `REG_HIER.mem[10];
-wire [31:0] r11  =  `REG_HIER.mem[11];
-wire [31:0] r12  =  `REG_HIER.mem[12];
-wire [31:0] r13  =  `REG_HIER.mem[13];
-wire [31:0] r14  =  `REG_HIER.mem[14];
-wire [31:0] r15  =  `REG_HIER.mem[15];
-wire [31:0] r16  =  `REG_HIER.mem[16];
-wire [31:0] r17  =  `REG_HIER.mem[17];
-wire [31:0] r18  =  `REG_HIER.mem[18];
-wire [31:0] r19  =  `REG_HIER.mem[19];
-wire [31:0] r20  =  `REG_HIER.mem[20];
-wire [31:0] r21  =  `REG_HIER.mem[21];
-wire [31:0] r22  =  `REG_HIER.mem[22];
-wire [31:0] r23  =  `REG_HIER.mem[23];
-wire [31:0] r24  =  `REG_HIER.mem[24];
-wire [31:0] r25  =  `REG_HIER.mem[25];
-wire [31:0] r26  =  `REG_HIER.mem[26];
-wire [31:0] r27  =  `REG_HIER.mem[27];
-wire [31:0] r28  =  `REG_HIER.mem[28];
-wire [31:0] r29  =  `REG_HIER.mem[29];
-wire [31:0] r30  =  `REG_HIER.mem[30];
-wire [31:0] r31  =  `REG_HIER.mem[31];
-wire [31:0] r32  =  `REG_HIER.mem[32];
-wire [31:0] r33  =  `REG_HIER.mem[33];
-wire [31:0] r34  =  `REG_HIER.mem[34];
-wire [31:0] r35  =  `REG_HIER.mem[35];
-wire [31:0] r36  =  `REG_HIER.mem[36];
-wire [31:0] r37  =  `REG_HIER.mem[37];
-wire [31:0] r38  =  `REG_HIER.mem[38];
-wire [31:0] r39  =  `REG_HIER.mem[39];
+initial begin
+  #100;
+  wait(uart_done);
+  //repeat(1000)  @(posedge clk_16);
+  repeat(10)  @(posedge clk_baud_19200);
+  $display("Simulation OK");
+  $finish;
+end
 
-eth_phy eth_phy
-(
-  // WISHBONE reset
-  .m_rst_n_i(!wb_rst),
-
-  // MAC TX
-  .mtx_clk_o(mtx_clk),    .mtxd_i(MTxD),    .mtxen_i(MTxEn),    .mtxerr_i(MTxErr),
-
-  // MAC RX
-  .mrx_clk_o(mrx_clk),    .mrxd_o(MRxD),    .mrxdv_o(MRxDV),    .mrxerr_o(MRxErr),
-  .mcoll_o(MColl),        .mcrs_o(MCrs),
-
-  // MIIM
-  .mdc_i(Mdc_O),          .md_io(Mdio_IO),
-
-  // SYSTEM
-  .phy_log(phy_log_file_desc)
-);
-
+always @(posedge UART_SR_DAV_0) begin
+  $display("Transmitted UART Data = %h", UART_SR_0);
+end
 endmodule //zap_test

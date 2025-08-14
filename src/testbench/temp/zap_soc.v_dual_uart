@@ -33,19 +33,12 @@ parameter ONLY_CORE                     = 0
         input wire          SYS_CLK,
         input wire          SYS_RST,
 
-`ifdef SYNTHESIS
-        output wire         led_0,
-        output wire         led_1,
-        output wire         led_2,
-        output wire         led_3,
-`endif
-
         // UART 0
         input  wire         UART0_RXD,
         output wire         UART0_TXD
 
 `ifdef DUAL_UART
-        ,
+        '
         // UART 1
         input  wire         UART1_RXD,
         output wire         UART1_TXD
@@ -55,36 +48,24 @@ parameter ONLY_CORE                     = 0
         //input wire          int_sel
 );
 
-wire int_sel;
 assign int_sel = 'b 1;
 
-`ifdef SYNTHESIS
-   reg [23:0] count = 0;
-    assign led_0 = count[23];
-    assign led_1 = count[22];
-    assign led_2 = count[21];
-    assign led_3 = count[20];
-    always @(posedge SYS_CLK) count <= count + 1;
-`endif
-
 // Peripheral addresses.
-`ifdef DUAL_UART
 localparam TIMER1_LO                    = 32'hFFFFFF60;
 localparam TIMER1_HI                    = 32'hFFFFFF7F;
 localparam UART1_LO                     = 32'hFFFFFF80;
 localparam UART1_HI                     = 32'hFFFFFF9F;
-`else
+localparam VIC_LO                       = 32'hFFFFFFA0;
+localparam VIC_HI                       = 32'hFFFFFFBF;
 localparam TIMER0_LO                    = 32'hFFFFFFC0;
 localparam TIMER0_HI                    = 32'hFFFFFFDF;
 localparam UART0_LO                     = 32'hFFFFFFE0;
 localparam UART0_HI                     = 32'hFFFFFFFF;
-`endif
-localparam VIC_LO                       = 32'hFFFFFFA0;
-localparam VIC_HI                       = 32'hFFFFFFBF;
 
 // Internal signals.
 wire            i_clk    = SYS_CLK;
 wire            i_reset  = SYS_RST;
+
 
 `ifdef DUAL_UART
 wire [1:0]      uart_in;
@@ -102,43 +83,24 @@ wire            data_wb_cyc;
 wire            data_wb_stb;
 reg [31:0]      data_wb_din;
 reg             data_wb_ack;
-
-`ifdef DUAL_UART
 reg             data_wb_cyc_ram, data_wb_cyc_uart [1:0], data_wb_cyc_timer [1:0], data_wb_cyc_vic;
 reg             data_wb_stb_ram, data_wb_stb_uart [1:0], data_wb_stb_timer [1:0], data_wb_stb_vic;
 wire [31:0]     data_wb_din_ram, data_wb_din_uart [1:0], data_wb_din_timer [1:0], data_wb_din_vic;
 wire            data_wb_ack_ram, data_wb_ack_uart [1:0], data_wb_ack_timer [1:0], data_wb_ack_vic;
-`else
-reg             data_wb_cyc_ram, data_wb_cyc_uart [0:0], data_wb_cyc_timer [0:0], data_wb_cyc_vic;
-reg             data_wb_stb_ram, data_wb_stb_uart [0:0], data_wb_stb_timer [0:0], data_wb_stb_vic;
-wire [31:0]     data_wb_din_ram, data_wb_din_uart [0:0], data_wb_din_timer [0:0], data_wb_din_vic;
-wire            data_wb_ack_ram, data_wb_ack_uart [0:0], data_wb_ack_timer [0:0], data_wb_ack_vic;
-`endif
-
 wire [3:0]      data_wb_sel;
 wire            data_wb_we;
 wire [31:0]     data_wb_dout;
 wire [31:0]     data_wb_adr;
 wire [2:0]      data_wb_cti; // Cycle Type Indicator.
 wire            global_irq;
-
-`ifdef DUAL_UART
 wire [1:0]      uart_irq;
 wire [1:0]      timer_irq;
-`else
-wire [0:0]      uart_irq;
-wire [0:0]      timer_irq;
-`endif
 
 // Wishbone fabric.
 always @* begin:blk1
   integer ii;
 
-`ifdef DUAL_UART
   for(ii=0;ii<=1;ii=ii+1) begin
-`else
-  for(ii=0;ii<1;ii=ii+1) begin
-`endif
     data_wb_cyc_uart [ii]  = 0;
     data_wb_stb_uart [ii]  = 0;
     data_wb_cyc_timer[ii] = 0;
@@ -169,7 +131,6 @@ always @* begin:blk1
     data_wb_ack       = data_wb_ack_vic;
     data_wb_din       = data_wb_din_vic;
   end
-`ifdef DUAL_UART
   else if(data_wb_adr >= UART1_LO && data_wb_adr <= UART1_HI) begin    // UART1 access
     data_wb_cyc_uart[1] = data_wb_cyc;
     data_wb_stb_uart[1] = data_wb_stb;
@@ -182,7 +143,6 @@ always @* begin:blk1
     data_wb_ack          = data_wb_ack_timer[1];
     data_wb_din          = data_wb_din_timer[1];
   end
-`endif
   else begin // External RAM access.
     data_wb_cyc_ram  = data_wb_cyc;
     data_wb_stb_ram  = data_wb_stb;
@@ -228,13 +188,11 @@ u_zap_top
         .i_wb_ack (data_wb_ack),
         .i_wb_err (1'd0),
         .o_wb_sel (data_wb_sel),
-        .o_wb_bte ()             // Always zero (Linear)
-`ifndef SYNTHESIS
-        ,
+        .o_wb_bte (),             // Always zero (Linear)
         .o_trace(),
         .o_trace_valid(),
         .o_trace_uop_last()
-`endif
+
 );
 
 // ===============================
@@ -308,25 +266,21 @@ vic #(.SOURCES(32)) u_vic (
         .i_wb_sel(data_wb_sel),
         .o_wb_dat(data_wb_din_vic), // To core.
         .o_wb_ack(data_wb_ack_vic),
-`ifdef DUAL_UART
         .i_irq({28'h 0, timer_irq[1], uart_irq[1], timer_irq[0], uart_irq[0]}), // Concatenate 32 interrupt sources.
-`else
-        .i_irq({30'h 0, timer_irq[0], uart_irq[0]}), // Concatenate 32 interrupt sources.
-`endif
         .o_irq(global_irq)                                                     // Interrupt out
 );
 
 ram_wb
       #
         (
-          .adr_width(11),
+          .adr_width(16),
           .dat_width(32),
-          .mem_size(2048)
+          .mem_size(65536)
         )
       ram_wb (
               .clk_i(i_clk),
               .rst_i(i_reset),
-              .adr_i(data_wb_adr[10:0]),
+              .adr_i(data_wb_adr[15:0]),
               .dat_i(data_wb_dout),
               .we_i(data_wb_we),
               .sel_i(data_wb_sel),

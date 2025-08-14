@@ -1,0 +1,22 @@
+#!/bin/csh -f
+/usr/bin/verilator --trace --binary --timing --exe --build -Wno-CASEX -Wno-ASCRANGE -Wno-WIDTHTRUNC -Wno-TIMESCALEMOD -Wno-WIDTHEXPAND -Wno-CASEINCOMPLETE -Wno-CASEOVERLAP -j $(nproc) -f file_list --top-module zap_test
+
+\rm -rf obj_dir zap.vcd; verilator --trace --binary --timing --exe --build -Wno-CASEX -Wno-ASCRANGE -Wno-WIDTHTRUNC -Wno-TIMESCALEMOD -Wno-WIDTHEXPAND -Wno-CASEINCOMPLETE -Wno-CASEOVERLAP -Wno-CMPCONST -j $(nproc) -f file_list --top-module zap_test
+
+#Run this command
+\rm -rf obj_dir zap.vcd; verilator --trace --binary --timing --exe --build -Wno-CMPCONST -Wno-WIDTHEXPAND -j $(nproc) -f file_list --top-module zap_test
+
+/*
+  ** These two warnings can be ignored as one is coming from zap_test which is NOT used in synthesis and and other has dependency on shamt(shift amount **
+   ** Theother warnings related to WIDTHEXPAND from zap_decompile.sv can be ignored as this module is NOT used in synthesis **
+  %Warning-WIDTHEXPAND: ../rtl/zap_cache_tag_ram.sv:505:37: Operator SHIFTR expects 128 bits on the LHS, but LHS's VARREF 'Dirty' generates 16 bits.  : ... note: In instance 'zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_cache_tag_ram'
+  505 |         {unused1,dirty_new} = Dirty >> shamt;
+      |                                     ^~
+%Warning-WIDTHEXPAND: zap_test.v:78:74: Operator ADD expects 32 bits on the RHS, but RHS's VARREF 'uart_ctr' generates 7 bits.
+                                      : ... note: In instance 'zap_test'
+   78 |                 i_uart[0] <= uart_ctr == 0 ? 0 : uart_string[((btrace*8) + uart_ctr - 1)];
+      |                             
+
+
+*/
+
