@@ -1,0 +1,22 @@
+--lib v
+-i ../../../rtl/verilog
+-i ../../../bench/verilog
+-i ../../../bench/verilog/test_cases
+-work work
+-d LOG_DIR="\"../log/uart_test\""
+
+../../../rtl/verilog/uart_top.v
+../../../rtl/verilog/uart_wb.v
+../../../rtl/verilog/uart_transmitter.v
+../../../rtl/verilog/uart_receiver.v
+../../../rtl/verilog/uart_tfifo.v
+../../../rtl/verilog/uart_rfifo.v
+../../../rtl/verilog/uart_regs.v
+../../../rtl/verilog/uart_debug_if.v
+../../../rtl/verilog/raminfr.v
+../../../rtl/verilog/uart_sync_flops.v
+
+../../../bench/verilog/uart_testbench_defines.v
+../../../bench/verilog/uart_testbench.v
+../../../bench/verilog/wb_master_model.v
+../../../bench/verilog/uart_device.v

@@ -1,0 +1,20 @@
+../../../rtl/verilog/uart_top.v
+../../../rtl/verilog/uart_wb.v
+../../../rtl/verilog/uart_transmitter.v
+../../../rtl/verilog/uart_receiver.v
+../../../rtl/verilog/uart_tfifo.v
+../../../rtl/verilog/uart_rfifo.v
+../../../rtl/verilog/uart_regs.v
+../../../rtl/verilog/uart_debug_if.v
+//////////////////////////////////////////////////
+// File created within script ./run_sim.scr
+//     path: /home/vedulas/solar_femtoTX/src/ips/test/uart16550/sim/rtl_sim/run
+//     user: vedulas
+//////////////////////////////////////////////////
+../../../bench/verilog/testcases/uart_test.v
+../../../bench/verilog/uart_testbench.v
+../../../bench/verilog/wb_master_model.v
+../../../bench/verilog/uart_device.v
+../../../bench/verilog/uart_testbench_utilities.v
+../../../bench/verilog/uart_wb_utilities.v
+../../../bench/verilog/uart_device_utilities.v
