@@ -1,22 +1,30 @@
-module ram (dat_i, dat_o, adr_i, we_i, clk );
 
-   parameter dat_width = 32;
-   parameter adr_width = 11;
-   parameter mem_size  = 2048;
-   
-   input [dat_width-1:0]      dat_i;
-   input [adr_width-1:0]      adr_i;
-   input 		      we_i;
-   output reg [dat_width-1:0] dat_o;
-   input 		      clk;   
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
-   reg [dat_width-1:0] ram [0:mem_size - 1] /* synthesis ram_style = no_rw_check */;
-   
-   always @ (posedge clk)
-     begin 
-	dat_o <= ram[adr_i];
-	if (we_i)
-	  ram[adr_i] <= dat_i;
-     end 
+module ram (clk, dat_i, dat_o, adr_i, we_i );
+  parameter dat_width = 32;
+  parameter adr_width = 16;
+  parameter mem_size  = 65536;
 
+  input [dat_width-1:0]      dat_i;
+  input [adr_width-1:0]      adr_i;
+  input 		      we_i;
+  output wire [dat_width-1:0] dat_o;
+  input 		      clk;   
+
+  reg [dat_width-1:0] ram [0:mem_size - 1]; 
+  
+  initial begin
+    //$readmemh("uart.dump", ram);
+    $readmemh("uart.dump_19200_100MHz", ram);
+  end
+
+  assign dat_o = ram[adr_i >> 2 ];
+  always @ (posedge clk) begin 
+    if (we_i) begin
+      ram[adr_i >> 2] <= dat_i;
+    end
+  end 
 endmodule // ram
