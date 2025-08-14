@@ -15,5 +15,10 @@ Milestone 1 (Recreate ZAP environment with Vivado tools)
 
 Milestone 2(Running a simulation in Soc (with ZAP Core) and implementing in Artix basic communication)
 ------------------------------------------------------------------------------------------------------
-1. src/testbench/README 
-2. src/testbench/syn/README 
+1. Git
+   -- git clone https://github.com/srvedulageth/solar_femtoTx.git
+   -- cd solar_femtoTx/
+   -- git branch //Should show that you are in main branch.
+   -- git checkout solar_femtoTX_ms2 //Checks out solar_femtoTX_ms2
+2. src/testbench/README 
+3. src/testbench/syn/README 
