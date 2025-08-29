@@ -75,7 +75,28 @@ localparam VIC_HI                       = 32'hFFFFFFBF;
 
 // Internal signals.
 wire            i_clk    = SYS_CLK;
-wire            i_reset  = ~SYS_RST;
+//wire            i_reset  = ~SYS_RST;
+
+// Synchronize SYS_RST (active low) into SYS_CLK domain
+(* ASYNC_REG = "TRUE" *) reg rst_meta;
+(* ASYNC_REG = "TRUE" *) reg rst_sync;
+
+// 2-FF synchronizer for reset de-assertion
+always @(posedge SYS_CLK or negedge SYS_RST) begin
+  if (!SYS_RST) begin
+    // Reset asserted (low at input) → drive internal reset high immediately
+    rst_meta <= 1'b1;
+    rst_sync <= 1'b1;
+  end else begin
+    // Deassertion synchronized to SYS_CLK
+    rst_meta <= 1'b0;
+    rst_sync <= rst_meta;
+  end
+end
+
+// Final internal reset, active high
+wire i_reset = rst_sync;
+
 
 `ifdef DUAL_UART
 wire [1:0]      uart_in;

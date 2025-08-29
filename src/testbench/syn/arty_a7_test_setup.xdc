@@ -1,4 +1,4 @@
-## This file is a general .xdc for the Arty A7-35 Rev. D
+## This file is a general .xdc for the Arty A7-100 Rev. A
 
 ## For default neorv32_test_setup.vhd top entity
 
@@ -28,14 +28,19 @@ set_property -dict { PACKAGE_PIN C2   IOSTANDARD LVCMOS33 } [get_ports { SYS_RST
 set_input_delay -clock [get_clocks SYS_CLK] -add_delay 1.000 [get_ports { SYS_RST } ]
 set_input_delay -clock [get_clocks SYS_CLK] -add_delay 1.000 [get_ports { UART0_RXD } ]
 
-set_output_delay -clock [get_clocks SYS_CLK] -max -add_delay 2.000 [get_ports { UART0_TXD } ]
-set_output_delay -clock [get_clocks SYS_CLK] -min -add_delay -1.000 [get_ports { UART0_TXD } ]
+# Allow up to 20 ns combinational+route from SYS_CLK flops to the pad
+set_max_delay -datapath_only 20.0-from [get_clocks SYS_CLK] -to [get_ports UART0_TXD]
+# Hold can be 0 for outputs (no latch at the receiver), but specify explicitly:
+set_min_delay -datapath_only 0.0 -from [get_clocks SYS_CLK] -to [get_ports UART0_TXD]
 
 set_output_delay -clock [get_clocks SYS_CLK] -max -add_delay 2.000 [get_ports { led_0 } ]
 set_output_delay -clock [get_clocks SYS_CLK] -max -add_delay 2.000 [get_ports { led_1 } ]
 set_output_delay -clock [get_clocks SYS_CLK] -max -add_delay 2.000 [get_ports { led_2 } ]
-set_output_delay -clock [get_clocks SYS_CLK] -max -add_delay 2.000 [get_ports { led_3 } ]
 set_output_delay -clock [get_clocks SYS_CLK] -min -add_delay -1.000 [get_ports { led_0 } ]
 set_output_delay -clock [get_clocks SYS_CLK] -min -add_delay -1.000 [get_ports { led_1 } ]
 set_output_delay -clock [get_clocks SYS_CLK] -min -add_delay -1.000 [get_ports { led_2 } ]
-set_output_delay -clock [get_clocks SYS_CLK] -min -add_delay -1.000 [get_ports { led_3 } ]
+
+group_path -name LED_DEBUG -to [get_ports led_3]
+set_false_path -to [get_ports led_3]
+#set_output_delay -clock [get_clocks SYS_CLK] -min -add_delay -1.000 [get_ports { led_3 } ]
+#set_output_delay -clock [get_clocks SYS_CLK] -max -add_delay 1000000.000 [get_ports { led_3 } ]
