@@ -13,5 +13,5 @@
       
    -- gtkterm &; configure (19200 baud, 8bit, 1 stop bit, no parity and no flow control, USB1 port)
       << what ever key you type gets printed on the terminal and also 4th led toggles
-   --
+   -- To remove synthesis generated not needed file etc: \rm -rf work/ *.rpt *.dcp vivado* clockInfo.txt tight_setup_hold_pins.txt .Xil
 3.

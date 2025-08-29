@@ -3,5 +3,7 @@ After installing Vivado and Veriletor
 run the following command
 
 \rm -rf obj_dir zap.vcd; verilator --trace --binary --timing --exe --build -Wno-CMPCONST -Wno-WIDTHEXPAND -j $(nproc) -f file_list --top-module zap_test
+./obj_dir/Vzap_test //To run
+vcd2fst zap.vcd zap.fst //To reduce vcd file size
 
 This will run uart test at 192 baud, 1 stop bit, no parity and no flow control.

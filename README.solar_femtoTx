@@ -1,3 +1,5 @@
+Milestone 1 (Recreate ZAP environment with Vivado tools)
+--------------------------------------------------------
 1. Installing and Santity Checking
    a. Install Vivado (You may need to add Vivado path to .bashrc i.e. put "source /tools/Xilinx/Vivado/2024.2/settings64.sh" in 
       .bashrc)
@@ -11,3 +13,12 @@
    b. Change in src/tc/<testcase>/<testcase.s> and <testcase.h>
 3. Instantiated EthMac from https://github.com/freecores/ethmac.git
 
+Milestone 2(Running a simulation in Soc (with ZAP Core) and implementing in Artix basic communication)
+------------------------------------------------------------------------------------------------------
+1. Git
+   -- git clone https://github.com/srvedulageth/solar_femtoTx.git
+   -- cd solar_femtoTx/
+   -- git branch //Should show that you are in main branch.
+   -- git checkout solar_femtoTX_ms2 //Checks out solar_femtoTX_ms2
+2. src/testbench/README 
+3. src/testbench/syn/README 
