@@ -69,7 +69,9 @@
 //
 
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_rxaddrcheck(MRxClk,  Reset, RxData, Broadcast ,r_Bro ,r_Pro,

@@ -71,7 +71,9 @@
 //
 //
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_register(DataIn, DataOut, Write, Clk, Reset, SyncReset);

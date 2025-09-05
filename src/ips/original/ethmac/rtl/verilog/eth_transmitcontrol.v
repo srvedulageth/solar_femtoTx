@@ -79,7 +79,9 @@
 //
 
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_transmitcontrol (MTxClk, TxReset, TxUsedDataIn, TxUsedDataOut, TxDoneIn, TxAbortIn, 

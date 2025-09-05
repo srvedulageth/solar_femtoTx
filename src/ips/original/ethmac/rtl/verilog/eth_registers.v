@@ -163,7 +163,9 @@
 //
 
 `include "ethmac_defines.v"
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_registers( DataIn, Address, Rw, Cs, Clk, Reset, DataOut, 

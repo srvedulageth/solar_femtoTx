@@ -74,7 +74,9 @@
 //
 
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_receivecontrol (MTxClk, MRxClk, TxReset, RxReset, RxData, RxValid, RxStartFrm, 

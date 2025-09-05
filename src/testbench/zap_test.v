@@ -66,6 +66,31 @@ wire            UART_SR_DAV_1;
 wire    [7:0]   UART_SR_1;
 `endif
 
+//EthMAC
+//Tx
+wire              mtx_clk_pad_i; // Transmit clock (from PHY)
+wire [3:0]        mtxd_pad_o;    // Transmit nibble (to PHY)
+wire              mtxen_pad_o;   // Transmit enable (to PHY)
+wire              mtxerr_pad_o;  // Transmit error (to PHY)
+
+//Rx
+wire              mrx_clk_pad_i; // Receive clock (from PHY)
+wire [3:0]        mrxd_pad_i;    // Receive nibble (from PHY)
+wire              mrxdv_pad_i;   // Receive data valid (from PHY)
+wire              mrxerr_pad_i;  // Receive data error (from PHY)
+
+//Common Tx and Rx
+wire              mcoll_pad_i;   // Collision (from PHY)
+wire              mcrs_pad_i;    // Carrier sense (from PHY)
+
+//Phy Reference Clock and Reset ...
+wire              eth_ref_clk;
+wire              eth_rstn;
+
+// MIIM MII Management interface
+wire              mdc_pad_o;     // MII Management data clock (to PHY)
+wire              mdio_pad_io;
+
 // Divided clocks.
 reg clk_2 = 1'd0, clk_4 = 1'd0, clk_8 = 1'd0, clk_16 = 1'd0;
 
@@ -155,6 +180,31 @@ zap_soc #(
         // Clk and rst
         .SYS_CLK  (i_clk),
         .SYS_RST  (i_reset),
+
+        //EthMAC
+        //TX
+        .mtx_clk_pad_i(mtx_clk_pad_i),
+        .mtxd_pad_o(mtxd_pad_o),
+        .mtxen_pad_o(mtxen_pad_o),
+        .mtxerr_pad_o(mtxerr_pad_o),
+
+        //RX
+        .mrx_clk_pad_i(mrx_clk_pad_i),
+        .mrxd_pad_i(mrxd_pad_i),
+        .mrxdv_pad_i(mrxdv_pad_i),
+        .mrxerr_pad_i(mrxerr_pad_i),
+
+        //Common Tx and Rx
+        .mcoll_pad_i(mcoll_pad_i),
+        .mcrs_pad_i(mcrs_pad_i),
+  
+        //Phy Reference Clock and Reset ...
+        .eth_ref_clk(eth_ref_clk),
+        .eth_rstn(eth_rstn),
+
+        // MIIM
+        .mdc_pad_o(mdc_pad_o),
+        .mdio_pad_io(mdio_pad_io),
 
         // UART 0
         .UART0_RXD(i_uart[0]),

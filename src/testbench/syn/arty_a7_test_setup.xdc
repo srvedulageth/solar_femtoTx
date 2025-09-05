@@ -22,6 +22,30 @@ set_property -dict { PACKAGE_PIN T10   IOSTANDARD LVCMOS33 } [get_ports { led_3 
 set_property -dict { PACKAGE_PIN A9   IOSTANDARD LVCMOS33 } [get_ports { UART0_RXD }]; #IO_L14N_T2_SRCC_16 Sch=uart_txd_in
 set_property -dict { PACKAGE_PIN D10  IOSTANDARD LVCMOS33 } [get_ports { UART0_TXD }]; #IO_L19N_T3_VREF_16 Sch=uart_rxd_out
 
+## SMSC Ethernet PHY
+set_property -dict { PACKAGE_PIN D17   IOSTANDARD LVCMOS33 } [get_ports { mcoll_pad_i }]; #IO_L16N_T2_A27_15 Sch=eth_col
+set_property -dict { PACKAGE_PIN G14   IOSTANDARD LVCMOS33 } [get_ports { mcrs_pad_i }]; #IO_L15N_T2_DQS_ADV_B_15 Sch=eth_crs
+set_property -dict { PACKAGE_PIN F16   IOSTANDARD LVCMOS33 } [get_ports { mdc_pad_o }]; #IO_L14N_T2_SRCC_15 Sch=eth_mdc
+set_property -dict { PACKAGE_PIN K13   IOSTANDARD LVCMOS33 } [get_ports { mdio_pad_io }]; #IO_L17P_T2_A26_15 Sch=eth_mdio
+
+set_property -dict { PACKAGE_PIN G18   IOSTANDARD LVCMOS33 } [get_ports { eth_ref_clk }]; #IO_L22P_T3_A17_15 Sch=eth_ref_clk
+set_property -dict { PACKAGE_PIN C16   IOSTANDARD LVCMOS33 } [get_ports { eth_rstn }]; #IO_L20P_T3_A20_15 Sch=eth_rstn
+
+set_property -dict { PACKAGE_PIN F15   IOSTANDARD LVCMOS33 } [get_ports { mrx_clk_pad_i }]; #IO_L14P_T2_SRCC_15 Sch=eth_rx_clk
+set_property -dict { PACKAGE_PIN G16   IOSTANDARD LVCMOS33 } [get_ports { mrxdv_pad_i }]; #IO_L13N_T2_MRCC_15 Sch=eth_rx_dv
+set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { mrxd_pad_i[0] }]; #IO_L21N_T3_DQS_A18_15 Sch=eth_rxd[0]
+set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { mrxd_pad_i[1] }]; #IO_L16P_T2_A28_15 Sch=eth_rxd[1]
+set_property -dict { PACKAGE_PIN E18   IOSTANDARD LVCMOS33 } [get_ports { mrxd_pad_i[2] }]; #IO_L21P_T3_DQS_15 Sch=eth_rxd[2]
+set_property -dict { PACKAGE_PIN G17   IOSTANDARD LVCMOS33 } [get_ports { mrxd_pad_i[3] }]; #IO_L18N_T2_A23_15 Sch=eth_rxd[3]
+set_property -dict { PACKAGE_PIN C17   IOSTANDARD LVCMOS33 } [get_ports { mrxerr_pad_i }]; #IO_L20N_T3_A19_15 Sch=eth_rxerr
+
+set_property -dict { PACKAGE_PIN H16   IOSTANDARD LVCMOS33 } [get_ports { mtx_clk_pad_i }]; #IO_L13P_T2_MRCC_15 Sch=eth_tx_clk
+set_property -dict { PACKAGE_PIN H15   IOSTANDARD LVCMOS33 } [get_ports { mtxen_pad_o }]; #IO_L19N_T3_A21_VREF_15 Sch=eth_tx_en
+set_property -dict { PACKAGE_PIN H14   IOSTANDARD LVCMOS33 } [get_ports { mtxd_pad_o[0] }]; #IO_L15P_T2_DQS_15 Sch=eth_txd[0]
+set_property -dict { PACKAGE_PIN J14   IOSTANDARD LVCMOS33 } [get_ports { mtxd_pad_o[1] }]; #IO_L19P_T3_A22_15 Sch=eth_txd[1]
+set_property -dict { PACKAGE_PIN J13   IOSTANDARD LVCMOS33 } [get_ports { mtxd_pad_o[2] }]; #IO_L17N_T2_A25_15 Sch=eth_txd[2]
+set_property -dict { PACKAGE_PIN H17   IOSTANDARD LVCMOS33 } [get_ports { mtxd_pad_o[3] }]; #IO_L18P_T2_A24_15 Sch=eth_txd[3]
+
 ## Misc.
 set_property -dict { PACKAGE_PIN C2   IOSTANDARD LVCMOS33 } [get_ports { SYS_RST }]; #IO_L16P_T2_35 Sch=ck_rst
 
@@ -29,9 +53,9 @@ set_input_delay -clock [get_clocks SYS_CLK] -add_delay 1.000 [get_ports { SYS_RS
 set_input_delay -clock [get_clocks SYS_CLK] -add_delay 1.000 [get_ports { UART0_RXD } ]
 
 # Allow up to 20 ns combinational+route from SYS_CLK flops to the pad
-set_max_delay -datapath_only 20.0-from [get_clocks SYS_CLK] -to [get_ports UART0_TXD]
+set_max_delay -datapath_only 20.0 -from [get_clocks SYS_CLK] -to [get_ports UART0_TXD]
 # Hold can be 0 for outputs (no latch at the receiver), but specify explicitly:
-set_min_delay -datapath_only 0.0 -from [get_clocks SYS_CLK] -to [get_ports UART0_TXD]
+set_min_delay 0.0 -from [get_clocks SYS_CLK] -to [get_ports UART0_TXD]
 
 set_output_delay -clock [get_clocks SYS_CLK] -max -add_delay 2.000 [get_ports { led_0 } ]
 set_output_delay -clock [get_clocks SYS_CLK] -max -add_delay 2.000 [get_ports { led_1 } ]

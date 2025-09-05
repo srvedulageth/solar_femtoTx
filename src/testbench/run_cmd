@@ -4,7 +4,7 @@
 \rm -rf obj_dir zap.vcd; verilator --trace --binary --timing --exe --build -Wno-CASEX -Wno-ASCRANGE -Wno-WIDTHTRUNC -Wno-TIMESCALEMOD -Wno-WIDTHEXPAND -Wno-CASEINCOMPLETE -Wno-CASEOVERLAP -Wno-CMPCONST -j $(nproc) -f file_list --top-module zap_test
 
 #Run this command
-\rm -rf obj_dir zap.vcd; verilator --trace --binary --timing --exe --build -Wno-CMPCONST -Wno-WIDTHEXPAND -j $(nproc) -f file_list --top-module zap_test
+\rm -rf obj_dir zap.vcd; verilator --trace-fst --binary --timing --exe --build -Wno-CMPCONST -Wno-WIDTHEXPAND -j $(nproc) -f file_list --top-module zap_test
 
 /*
   ** These two warnings can be ignored as one is coming from zap_test which is NOT used in synthesis and and other has dependency on shamt(shift amount **

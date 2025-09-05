@@ -57,7 +57,9 @@
 //
 
 `include "ethmac_defines.v"
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 module eth_fifo (data_in, data_out, clk, reset, write, read, clear,
                  almost_full, full, almost_empty, empty, cnt);

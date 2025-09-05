@@ -110,7 +110,9 @@
 //
 //
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_rxethmac (MRxClk, MRxDV, MRxD, Reset, Transmitting, MaxFL, r_IFG,
