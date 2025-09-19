@@ -40,8 +40,13 @@
 ../rtl/zap_top.sv
 
 //WB Ram
-../ips/ram_wb/trunk/rtl/verilog/ram_wb.v
-../ips/ram_wb/trunk/rtl/verilog/ram_wb_sc_sw.v
+../ips/ram_wb/verilog/ram_wb.v
+../ips/ram_wb/verilog/ram_wb_sc_sw.v
+
+//WB Arbiter ...
+./wb_arb2.v
+
+//WB Arbiter ...
 
 //WB UART
 ../ips/test/uart16550/rtl/verilog/raminfr.v
@@ -87,6 +92,7 @@
 ./vic.v
 ./uart_tx_dumper.v
 
+../ips/original/ethmac/bench/verilog/eth_phy.v
 ./zap_soc.v
 
 ./zap_test.v

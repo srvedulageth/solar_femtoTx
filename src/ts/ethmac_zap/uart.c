@@ -20,6 +20,10 @@
 
 #include "uart.h"
 
+void eth_demo_init(void);
+void eth_demo_poll(void);
+void eth_irq_handler(void);
+
 void irq_handler ()
 {
        // Wait for space to be available.
@@ -27,6 +31,8 @@ void irq_handler ()
 
        // Write character
        UARTWriteByte ( UARTGetChar() );
+
+       eth_irq_handler();
 
        // Clear interrupt pending register in VIC.
        *VIC_INT_CLEAR = 0xffffffff;
@@ -37,6 +43,9 @@ int main(void)
         // Just bringup the UART TX and RX - enable interrupts and exit.
         UARTInit();
         UARTEnableRXInterrupt();
+
+        eth_demo_init();
+
         return 0;
 }
 

@@ -221,24 +221,6 @@ zap_soc #(
         //.int_sel  ('b 1)
 );
 
-eth_phy eth_phy (
-  // WISHBONE reset
-  .m_rst_n_i(!i_reset),
-
-  // MAC TX
-  .mtx_clk_o(mtx_clk_pad_i),    .mtxd_i(mtxd_pad_o),    .mtxen_i(mtxen_pad_o),    .mtxerr_i(mtxerr_pad_o),
-
-  // MAC RX
-  .mrx_clk_o(mrx_clk_pad_i),    .mrxd_o(mrxd_pad_i),    .mrxdv_o(mrxdv_pad_i),    .mrxerr_o(mrxdv_pad_i),
-  .mcoll_o(mcoll_pad_i),        .mcrs_o(mcrs_pad_i),
-
-  // MIIM
-  .mdc_i(mdc_pad_o),          .md_io(mdio_pad_io),
-
-  // SYSTEM
-  //.phy_log(phy_log_file_desc)
-  .phy_log() //Not connected
-);
 initial begin
   $dumpfile("zap.vcd");
   $dumpvars(0);

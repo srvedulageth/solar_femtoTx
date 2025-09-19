@@ -58,7 +58,7 @@ parameter ONLY_CORE                     = 0
         input               mcrs_pad_i,    // Carrier sense (from PHY)
 
         //Phy Reference Clock and Reset ...
-        output              eth_ref_clk,
+        output wire         eth_ref_clk,
         output wire         eth_rstn,
 
         // MIIM MII Management interface
@@ -103,6 +103,9 @@ localparam VIC_LO                       = 32'hFFFFFFA0;
 localparam VIC_HI                       = 32'hFFFFFFBF;
 localparam ETHMAC_LO                    = 32'hFFFFE000; //Internal Slave Ram of EthMAC total 2K bytes
 localparam ETHMAC_HI                    = 32'hFFFFEFFF;
+
+localparam ETHMAC_BUF_RAM_LO            = 32'h0A000000;
+localparam ETHMAC_BUF_RAM_HI            = 32'h0A001FFF; //Total 8K, accessed both by processor and ethmac...
 
 // Internal signals.
 wire            i_clk    = SYS_CLK;
@@ -169,11 +172,10 @@ reg             data_wb_stb_uart [0:0], data_wb_stb_timer [0:0];
 wire [31:0]     data_wb_din_uart [0:0], data_wb_din_timer [0:0];
 wire            data_wb_ack_uart [0:0], data_wb_ack_timer [0:0];
 `endif
-reg             data_wb_cyc_ram, data_wb_cyc_vic, data_wb_cyc_ethmac;
-reg             data_wb_stb_ram, data_wb_stb_vic, data_wb_stb_ethmac;
-wire [31:0]     data_wb_din_ram, data_wb_din_vic, data_wb_din_ethmac;
-wire            data_wb_ack_ram, data_wb_ack_vic, data_wb_ack_ethmac;
-assign          data_wb_ack_ram = ethmac_m_wb_cyc_o ? 1'b 0 : ram_ack_o;
+reg             data_wb_cyc_ram, data_wb_cyc_vic, data_wb_cyc_ethmac, data_wb_cyc_ethmac_ram;
+reg             data_wb_stb_ram, data_wb_stb_vic, data_wb_stb_ethmac, data_wb_stb_ethmac_ram;
+wire [31:0]     data_wb_din_ram, data_wb_din_vic, data_wb_din_ethmac, data_wb_din_ethmac_ram;
+wire            data_wb_ack_ram, data_wb_ack_vic, data_wb_ack_ethmac, data_wb_ack_ethmac_ram;
 
 wire [3:0]      data_wb_sel;
 wire            data_wb_we;
@@ -190,9 +192,6 @@ wire [0:0]      uart_irq;
 wire [0:0]      timer_irq;
 `endif
 wire            ethmac_irq;
-
-assign ethmac_m_wb_dat_i = data_wb_din_ram;
-assign ethmac_m_wb_ack_i = ethmac_m_wb_cyc_o ? ram_ack_o : 1'b 0;
 
 // Wishbone fabric.
 always @* begin:blk1
@@ -217,6 +216,9 @@ always @* begin:blk1
 
   data_wb_cyc_ethmac = 0;
   data_wb_stb_ethmac = 0;
+
+  data_wb_cyc_ethmac_ram = 0;
+  data_wb_stb_ethmac_ram = 0;
 
   if(data_wb_adr >= UART0_LO && data_wb_adr <= UART0_HI) begin        // UART0 access
     data_wb_cyc_uart[0] = data_wb_cyc;
@@ -250,11 +252,17 @@ always @* begin:blk1
     data_wb_din          = data_wb_din_timer[1];
   end
 `endif
-  else if(data_wb_adr >= ETHMAC_LO && data_wb_adr <= ETHMAC_HI) begin  // EthMAC 0
+  else if(data_wb_adr >= ETHMAC_LO && data_wb_adr <= ETHMAC_HI) begin  // EthMAC 0 Slave Address Space ...
     data_wb_cyc_ethmac = data_wb_cyc;
     data_wb_stb_ethmac = data_wb_stb;
     data_wb_ack        = data_wb_ack_ethmac;
     data_wb_din        = data_wb_din_ethmac;
+  end
+  else if(data_wb_adr >= ETHMAC_BUF_RAM_LO && data_wb_adr <= ETHMAC_BUF_RAM_HI) begin  // EthMAC 0 Master Address Space ...
+    data_wb_cyc_ethmac_ram = data_wb_cyc;
+    data_wb_stb_ethmac_ram = data_wb_stb;
+    data_wb_ack        = data_wb_ack_ethmac_ram;
+    data_wb_din        = data_wb_din_ethmac_ram;
   end
   else begin // External RAM access.
     data_wb_cyc_ram  = data_wb_cyc;
@@ -463,28 +471,102 @@ ethmac ethmac(
 // RAM
 // ===============================
 
-wire [13:0] ram_adr_i = ethmac_m_wb_cyc_o ? ethmac_m_wb_adr_o[13:0] : data_wb_adr[13:0];
-
+//Processor RAM ...
 ram_wb
       #
         (
-          .adr_width(14),
+          .adr_width(13),
           .dat_width(32),
-          .mem_size(16384)
+          .mem_size(8192),
+          .MEMFILE("ethmac_zap.dump")
         )
       ram_wb (
               .clk_i(i_clk),
               .rst_i(i_reset),
-              .adr_i(ram_adr_i),
-              .dat_i(ethmac_m_wb_cyc_o ? ethmac_m_wb_dat_o : data_wb_dout),
-              .we_i(ethmac_m_wb_cyc_o ? ethmac_m_wb_we_o : data_wb_we),
-              .sel_i(ethmac_m_wb_cyc_o ? ethmac_m_wb_sel_o : data_wb_sel),
+              .adr_i(data_wb_adr[12:0]),
+              .dat_i(data_wb_dout),
+              .we_i(data_wb_we),
+              .sel_i(data_wb_sel),
               .dat_o(data_wb_din_ram),
-              .cyc_i(ethmac_m_wb_cyc_o ? 1'b 1 : data_wb_cyc_ram),
-              .stb_i(ethmac_m_wb_cyc_o ? ethmac_m_wb_stb_o : data_wb_stb_ram),
-              .ack_o(ram_ack_o),
+              .cyc_i(data_wb_cyc_ram),
+              .stb_i(data_wb_stb_ram),
+              .ack_o(data_wb_ack_ram),
               .cti_i(3'b 000)
             );
+
+//EthMAC TX/RX/BDS RAM ...
+wire [12:0] ethmac_ram_adr;
+wire [31:0] ethmac_ram_dat_i;
+wire [31:0] ethmac_ram_dat_o;
+wire ethmac_ram_we;
+wire ethmac_ram_sel;
+wire ethmac_ram_cyc;
+wire ethmac_ram_stb;
+wire ethmac_ram_ack;
+
+ram_wb
+      #
+        (
+          .adr_width(13),
+          .dat_width(32),
+          .mem_size(8192)
+        )
+      ram_wb_ethmac (
+              .clk_i(i_clk),
+              .rst_i(i_reset),
+              .adr_i(ethmac_ram_adr),
+              .dat_i(ethmac_ram_dat_i),
+              .we_i(ethmac_ram_we),
+              .sel_i(ethmac_ram_sel),
+              .dat_o(ethmac_ram_dat_o),
+              .cyc_i(ethmac_ram_cyc),
+              .stb_i(ethmac_ram_stb),
+              .ack_o(ethmac_ram_ack),
+              .cti_i(3'b 000)
+            );
+
+//Wishbone Arbiter ...
+wb_arb2 #(
+  .ADR_WIDTH(13),
+  .DAT_WIDTH(32),
+  .PARK_ON_M0(1)      // park on CPU
+) u_arb (
+  .clk     (i_clk),
+  .rst     (i_reset),
+
+  // M0: CPU
+  .m0_adr_i(data_wb_adr[12:0]),
+  .m0_dat_i(data_wb_dout),
+  .m0_dat_o(data_wb_din_ethmac_ram),
+  .m0_we_i (data_wb_we),
+  .m0_sel_i(data_wb_sel),
+  .m0_cyc_i(data_wb_cyc_ethmac_ram),
+  .m0_stb_i(data_wb_stb_ethmac_ram),
+  .m0_cti_i(3'b 000),
+  .m0_ack_o(data_wb_ack_ethmac_ram),
+
+  // M1: EthMAC master
+  .m1_adr_i(ethmac_m_wb_adr_o[12:0]),
+  .m1_dat_i(ethmac_m_wb_dat_o),
+  .m1_dat_o(ethmac_m_wb_dat_i),
+  .m1_we_i (ethmac_m_wb_we_o),
+  .m1_sel_i(ethmac_m_wb_sel_o),
+  .m1_cyc_i(ethmac_m_wb_cyc_o),
+  .m1_stb_i(ethmac_m_wb_stb_o),
+  .m1_cti_i(3'b 000),
+  .m1_ack_o(ethmac_m_wb_ack_i),
+
+  // Slave: 8K RAM
+  .s_adr_o (ethmac_ram_adr[12:0]),
+  .s_dat_o (ethmac_ram_dat_i),
+  .s_dat_i (ethmac_ram_dat_o),
+  .s_we_o  (ethmac_ram_we),
+  .s_sel_o (ethmac_ram_sel),
+  .s_cyc_o (ethmac_ram_cyc),
+  .s_stb_o (ethmac_ram_stb),
+  .s_cti_o (), //NOT USED
+  .s_ack_i (ethmac_ram_ack)
+);
 
 `ifdef SYNTHESIS
    reg [23:0] count = 0;

@@ -78,8 +78,9 @@ add_files -scan_for_includes {
 ../../rtl/zap_wb_merger.sv \
 ../../rtl/zap_writeback.sv \
 ../../rtl/zap_top.sv \
-../../ips/ram_wb/trunk/rtl/verilog/ram_wb.v \
-../../ips/ram_wb/trunk/rtl/verilog/ram_wb_sc_sw.v \
+./wb_arb2.v \
+../../ips/ram_wb/verilog/ram_wb.v \
+../../ips/ram_wb/verilog/ram_wb_sc_sw.v \
 ../../ips/test/uart16550/rtl/verilog/raminfr.v \
 ../../ips/test/uart16550/rtl/verilog/uart_debug_if.v \
 ../../ips/test/uart16550/rtl/verilog/uart_receiver.v \

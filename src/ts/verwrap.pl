@@ -43,14 +43,12 @@ my $BP                          = $Config{'BP_DEPTH'};
 my $FIFO                        = $Config{'INSTR_FIFO_DEPTH'};
 my $REG_HIER                    = "u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file";
 
-my $IVL_OPTIONS  = " -Isrc/rtl ";
-   $IVL_OPTIONS .= "   src/rtl/*.sv ";
+my $IVL_OPTIONS  = " -I/home/vedulas/Xilinx_Test/ZAP/src/rtl ";
+   $IVL_OPTIONS .= "   /home/vedulas/Xilinx_Test/ZAP/src/rtl/*.sv ";
    $IVL_OPTIONS .= " -Iobj/ts/$TEST ";
-   $IVL_OPTIONS .= "   src/ips/uart16550/rtl/verilog/uart.v ";
-   $IVL_OPTIONS .= "   src/ips/uart_tx_dumper/uart_tx_dumper.v ";
-   $IVL_OPTIONS .= "   src/ips/timer/timer.v ";
-   $IVL_OPTIONS .= "   src/ips/vic/vic.v ";
-   $IVL_OPTIONS .= "   src/testbench/*.v ";
+   $IVL_OPTIONS .= " -Isrc/testbench/temp ";
+   $IVL_OPTIONS .= "   src/testbench/temp/uart_org.v ";
+   $IVL_OPTIONS .= "   src/testbench/temp/zap_test_org.v ";
    $IVL_OPTIONS .= " -GBP_ENTRIES=$BP ";
    $IVL_OPTIONS .= " -GFIFO_DEPTH=$FIFO ";
    $IVL_OPTIONS .= " -GDATA_SECTION_TLB_ENTRIES=$DATA_SECTION_TLB_ENTRIES ";
@@ -127,7 +125,7 @@ if ( $HT == 1 )
 }
 
 my $cmd =
-"verilator --timing -O3 $HT -Wno-lint --cc --exe --assert  --build ../../../src/testbench/zap_test.cpp --Mdir obj/ts/$TEST --top zap_test $IVL_OPTIONS --x-assign unique --x-initial unique --error-limit 1 ";
+"verilator --timing -O3 $HT -Wno-lint --cc --exe --assert  --build ../../../src/testbench/temp/zap_test.cpp --Mdir obj/ts/$TEST --top zap_test $IVL_OPTIONS --x-assign unique --x-initial unique --error-limit 1 ";
 
 print "$cmd\n";
 die "Error: Failed to build executable." if system("$cmd");

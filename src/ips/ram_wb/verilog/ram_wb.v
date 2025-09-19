@@ -13,6 +13,8 @@ module ram_wb ( dat_i, dat_o, adr_i, we_i, sel_i, cyc_i, stb_i, ack_o, cti_i, cl
   parameter adr_width = 16;
   parameter dat_width = 32;
   parameter mem_size  = 65536;
+  //parameter string MEMFILE  = "";
+  parameter [1023:0] MEMFILE = "";
 
   // wishbone signals
   input [dat_width-1:0]          dat_i;   
@@ -47,7 +49,8 @@ module ram_wb ( dat_i, dat_o, adr_i, we_i, sel_i, cyc_i, stb_i, ack_o, cti_i, cl
     (
      .adr_width(adr_width),
      .dat_width(dat_width),
-     .mem_size(mem_size)
+     .mem_size(mem_size),
+     .MEMFILE(MEMFILE)
     )
     ram0
     (

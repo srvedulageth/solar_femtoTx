@@ -22,3 +22,19 @@ Milestone 2(Running a simulation in Soc (with ZAP Core) and implementing in Arti
    -- git checkout solar_femtoTX_ms2 //Checks out solar_femtoTX_ms2
 2. src/testbench/README 
 3. src/testbench/syn/README 
+4. Commands to run .c/.s/.h files
+
+\rm -rf obj
+mkdir -p obj/ts/ethmac_zap/
+arm-none-eabi-as -march=armv5te -g   src/ts/ethmac_zap/uart.s   -o obj/ts/ethmac_zap/uart_start.o
+arm-none-eabi-gcc -c -msoft-float -mfloat-abi=soft -march=armv5te -ffreestanding -g -O2 -Isrc/ts/ethmac_zap   src/ts/ethmac_zap/ethmac_zap.c     -o obj/ts/ethmac_zap/ethmac_zap.o
+arm-none-eabi-gcc -c -msoft-float -mfloat-abi=soft -march=armv5te -ffreestanding -g -O2 -Isrc/ts/ethmac_zap   src/ts/ethmac_zap/ethmac_demo.c     -o obj/ts/ethmac_zap/ethmac_demo.o
+arm-none-eabi-gcc -c -msoft-float -mfloat-abi=soft -march=armv5te -ffreestanding -g -O2 -Isrc/ts/ethmac_zap   src/ts/ethmac_zap/ethmac_irq.c     -o obj/ts/ethmac_zap/ethmac_irq.o
+arm-none-eabi-gcc -c -msoft-float -mfloat-abi=soft -march=armv5te -ffreestanding -g -O2 -Isrc/ts/ethmac_zap   src/ts/ethmac_zap/uart_shim.c      -o obj/ts/ethmac_zap/uart_shim.o
+arm-none-eabi-gcc -c -msoft-float -mfloat-abi=soft -march=armv5te -ffreestanding -g -O2 -Isrc/ts/ethmac_zap   src/ts/ethmac_zap/uart.c           -o obj/ts/ethmac_zap/uart.o
+arm-none-eabi-gcc -nostartfiles -nostdlib -Wl,-T,src/ts/common.ld -Wl,--gc-sections   obj/ts/ethmac_zap/uart_start.o   obj/ts/ethmac_zap/ethmac_zap.o   obj/ts/ethmac_zap/ethmac_demo.o   obj/ts/ethmac_zap/ethmac_irq.o   obj/ts/ethmac_zap/uart_shim.o   obj/ts/ethmac_zap/uart.o   -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group   -Wl,-Map,obj/ts/ethmac_zap/ethmac_zap.map   -o obj/ts/ethmac_zap/ethmac_zap.elf
+
+arm-none-eabi-objcopy -O binary obj/ts/ethmac_zap/ethmac_zap.elf obj/ts/ethmac_zap/ethmac_zap.bin
+hexdump -ve '1/4 "%08x\n"' obj/ts/ethmac_zap/ethmac_zap.bin > obj/ts/ethmac_zap/ethmac_zap.dump
+
+5.
