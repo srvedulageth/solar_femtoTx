@@ -99,6 +99,46 @@ static void eth_init_bds(void){
     }
 }
 
+//Same function can be used for both Tx and Rx ...
+static inline void eth_set_bd(unsigned index, uint16_t length, uint16_t flags, uint32_t payload_addr) {
+    volatile uint32_t *bd = (volatile uint32_t *)(ETH_BD_BASE + (index * 8u));
+    uint32_t status = ((uint32_t)length << 16) | (uint32_t)flags;
+
+    bd[1] = (uint32_t)payload_addr;          // payload pointer word (address)
+    bd[0] = status;                          // status/length word
+}
+
+//For Repeat transactions we only need to set ready bit. Hence writing to offset 0.
+void eth_set_bd_addr0(unsigned index, uint16_t length, uint16_t flags, uint32_t payload_addr) {
+    volatile uint32_t *bd = (volatile uint32_t *)(ETH_BD_BASE + (index * 8u));
+    uint32_t status = ((uint32_t)length << 16) | (uint32_t)flags;
+
+    bd[0] = status;                          // status/length word
+}
+
+void eth_rx_init_ring(void) {
+  //TX_BD_NUM
+  //eth_writel(64, ETH_TX_BD_NUM_REG);    // first 0x40(64) BDs TX i.e. remaining 0x40(64) BDs for RX
+
+  //Enable RX
+  //eth_writel((MODER_RXEN | MODER_FULLD | MODER_IFG | MODER_PRO | MODER_BRO), ETH_MODER);
+
+  uint32_t len = eth_readl(ETH_PACKETLEN);
+  uint16_t max_len = (uint16_t)(len & 0xFFFF);
+  uint16_t min_len = (uint16_t)((len >> 16) & 0xFFFF);
+
+  //RX BD ...
+  uint16_t i_length = (min_len - 4); 
+
+  uint16_t flags = 0;
+  flags |= BD_E_R; //E=1 i.e. ready to receive data ...
+  flags |= BD_IRQ; //1= When data is received, an RXF interrupt will be generated ...
+  flags |= BD_WRAP; //1= this BD is the last ...
+
+  //Set Buffer Descriptor
+  (void)eth_set_bd(64, i_length, flags, ETHMAC_RX_BUF_RAM_BASE); //Rx Data Buffer located at BASE + 4K
+}
+
 /* ------------ Public API ------------ */
 int eth_init(const uint8_t mac[6]){
     // Disable MAC
@@ -113,17 +153,24 @@ int eth_init(const uint8_t mac[6]){
     // Program MAC + BDs
     eth_set_mac(mac);
     eth_config_defaults();
-    eth_init_bds();
+    //eth_init_bds();
+
+    eth_rx_init_ring();
+
+    //Unmask Interrupts ...
+    eth_writel((ETH_INT_TXB | ETH_INT_TXE | ETH_INT_RXB | ETH_INT_RXE | ETH_INT_BUSY | ETH_INT_TXC | ETH_INT_RXC), ETH_INT_MASK);
 
     // Duplex from PHY
     uint32_t m = eth_readl(ETH_MODER);
     if (phy_full_duplex()) m |= MODER_FULLD; else m &= ~MODER_FULLD;
-    m |= MODER_RXEN | MODER_TXEN | MODER_PAD | MODER_CRCEN;
+    m |= (MODER_RXEN | MODER_TXEN | MODER_FULLD | MODER_PRO | MODER_BRO | MODER_PAD | MODER_CRCEN);
+    //m |= (MODER_RXEN | MODER_TXEN | MODER_FULLD | MODER_PAD | MODER_CRCEN);
     eth_writel(m, ETH_MODER);
     return 0;
 }
 
 // Enqueue a TX buffer (blocking; picks first free BD)
+/*
 int eth_tx_enqueue(const void* buf, unsigned len){
     dcache_clean_range((void*)buf, len);
 
@@ -138,6 +185,69 @@ int eth_tx_enqueue(const void* buf, unsigned len){
     return -1; // no free TX descriptor
 }
 
+static inline void write_payload_to_bufram32(const uint8_t *src, unsigned len)
+{
+    volatile uint32_t *dst = (volatile uint32_t *)ETHMAC_BUF_RAM_BASE;
+    unsigned i = 0;
+    while (i < len) {
+        uint32_t word = 0;
+        for (int b = 0; b < 4 && i < len; b++, i++)
+            word |= ((uint32_t)src[i]) << (b * 8);
+        *dst++ = word;
+    }
+}
+*/
+
+static inline void write_payload_to_bufram32_be(const uint8_t *src, unsigned len)
+{
+    volatile uint32_t *dst = (volatile uint32_t *)ETHMAC_BUF_RAM_BASE;
+    unsigned i = 0;
+
+    while (i < len) {
+        uint32_t word = 0;
+        for (int b = 0; b < 4 && i < len; b++, i++)
+            word |= ((uint32_t)src[i]) << ((3 - b) * 8);  // <-- reverse order
+        *dst++ = word;
+    }
+}
+
+int eth_tx_enqueue(const void* buf, unsigned buf_len) {
+  //Write Payload data to buffer ram ...
+  write_payload_to_bufram32_be(buf, buf_len);
+
+  //TX_BD_NUM
+  //eth_writel(ETH_TX_BD_NUM, ETH_TX_BD_NUM_REG);    // first N BDs TX
+
+  //Unmask Interrupts ...
+  //eth_writel((ETH_INT_TXB | ETH_INT_TXE | ETH_INT_RXB | ETH_INT_RXE | ETH_INT_BUSY | ETH_INT_TXC | ETH_INT_RXC), ETH_INT_MASK);
+
+  uint32_t len = eth_readl(ETH_PACKETLEN);
+  uint16_t max_len = (uint16_t)(len & 0xFFFF);
+  uint16_t min_len = (uint16_t)((len >> 16) & 0xFFFF);
+
+  //TX BD ...
+  uint16_t i_length = (min_len - 4); 
+  uint16_t flags = 0;
+  flags |= (1u << 15); //rd ready
+  flags |= (1u << 14); //irq en
+  flags |= (1u << 13); //wrap set to 1 => this buffer descriptor is the last ...
+  flags |= (1u << 12); //pad padding en
+  flags |= (1u << 11); //crc append crc
+
+  //Set Buffer Descriptor
+  (void)eth_set_bd(0, i_length, flags, ETHMAC_BUF_RAM_BASE);
+
+  //Set WR bit to 1 in TXBD ...
+  //uint32_t m = eth_readl();
+
+  //uint32_t m = (MODER_RXEN | MODER_TXEN | MODER_PRO | MODER_BRO | MODER_PAD | MODER_FULLD | MODER_CRCEN);
+  //uint32_t m = (MODER_TXEN | MODER_PAD | MODER_FULLD | MODER_CRCEN);
+  //eth_writel(m, ETH_MODER);
+
+  return 0;
+}
+
+/*
 // Poll for one RX frame; copies into out_buf if provided.
 // Return: 1 if a frame delivered, 0 if none, <0 on error.
 int eth_rx_poll(void* out_buf, unsigned* out_len){
@@ -149,9 +259,24 @@ int eth_rx_poll(void* out_buf, unsigned* out_len){
             if (out_len) *out_len = len;
             if (out_buf) memcpy(out_buf, (void*)BD(i)->ptr, len);
             // hand BD back to MAC
-            BD(i)->stat = (st & BD_WRAP) | BD_IRQ | BD_E_R;
+            ;BD(i)->stat = (st & BD_WRAP) | BD_IRQ | BD_E_R;
             return 1;
         }
+    }
+    return 0;
+}
+*/
+
+int eth_rx_poll(unsigned index, void* out_buf, unsigned* out_len){
+    uint32_t st = BD(index)->stat;
+    if ((st & BD_E_R)==0){ // EMPTY==0 → filled by MAC
+        unsigned len = st & BD_LEN_MASK;
+        dcache_inval_range((void*)BD(index)->ptr, len);
+        if (out_len) *out_len = len;
+        if (out_buf) memcpy(out_buf, (void*)BD(index)->ptr, len);
+        // hand BD back to MAC
+        BD(index)->stat = (st & BD_WRAP) | BD_IRQ | BD_E_R;
+        return 1;
     }
     return 0;
 }

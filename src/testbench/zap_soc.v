@@ -152,7 +152,7 @@ wire ram_ack_o;
 
 //EthMAC Wishbone Master
 wire [31:0] ethmac_m_wb_adr_o;
-wire ethmac_m_wb_sel_o;
+wire [3:0] ethmac_m_wb_sel_o;
 wire ethmac_m_wb_we_o;
 wire [31:0] ethmac_m_wb_dat_o;
 wire [31:0] ethmac_m_wb_dat_i;
@@ -499,7 +499,7 @@ wire [12:0] ethmac_ram_adr;
 wire [31:0] ethmac_ram_dat_i;
 wire [31:0] ethmac_ram_dat_o;
 wire ethmac_ram_we;
-wire ethmac_ram_sel;
+wire [3:0] ethmac_ram_sel;
 wire ethmac_ram_cyc;
 wire ethmac_ram_stb;
 wire ethmac_ram_ack;

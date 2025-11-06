@@ -115,6 +115,29 @@ wire            i_clk    = SYS_CLK;
 (* ASYNC_REG = "TRUE" *) reg rst_meta;
 (* ASYNC_REG = "TRUE" *) reg rst_sync;
 
+/*
+(* MARK_DEBUG = "true" *) wire mdc_dbg  = mdc_pad_o;   // EthMAC MDC out
+(* MARK_DEBUG = "true" *) wire mdio_i_dbg = mdio_pad_io; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mdio_o_dbg = md_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mdio_oe_dbg = md_padoe_o; // MDIO bidir
+
+// (optional) keep them from being optimized away
+(* DONT_TOUCH = "true" *) wire mdc_dbg_keep     = mdc_dbg;
+(* DONT_TOUCH = "true" *) wire mdio_i_dbg_keep  = mdio_i_dbg;
+(* DONT_TOUCH = "true" *) wire mdio_o_dbg_keep  = mdio_o_dbg;
+(* DONT_TOUCH = "true" *) wire mdio_oe_dbg_keep = mdio_oe_dbg;
+*/
+
+(* MARK_DEBUG = "true" *) wire mtx_clk_pad_dbg  = mtx_clk_pad_i;   // EthMAC MDC out
+(* MARK_DEBUG = "true" *) wire [3:0] mtxd_pad_dbg = mtxd_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mtxen_pad_dbg = mtxen_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mtxerr_pad_dbg = mtxerr_pad_o; // MDIO bidir
+
+// (optional) keep them from being optimized away
+(* DONT_TOUCH = "true" *) wire mtx_clk_pad_dbg_keep = mtx_clk_pad_dbg;
+(* DONT_TOUCH = "true" *) wire mtxd_pad_dbg_keep    = mtxd_pad_dbg;
+(* DONT_TOUCH = "true" *) wire mtxen_pad_dbg_keep   = mtxen_pad_dbg;
+
 // 2-FF synchronizer for reset de-assertion
 always @(posedge SYS_CLK or negedge SYS_RST) begin
   if (!SYS_RST) begin
@@ -132,6 +155,7 @@ end
 wire i_reset = rst_sync;
 
 //EthPHY Reference clock, 25MHz ...
+wire clk25;
 reg             eth_ref_clk_r1, eth_ref_clk_r2;
 
 always @(posedge SYS_CLK) begin
@@ -143,13 +167,40 @@ always @(posedge SYS_CLK) begin
 end
 
 always @(posedge eth_ref_clk_r1) begin
-  if (SYS_RST) begin
+  if (i_reset) begin
     eth_ref_clk_r2 <= 'b 0;
   end else begin
     eth_ref_clk_r2 <= ~eth_ref_clk_r2;
   end
 end
-assign eth_ref_clk = eth_ref_clk_r2;
+assign clk25 = eth_ref_clk_r2;
+
+// Drive the PHY reference clock pin
+OBUF u_refclk_obuf (
+  .I (clk25),
+  .O (eth_ref_clk)
+);
+
+/*
+wire clk25;
+
+// Divide 100 MHz SYS_CLK by 4 → 25 MHz on a global buffer
+BUFGCE_DIV #(
+  .BUFGCE_DIVIDE(4)
+) u_clkdiv_25 (
+  .I   (SYS_CLK),
+  .CE  (1'b1),
+  .CLR (1'b0),
+  .O   (clk25)
+);
+
+// Drive the PHY REFCLK pin
+OBUF u_refclk_obuf (
+  .I (clk25),
+  .O (eth_ref_clk)
+);
+*/
+
 assign eth_rstn = ~i_reset;
 
 `ifdef DUAL_UART
@@ -499,7 +550,7 @@ ram_wb
           .adr_width(13),
           .dat_width(32),
           .mem_size(8192),
-          .MEMFILE("uart.dump_19200_100MHz")
+          .MEMFILE("ethmac_zap.dump")
         )
       ram_wb (
               .clk_i(i_clk),
@@ -593,9 +644,13 @@ wb_arb2 #(
    reg [23:0] count = 0;
    assign led_0 = count[23];
    assign led_1 = count[22];
-   assign led_2 = count[21];
+   //assign led_2 = count[21];
    //assign led_3 = count[20];
    assign led_3 = ~uart_out[0:0];
    always @(posedge SYS_CLK) count <= count + 1;
+
+   reg [23:0] count_1 = 0;
+   assign led_2 = count_1[23];
+   always @(posedge clk25) count_1 <= count_1 + 1;
 `endif
 endmodule // zap_soc

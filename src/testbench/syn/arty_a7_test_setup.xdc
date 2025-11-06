@@ -28,6 +28,8 @@ set_property -dict { PACKAGE_PIN G14   IOSTANDARD LVCMOS33 } [get_ports { mcrs_p
 set_property -dict { PACKAGE_PIN F16   IOSTANDARD LVCMOS33 } [get_ports { mdc_pad_o }]; #IO_L14N_T2_SRCC_15 Sch=eth_mdc
 set_property -dict { PACKAGE_PIN K13   IOSTANDARD LVCMOS33 } [get_ports { mdio_pad_io }]; #IO_L17P_T2_A26_15 Sch=eth_mdio
 
+# Generated 25 MHz ref clock from SYS_CLK/4
+create_generated_clock -name ETH_REFCLK -source [get_ports SYS_CLK] -divide_by 4 [get_ports eth_ref_clk]
 set_property -dict { PACKAGE_PIN G18   IOSTANDARD LVCMOS33 } [get_ports { eth_ref_clk }]; #IO_L22P_T3_A17_15 Sch=eth_ref_clk
 set_property -dict { PACKAGE_PIN C16   IOSTANDARD LVCMOS33 } [get_ports { eth_rstn }]; #IO_L20P_T3_A20_15 Sch=eth_rstn
 

@@ -32,10 +32,21 @@ void irq_handler ()
        *VIC_INT_CLEAR = 0xffffffff;
 }
 
+// ---------------- Friendly boot banner ----------------
+void UARTPrintBanner(void) {
+    UARTWrite("\n\r================================\n\r");
+    UARTWrite("          ZAP SoC Boot           \n\r");
+    UARTWrite("        UART is alive ✔          \n\r");
+    UARTWrite("================================\n\r\n\r");
+}
+
 int main(void)
 {
         // Just bringup the UART TX and RX - enable interrupts and exit.
         UARTInit();
+
+        UARTPrintBanner();
+
         UARTEnableRXInterrupt();
         return 0;
 }
@@ -55,34 +66,18 @@ void UARTInit()
 }
 
 /* Write a string to the UART device. This is an open loop function. */
-void UARTWrite(char* s)
+void UARTWrite(const char* s)
 {
-        int len;
-        int i;
-
-        len = strlen(s);
-
-        for(i=0;i<len;i++)        {
-                UARTWriteByte(s[i]);
-        }
+    while (*s) {
+        UARTWriteByte((unsigned char)*s++);  // pass the byte VALUE
+        while (!UARTTransmitEmpty() ) ;    // block until THR/FIFO drained
+    }
 }
 
 /* Write a byte to the UART. This is an open loop function. */
-void UARTWriteByte(char c)
+void UARTWriteByte(unsigned char c)
 {
         *UART0_THR = c;
-}
-
-/* Length of a string */
-int strlen(char* s)
-{
-        int i;
-        i = 0;
-
-        while(s[i] != '\0')
-                i++;
-
-        return i;
 }
 
 /* UART Enable RX interrupt */

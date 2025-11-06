@@ -1,0 +1,156 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Wed Nov  5 05:01:12 2025
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
+[dumpfile_mtime] "Tue Nov  4 20:21:24 2025"
+[dumpfile_size] 3916164
+[savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_3.gtkw"
+[timestart] 176611900
+[size] 1698 867
+[pos] -1 -1
+*-15.473377 176725000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.zap_test.
+[treeopen] TOP.zap_test.u_chip_top.
+[treeopen] TOP.zap_test.u_chip_top.ethmac.
+[treeopen] TOP.zap_test.u_chip_top.ethmac.wishbone.
+[treeopen] TOP.zap_test.u_chip_top.u_zap_top.
+[sst_width] 280
+[signals_width] 307
+[sst_expanded] 1
+[sst_vpaned_height] 520
+@200
+-
+-TX
+@28
+TOP.zap_test.u_chip_top.mtx_clk_pad_i
+@22
+TOP.zap_test.u_chip_top.mtxd_pad_o[3:0]
+@28
+TOP.zap_test.u_chip_top.mtxen_pad_o
+TOP.zap_test.u_chip_top.mtxerr_pad_o
+TOP.zap_test.u_chip_top.ethmac.wishbone.TxIRQEn
+TOP.zap_test.u_chip_top.ethmac.wishbone.TxB_IRQ
+@200
+-
+@28
+TOP.zap_test.u_chip_top.ethmac.wishbone.TxDone
+@22
+TOP.zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
+@28
+TOP.zap_test.u_chip_top.ethmac.wishbone.Busy_IRQ
+@29
+TOP.zap_test.u_chip_top.ethmac.wishbone.RxBDRead
+@28
+TOP.zap_test.u_chip_top.ethmac.wishbone.RxBDReady
+TOP.zap_test.u_chip_top.ethmac.wishbone.RxPointerRead
+TOP.zap_test.u_chip_top.ethmac.wishbone.RxReady
+@200
+-
+@c00022
+TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+@28
+(0)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(1)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(2)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(3)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(4)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(5)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(6)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(7)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(8)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(9)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(10)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(11)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(12)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(13)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(14)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(15)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(16)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(17)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(18)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(19)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(20)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(21)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(22)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(23)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(24)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(25)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(26)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(27)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(28)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(29)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(30)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+(31)TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+@1401200
+-group_end
+@28
+TOP.zap_test.u_chip_top.u_zap_top.u_zap_core.instr_valid
+@200
+-
+-RX
+@28
+TOP.zap_test.u_chip_top.ethmac.mrx_clk_pad_i
+@22
+TOP.zap_test.u_chip_top.ethmac.mrxd_pad_i[3:0]
+@28
+TOP.zap_test.u_chip_top.ethmac.mrxdv_pad_i
+TOP.zap_test.u_chip_top.ethmac.mrxerr_pad_i
+TOP.zap_test.u_chip_top.ethmac.wishbone.RxB_IRQ
+TOP.zap_test.u_chip_top.ethmac.wishbone.RxError
+TOP.zap_test.u_chip_top.ethmac.wishbone.RxIRQEn
+@200
+-
+-BD RAM
+@22
+TOP.zap_test.u_chip_top.ethmac.wishbone.bd_ram.addr[7:0]
+@28
+TOP.zap_test.u_chip_top.ethmac.wishbone.bd_ram.ce
+TOP.zap_test.u_chip_top.ethmac.wishbone.bd_ram.oe
+@22
+TOP.zap_test.u_chip_top.ethmac.wishbone.bd_ram.we[3:0]
+TOP.zap_test.u_chip_top.ethmac.wishbone.bd_ram.addr[7:0]
+TOP.zap_test.u_chip_top.ethmac.wishbone.bd_ram.di[31:0]
+TOP.zap_test.u_chip_top.ethmac.wishbone.bd_ram.raddr[7:0]
+TOP.zap_test.u_chip_top.ethmac.wishbone.bd_ram.dato[31:0]
+@200
+-
+-
+-ETHMAC REGS
+@22
+TOP.zap_test.u_chip_top.ethmac.ethreg1.Address[7:0]
+TOP.zap_test.u_chip_top.ethmac.ethreg1.Cs[3:0]
+@c00028
+TOP.zap_test.u_chip_top.ethmac.ethreg1.MODER_Wr[2:0]
+@28
+(0)TOP.zap_test.u_chip_top.ethmac.ethreg1.MODER_Wr[2:0]
+(1)TOP.zap_test.u_chip_top.ethmac.ethreg1.MODER_Wr[2:0]
+(2)TOP.zap_test.u_chip_top.ethmac.ethreg1.MODER_Wr[2:0]
+@1401200
+-group_end
+@22
+TOP.zap_test.u_chip_top.ethmac.ethreg1.MAC_ADDR0_Wr[3:0]
+@28
+TOP.zap_test.u_chip_top.ethmac.ethreg1.MAC_ADDR1_Wr[1:0]
+TOP.zap_test.u_chip_top.ethmac.ethreg1.TX_BD_NUM_Wr[0]
+TOP.zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCE_Wr[0]
+TOP.zap_test.u_chip_top.ethmac.ethreg1.Read
+@200
+-
+@28
+TOP.zap_test.u_chip_top.ethmac.int_o
+@200
+-
+@28
+TOP.zap_test.u_chip_top.ethmac.wb_cyc_i
+@22
+TOP.zap_test.u_chip_top.ethmac.wb_adr_i[11:2]
+TOP.zap_test.u_chip_top.ethmac.wb_dat_o[31:0]
+@28
+TOP.zap_test.u_chip_top.ethmac.wb_we_i
+@200
+-
+-
+[pattern_trace] 1
+[pattern_trace] 0

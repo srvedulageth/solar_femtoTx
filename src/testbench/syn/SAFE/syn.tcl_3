@@ -116,7 +116,6 @@ add_files -scan_for_includes {
 ../../ips/original/ethmac/rtl/verilog/eth_wishbone.v \
 ../../ips/original/ethmac/rtl/verilog/xilinx_dist_ram_16x32.v \
 ../../ips/original/ethmac/rtl/verilog/ethmac.v \
-./reset_sync_debounce.v
 ./timer.v \
 ./vic.v \
 ./zap_soc.v \
@@ -155,7 +154,6 @@ report_timing_summary \
 # the design into an SOC.
 #
 write_checkpoint -force zap_synth.dcp
-
 open_checkpoint zap_synth.dcp
 create_debug_core u_ila_0 ila
 set_property C_DATA_DEPTH 1024 [get_debug_cores u_ila_0]
@@ -171,27 +169,22 @@ set_property C_EN_STRG_QUAL true [get_debug_cores u_ila_0 ]
 set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0 ]
 set_property ALL_PROBE_SAME_MU_CNT 2 [get_debug_cores u_ila_0 ]
 endgroup
-
 connect_debug_port u_ila_0/clk [get_nets [list SYS_CLK_IBUF_BUFG ]]
 set_property port_width 1 [get_debug_ports u_ila_0/probe0]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
-connect_debug_port u_ila_0/probe0 [get_nets [list mtx_clk_pad_dbg ]]
-
+connect_debug_port u_ila_0/probe0 [get_nets [list mdc_dbg ]]
 create_debug_port u_ila_0 probe
-set_property port_width 4 [get_debug_ports u_ila_0/probe1]
+set_property port_width 1 [get_debug_ports u_ila_0/probe1]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-#connect_debug_port u_ila_0/probe1 [get_nets [list mtxd_pad_dbg ]]
-connect_debug_port u_ila_0/probe1 [get_nets {mtxd_pad_dbg[*]}]
-
+connect_debug_port u_ila_0/probe1 [get_nets [list mdio_i_dbg ]]
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe2]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
-connect_debug_port u_ila_0/probe2 [get_nets [list mtxen_pad_dbg ]]
-
+connect_debug_port u_ila_0/probe2 [get_nets [list mdio_o_dbg ]]
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe3]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
-connect_debug_port u_ila_0/probe3 [get_nets [list mtxerr_pad_dbg ]]
+connect_debug_port u_ila_0/probe3 [get_nets [list mdio_oe_dbg ]]
 
 #Debug
 #link_design -debug

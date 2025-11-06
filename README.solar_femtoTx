@@ -37,4 +37,5 @@ arm-none-eabi-gcc -nostartfiles -nostdlib -Wl,-T,src/ts/common.ld -Wl,--gc-secti
 arm-none-eabi-objcopy -O binary obj/ts/ethmac_zap/ethmac_zap.elf obj/ts/ethmac_zap/ethmac_zap.bin
 hexdump -ve '1/4 "%08x\n"' obj/ts/ethmac_zap/ethmac_zap.bin > obj/ts/ethmac_zap/ethmac_zap.dump
 
-5.
+arm-none-eabi-objdump -d obj/ts/ethmac_zap/ethmac_zap.elf //Creates Object Dump ...
+5. ./run_cmd this will run all the above commands and generate obj/ts/ethmac_zap/ethmac_zap.dump

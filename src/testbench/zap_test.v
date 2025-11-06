@@ -37,7 +37,7 @@ end
 reg i_reset;
 initial begin
   i_reset = 'b 1;
-  repeat(10) @(posedge i_clk);
+  repeat(50) @(posedge i_clk);
   #1;
   i_reset = 'b 0;
 end
@@ -52,7 +52,7 @@ reg [0:0]                  o_uart;
 
 reg [3:0]                  clk_ctr = 4'd0;
 //reg [STRING_LENGTH*8-1:0]  uart_string = "DLROW OLLEH ";
-reg [STRING_LENGTH*8-1:0]  uart_string = "OLLEH ";
+reg [STRING_LENGTH*8-1:0]  uart_string = "H";
 reg [6:0]                  uart_ctr    = 7'd10;
 reg [31:0]                 btrace      = 32'd0;
 reg                        uart_done = 1'd0;
@@ -221,6 +221,11 @@ zap_soc #(
         //.int_sel  ('b 1)
 );
 
+integer phy_log_file_desc;
+initial begin
+  phy_log_file_desc = $fopen("./eth_tb_phy.log");
+end
+
 eth_phy eth_phy (
   // WISHBONE reset
   .m_rst_n_i(!i_reset),
@@ -236,8 +241,8 @@ eth_phy eth_phy (
   .mdc_i(mdc_pad_o),          .md_io(mdio_pad_io),
 
   // SYSTEM
-  //.phy_log(phy_log_file_desc)
-  .phy_log() //Not connected
+  .phy_log(phy_log_file_desc)
+  //.phy_log() //Not connected
 );
 initial begin
   $dumpfile("zap.vcd");
@@ -251,6 +256,242 @@ initial begin
   repeat(10)  @(posedge clk_baud_19200);
   $display("Simulation OK");
   $finish;
+end
+
+initial begin
+  #50000ns;
+  eth_phy.link_up_down(1);
+end
+
+task set_rx_packet;
+  input  [31:0] rxpnt;
+  input  [15:0] len;
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input  [47:0] eth_dest_addr;
+  input  [47:0] eth_source_addr;
+  input  [15:0] eth_type_len;
+  input  [7:0]  eth_start_data;
+  integer       i, sd;
+  reg    [47:0] dest_addr;
+  reg    [47:0] source_addr;
+  reg    [15:0] type_len;
+  reg    [21:0] buffer;
+  reg           delta_t;
+begin
+  buffer = rxpnt[21:0];
+  dest_addr = eth_dest_addr;
+  source_addr = eth_source_addr;
+  type_len = eth_type_len;
+  sd = eth_start_data;
+  delta_t = 0;
+  for(i = 0; i < len; i = i + 1) 
+  begin
+    if (i < 6)
+    begin
+      eth_phy.rx_mem[buffer] = dest_addr[47:40];
+      dest_addr = dest_addr << 8;
+    end
+    else if (i < 12)
+    begin
+      eth_phy.rx_mem[buffer] = source_addr[47:40];
+      source_addr = source_addr << 8;
+    end
+    else if (i < 14)
+    begin
+      eth_phy.rx_mem[buffer] = type_len[15:8];
+      type_len = type_len << 8;
+    end
+    else
+    begin
+      eth_phy.rx_mem[buffer] = sd[7:0];
+      sd = sd + 1;
+    end
+    buffer = buffer + 1;
+  end
+  delta_t = !delta_t;
+  if (plus_dribble_nibble)
+    eth_phy.rx_mem[buffer] = {4'h0, 4'hD /*sd[3:0]*/};
+  delta_t = !delta_t;
+end
+endtask // set_rx_packet
+
+task append_rx_crc;
+  input  [31:0] rxpnt_phy; // source
+  input  [15:0] len; // length in bytes without CRC
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input         negated_crc; // if appended CRC is correct or not
+  reg    [31:0] crc;
+  reg    [7:0]  tmp;
+  reg    [31:0] addr_phy;
+  reg           delta_t;
+begin
+  addr_phy = rxpnt_phy + len;
+  delta_t = 0;
+  // calculate CRC from prepared packet
+  paralel_crc_phy_rx(rxpnt_phy, {16'h0, len}, plus_dribble_nibble, crc);
+  if (negated_crc)
+    crc = ~crc;
+  delta_t = !delta_t;
+
+  if (plus_dribble_nibble)
+  begin
+    tmp = eth_phy.rx_mem[addr_phy];
+    eth_phy.rx_mem[addr_phy]     = {crc[27:24], tmp[3:0]};
+    eth_phy.rx_mem[addr_phy + 1] = {crc[19:16], crc[31:28]};
+    eth_phy.rx_mem[addr_phy + 2] = {crc[11:8], crc[23:20]};
+    eth_phy.rx_mem[addr_phy + 3] = {crc[3:0], crc[15:12]};
+    eth_phy.rx_mem[addr_phy + 4] = {4'h0, crc[7:4]};
+  end
+  else
+  begin
+    eth_phy.rx_mem[addr_phy]     = crc[31:24];
+    eth_phy.rx_mem[addr_phy + 1] = crc[23:16];
+    eth_phy.rx_mem[addr_phy + 2] = crc[15:8];
+    eth_phy.rx_mem[addr_phy + 3] = crc[7:0];
+  end
+end
+endtask // append_rx_crc
+
+// paralel CRC calculating for PHY RX
+task paralel_crc_phy_rx;
+  input  [31:0] start_addr; // start address
+  input  [31:0] len; // length of frame in Bytes without CRC length
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  output [31:0] crc_out;
+  reg    [21:0] addr_cnt; // only 22 address lines
+  integer       word_cnt;
+  integer       nibble_cnt;
+  reg    [31:0] load_reg;
+  reg           delta_t;
+  reg    [31:0] crc_next;
+  reg    [31:0] crc;
+  reg           crc_error;
+  reg     [3:0] data_in;
+  integer       i;
+begin
+  #1 addr_cnt = start_addr[21:0];
+  word_cnt = 24; // 27; // start of the frame - nibble granularity (MSbit first)
+  crc = 32'hFFFF_FFFF; // INITIAL value
+  delta_t = 0;
+  // length must include 4 bytes of ZEROs, to generate CRC
+  // get number of nibbles from Byte length (2^1 = 2)
+  if (plus_dribble_nibble)
+    nibble_cnt = ((len + 4) << 1) + 1'b1; // one nibble longer
+  else
+    nibble_cnt = ((len + 4) << 1);
+  // because of MAGIC NUMBER nibbles are swapped [3:0] -> [0:3]
+  load_reg[31:24] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[23:16] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[15: 8] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[ 7: 0] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  while (nibble_cnt > 0)
+  begin
+    // wait for delta time
+    delta_t = !delta_t;
+    // shift data in
+
+    if(nibble_cnt <= 8) // for additional 8 nibbles shift ZEROs in!
+      data_in[3:0] = 4'h0;
+    else
+
+      data_in[3:0] = {load_reg[word_cnt], load_reg[word_cnt+1], load_reg[word_cnt+2], load_reg[word_cnt+3]};
+    crc_next[0]  = (data_in[0] ^ crc[28]);
+    crc_next[1]  = (data_in[1] ^ data_in[0] ^ crc[28]    ^ crc[29]);
+    crc_next[2]  = (data_in[2] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[30]);
+    crc_next[3]  = (data_in[3] ^ data_in[2] ^ data_in[1] ^ crc[29]  ^ crc[30] ^ crc[31]);
+    crc_next[4]  = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[0];
+    crc_next[5]  = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[1];
+    crc_next[6]  = (data_in[2] ^ data_in[1] ^ crc[29]    ^ crc[30]) ^ crc[ 2];
+    crc_next[7]  = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[3];
+    crc_next[8]  = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[4];
+    crc_next[9]  = (data_in[2] ^ data_in[1] ^ crc[29]    ^ crc[30]) ^ crc[5];
+    crc_next[10] = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[6];
+    crc_next[11] = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[7];
+    crc_next[12] = (data_in[2] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[30]) ^ crc[8];
+    crc_next[13] = (data_in[3] ^ data_in[2] ^ data_in[1] ^ crc[29]  ^ crc[30] ^ crc[31]) ^ crc[9];
+    crc_next[14] = (data_in[3] ^ data_in[2] ^ crc[30]    ^ crc[31]) ^ crc[10];
+    crc_next[15] = (data_in[3] ^ crc[31])   ^ crc[11];
+    crc_next[16] = (data_in[0] ^ crc[28])   ^ crc[12];
+    crc_next[17] = (data_in[1] ^ crc[29])   ^ crc[13];
+    crc_next[18] = (data_in[2] ^ crc[30])   ^ crc[14];
+    crc_next[19] = (data_in[3] ^ crc[31])   ^ crc[15];
+    crc_next[20] =  crc[16];
+    crc_next[21] =  crc[17];
+    crc_next[22] = (data_in[0] ^ crc[28])   ^ crc[18];
+    crc_next[23] = (data_in[1] ^ data_in[0] ^ crc[29]    ^ crc[28]) ^ crc[19];
+    crc_next[24] = (data_in[2] ^ data_in[1] ^ crc[30]    ^ crc[29]) ^ crc[20];
+    crc_next[25] = (data_in[3] ^ data_in[2] ^ crc[31]    ^ crc[30]) ^ crc[21];
+    crc_next[26] = (data_in[3] ^ data_in[0] ^ crc[31]    ^ crc[28]) ^ crc[22];
+    crc_next[27] = (data_in[1] ^ crc[29])   ^ crc[23];
+    crc_next[28] = (data_in[2] ^ crc[30])   ^ crc[24];
+    crc_next[29] = (data_in[3] ^ crc[31])   ^ crc[25];
+    crc_next[30] =  crc[26];
+    crc_next[31] =  crc[27];
+
+    crc = crc_next;
+    crc_error = crc[31:0] != 32'hc704dd7b;  // CRC not equal to magic number
+    case (nibble_cnt)
+    9: crc_out = {!crc[24], !crc[25], !crc[26], !crc[27], !crc[28], !crc[29], !crc[30], !crc[31],
+                  !crc[16], !crc[17], !crc[18], !crc[19], !crc[20], !crc[21], !crc[22], !crc[23],
+                  !crc[ 8], !crc[ 9], !crc[10], !crc[11], !crc[12], !crc[13], !crc[14], !crc[15],
+                  !crc[ 0], !crc[ 1], !crc[ 2], !crc[ 3], !crc[ 4], !crc[ 5], !crc[ 6], !crc[ 7]};
+    default: crc_out = crc_out;
+    endcase
+    // wait for delta time
+    delta_t = !delta_t;
+    // increment address and load new data
+    if ((word_cnt+3) == 7)//4)
+    begin
+      // because of MAGIC NUMBER nibbles are swapped [3:0] -> [0:3]
+      load_reg[31:24] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[23:16] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[15: 8] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[ 7: 0] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+    end
+    // set new load bit position
+    if((word_cnt+3) == 31)
+      word_cnt = 16;
+    else if ((word_cnt+3) == 23)
+      word_cnt = 8;
+    else if ((word_cnt+3) == 15)
+      word_cnt = 0;
+    else if ((word_cnt+3) == 7)
+      word_cnt = 24;
+    else
+      word_cnt = word_cnt + 4;// - 4;
+    // decrement nibble counter
+    nibble_cnt = nibble_cnt - 1;
+    // wait for delta time
+    delta_t = !delta_t;
+  end // while
+  #1;
+end
+endtask // paralel_crc_phy_rx
+
+integer loop_count;
+initial begin
+  while(1) begin
+    #100ns;
+    wait(u_chip_top.ethmac.txethmac1.TxDone == 'b 0);
+    #100ns;
+    wait(u_chip_top.ethmac.txethmac1.TxDone == 'b 1);
+    #20000ns;
+    //Start Rx ...
+    $display("Rx Begin");
+    set_rx_packet(0, 'h 5FC, 1'b0, 48'hAA02_0304_0506, 48'h0708_090A_0B0C, 16'h0D0E, 8'h0F); // length without CRC
+    append_rx_crc (0, 'h 3c, 1'b0, 1'b0);
+    #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'h 40, 1'b0);
+    repeat(10000) @(posedge i_clk);
+    $display("Rx Done");
+  end
 end
 
 always @(posedge UART_SR_DAV_0) begin

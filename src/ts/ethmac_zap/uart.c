@@ -19,10 +19,17 @@
 
 
 #include "uart.h"
+#include "ethmac_zap.h"
 
 void eth_demo_init(void);
-void eth_demo_poll(void);
+void eth_print_phy_status(void);
 void eth_irq_handler(void);
+void phy_hw_reset(void);
+void phy_scan_all(void);
+void phy_autoneg_and_wait(void);
+void phy_verify(int pa);
+void mdio_burner(int pa);
+void eth_transmit(void);
 
 void irq_handler ()
 {
@@ -30,7 +37,7 @@ void irq_handler ()
        while ( !UARTTransmitEmpty() );
 
        // Write character
-       UARTWriteByte ( UARTGetChar() );
+       //UARTWriteByte ( UARTGetChar() );
 
        eth_irq_handler();
 
@@ -38,13 +45,38 @@ void irq_handler ()
        *VIC_INT_CLEAR = 0xffffffff;
 }
 
+// ---------------- Friendly boot banner ----------------
+void UARTPrintBanner(void) {
+    UARTWrite("\n\r================================\n\r");
+    UARTWrite("          ZAP SoC Boot           \n\r");
+    UARTWrite("        UART is alive ✔          \n\r");
+    UARTWrite("================================\n\r\n\r");
+}
+
 int main(void)
 {
         // Just bringup the UART TX and RX - enable interrupts and exit.
         UARTInit();
-        UARTEnableRXInterrupt();
+
+        UARTPrintBanner();
 
         eth_demo_init();
+
+        phy_hw_reset();
+        phy_scan_all();
+        phy_autoneg_and_wait();
+        eth_print_phy_status();
+        phy_verify(1);
+        //phy_verify(2);
+        mdio_burner(1);
+
+        eth_transmit();
+
+        UARTEnableRXInterrupt();
+
+        // Never return — idle
+        for (;;)
+           __asm__ volatile("" ::: "memory");
 
         return 0;
 }
@@ -64,34 +96,18 @@ void UARTInit()
 }
 
 /* Write a string to the UART device. This is an open loop function. */
-void UARTWrite(char* s)
+void UARTWrite(const char* s)
 {
-        int len;
-        int i;
-
-        len = strlen(s);
-
-        for(i=0;i<len;i++)        {
-                UARTWriteByte(s[i]);
-        }
+    while (*s) {
+        UARTWriteByte((unsigned char)*s++);  // pass the byte VALUE
+        while (!UARTTransmitEmpty() ) ;    // block until THR/FIFO drained
+    }
 }
 
 /* Write a byte to the UART. This is an open loop function. */
-void UARTWriteByte(char c)
+void UARTWriteByte(unsigned char c)
 {
         *UART0_THR = c;
-}
-
-/* Length of a string */
-int strlen(char* s)
-{
-        int i;
-        i = 0;
-
-        while(s[i] != '\0')
-                i++;
-
-        return i;
 }
 
 /* UART Enable RX interrupt */

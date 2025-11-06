@@ -22,11 +22,14 @@
 
 // Descriptor counts (2 KB BD RAM / 8 B per BD ⇒ up to 256 BDs)
 #define ETH_BD_COUNT        8u
-#define ETH_TX_BD_NUM       2u    // first N are TX, remaining are RX
+#define ETH_TX_BD_NUM       64u    // first N are TX, remaining are RX
 
 // System RAM (packet buffers) accessible by EthMAC Wishbone master
 #define ETH_DMA_MEM_BASE    0x0A000000u   // TODO: set to a valid uncached/phys region
 #define ETH_DMA_MEM_SIZE    0x2000u    // 1 MiB example
+
+#define ETHMAC_BUF_RAM_BASE   0x0A000000UL
+#define ETHMAC_RX_BUF_RAM_BASE   (ETHMAC_BUF_RAM_BASE + 0x1000u)
 
 // CPU clock (for MDIO divisor)
 #define SYS_CLK_HZ          100000000u    // 100 MHz
@@ -72,9 +75,11 @@ static inline uint32_t eth_readl(uintptr_t a){ return *(volatile uint32_t*)a; }
 #define MODER_RXEN           (1u<<0)
 #define MODER_TXEN           (1u<<1)
 #define MODER_PAD            (1u<<2)
-#define MODER_CRCEN          (1u<<3)
+#define MODER_BRO            (1u<<3)
+#define MODER_PRO            (1u<<5)
+#define MODER_IFG            (1u<<6)
 #define MODER_FULLD          (1u<<10)
-#define MODER_PRO            (1u<<11)
+#define MODER_CRCEN          (1u<<13)
 
 /* ================= MII management ================= */
 #define MIICOMMAND_RSTAT      (1u<<1)
@@ -105,6 +110,15 @@ static inline uint32_t eth_readl(uintptr_t a){ return *(volatile uint32_t*)a; }
 #define BMSR_AN_COMPLETE      (1u<<5)
 #define BMSR_LINK_STATUS      (1u<<2)
 
+/* Interrupt Source Register */
+#define ETH_INT_TXB        0x00000001 /* Transmit Buffer IRQ */
+#define ETH_INT_TXE        0x00000002 /* Transmit Error IRQ */
+#define ETH_INT_RXB        0x00000004 /* Receive Buffer IRQ */
+#define ETH_INT_RXE        0x00000008 /* Receive Error IRQ */
+#define ETH_INT_BUSY       0x00000010 /* Busy IRQ */
+#define ETH_INT_TXC        0x00000020 /* Transmit Control Frame IRQ */
+#define ETH_INT_RXC        0x00000040 /* Received Control Frame IRQ */
+
 /* ================= Buffer Descriptors ================= */
 typedef struct {
     volatile uint32_t stat;   // control/status + length (low bits)
@@ -114,17 +128,40 @@ typedef struct {
 #define BD(i)                 ((eth_bd_t*)(ETH_BD_BASE) + (i))
 
 // Common EthMAC BD bits (names vary; adjust if your drop differs)
-#define BD_WRAP               (1u<<13)
-#define BD_IRQ                (1u<<14)
 #define BD_E_R                (1u<<15)   // RX: EMPTY (1=owned by MAC), TX: READY (1=start TX)
+#define BD_IRQ                (1u<<14)
+#define BD_WRAP               (1u<<13)
+
+#define BD_TX_RD              (1u<<15)
+#define BD_TX_IRQ             (1u<<14)
+#define BD_TX_WR              (1u<<13)
 #define BD_TX_PAD             (1u<<12)
 #define BD_TX_CRC             (1u<<11)
+#define BD_TX_UR              (1u<<8)
+#define BD_TX_RL              (1u<<3)
+#define BD_TX_LC              (1u<<2)
+#define BD_TX_DF              (1u<<1)
+#define BD_TX_CS              (1u<<0)
+
 #define BD_LEN_MASK           0x7FFu     // length field bits (typical 11-bit)
+
+// Rx BD flags
+#define BD_RX_CF              (1u<<8)
+#define BD_RX_M               (1u<<7)
+#define BD_RX_OR              (1u<<6)
+#define BD_RX_IS              (1u<<5)
+#define BD_RX_DN              (1u<<4)
+#define BD_RX_TL              (1u<<3)
+#define BD_RX_SF              (1u<<2)
+#define BD_RX_CRC             (1u<<1)
+#define BD_RX_LC              (1u<<0)
 
 /* ================= Public API ================= */
 int  eth_init(const uint8_t mac[6]);
 int  eth_tx_enqueue(const void* buf, unsigned len);
-int  eth_rx_poll(void* out_buf, unsigned* out_len);
+int  eth_rx_poll(unsigned index, void* out_buf, unsigned* out_len);
+void eth_rx_init_ring(void);
+void eth_set_bd_addr0(unsigned index, uint16_t length, uint16_t flags, uint32_t payload_addr);
 
 // Optional helpers if you want to expose MDIO
 int  eth_mdio_write(uint8_t phy, uint8_t reg, uint16_t val);

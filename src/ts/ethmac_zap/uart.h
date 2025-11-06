@@ -37,8 +37,8 @@
         void UARTEnableRX(void);
 
         // Open loop functions.
-        void UARTWrite(char*);
-        void UARTWriteByte(char x);
+        void UARTWrite(const char*);
+        void UARTWriteByte(unsigned char x);
 
         // UART interrupt related functions.
         void UARTEnableTXInterrupt(void);
@@ -49,8 +49,4 @@
 
         // Get a character from the UART.
         char UARTGetChar (void );
-
-        // String processing functions.
-        int strlen(char*);
-
 #endif
