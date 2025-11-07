@@ -110,6 +110,7 @@ localparam ETHMAC_BUF_RAM_HI            = 32'h0A001FFF; //Total 8K, accessed bot
 // Internal signals.
 wire            i_clk    = SYS_CLK;
 //wire            i_reset  = ~SYS_RST;
+wire            stable_rst_sync;
 
 // Synchronize SYS_RST (active low) into SYS_CLK domain
 (* ASYNC_REG = "TRUE" *) reg rst_meta;
@@ -128,15 +129,6 @@ wire            i_clk    = SYS_CLK;
 (* DONT_TOUCH = "true" *) wire mdio_oe_dbg_keep = mdio_oe_dbg;
 */
 
-(* MARK_DEBUG = "true" *) wire mtx_clk_pad_dbg  = mtx_clk_pad_i;   // EthMAC MDC out
-(* MARK_DEBUG = "true" *) wire [3:0] mtxd_pad_dbg = mtxd_pad_o; // MDIO bidir
-(* MARK_DEBUG = "true" *) wire mtxen_pad_dbg = mtxen_pad_o; // MDIO bidir
-(* MARK_DEBUG = "true" *) wire mtxerr_pad_dbg = mtxerr_pad_o; // MDIO bidir
-
-// (optional) keep them from being optimized away
-(* DONT_TOUCH = "true" *) wire mtx_clk_pad_dbg_keep = mtx_clk_pad_dbg;
-(* DONT_TOUCH = "true" *) wire mtxd_pad_dbg_keep    = mtxd_pad_dbg;
-(* DONT_TOUCH = "true" *) wire mtxen_pad_dbg_keep   = mtxen_pad_dbg;
 
 // 2-FF synchronizer for reset de-assertion
 always @(posedge SYS_CLK or negedge SYS_RST) begin
@@ -153,6 +145,14 @@ end
 
 // Final internal reset, active high
 wire i_reset = rst_sync;
+//wire i_reset = stable_rst_sync;
+
+(* MARK_DEBUG = "true" *) wire mtx_clk_pad_dbg  = mtx_clk_pad_i;   // EthMAC MDC out
+(* MARK_DEBUG = "true" *) wire [3:0] mtxd_pad_dbg = mtxd_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mtxen_pad_dbg = mtxen_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mtxerr_pad_dbg = mtxerr_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire i_reset_dbg = i_reset; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire stable_reset_dbg = stable_rst_sync; // MDIO bidir
 
 //EthPHY Reference clock, 25MHz ...
 wire clk25;
@@ -544,18 +544,22 @@ ethmac ethmac(
 // ===============================
 
 //Processor RAM ...
+localparam RAM_ADDR_WIDTH        = 14;
+localparam RAM_DATA_WIDTH        = 32;
+localparam RAM_MEM_SIZE          = 16384;
+
 ram_wb
       #
         (
-          .adr_width(13),
-          .dat_width(32),
-          .mem_size(8192),
+          .adr_width(RAM_ADDR_WIDTH),
+          .dat_width(RAM_DATA_WIDTH),
+          .mem_size(RAM_MEM_SIZE),
           .MEMFILE("ethmac_zap.dump")
         )
       ram_wb (
               .clk_i(i_clk),
               .rst_i(i_reset),
-              .adr_i(data_wb_adr[12:0]),
+              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:0]),
               .dat_i(data_wb_dout),
               .we_i(data_wb_we),
               .sel_i(data_wb_sel),
@@ -653,4 +657,10 @@ wb_arb2 #(
    assign led_2 = count_1[23];
    always @(posedge clk25) count_1 <= count_1 + 1;
 `endif
+
+reset_sync_debounce reset_sync_debounce (
+    .clk(i_clk),          // your SYS_CLK (e.g., 100 MHz)
+    .rst_n_in(SYS_RST),     // asynchronous, active-LOW external reset
+    .rst_sync(stable_rst_sync)      // synchronous, active-HIGH reset for fabric
+);
 endmodule // zap_soc

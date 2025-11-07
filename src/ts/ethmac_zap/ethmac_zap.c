@@ -148,7 +148,7 @@ int eth_init(const uint8_t mac[6]){
     mdio_init();
 
     // PHY bring-up
-    (void)phy_wait_link(3000);
+    (void)phy_wait_link(30);
 
     // Program MAC + BDs
     eth_set_mac(mac);

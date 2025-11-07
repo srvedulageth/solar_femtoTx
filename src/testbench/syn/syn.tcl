@@ -116,7 +116,7 @@ add_files -scan_for_includes {
 ../../ips/original/ethmac/rtl/verilog/eth_wishbone.v \
 ../../ips/original/ethmac/rtl/verilog/xilinx_dist_ram_16x32.v \
 ../../ips/original/ethmac/rtl/verilog/ethmac.v \
-./reset_sync_debounce.v
+./reset_sync_debounce.v \
 ./timer.v \
 ./vic.v \
 ./zap_soc.v \
@@ -192,6 +192,16 @@ create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe3]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
 connect_debug_port u_ila_0/probe3 [get_nets [list mtxerr_pad_dbg ]]
+
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe4]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list i_reset_dbg ]]
+
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe5]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list stable_reset_dbg ]]
 
 #Debug
 #link_design -debug
