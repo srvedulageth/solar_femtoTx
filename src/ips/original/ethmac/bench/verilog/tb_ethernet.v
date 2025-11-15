@@ -397,8 +397,8 @@ begin
   //eth_phy.carrier_sense_real_delay(0);
   //test_mac_full_duplex_transmit(2, 2);    // 0 - 23
   //simple_transmit;
-  test_mac_full_duplex_receive(4, 4);     // 0 - 15
-  //simple_receive;
+  //test_mac_full_duplex_receive(4, 4);     // 0 - 15
+  simple_receive;
   //test_mac_full_duplex_flow_control(0, 5); // 0 - 5
 
   //// Tests not working, yet.
@@ -3702,8 +3702,8 @@ begin
                            `ETH_INT_TXC | `ETH_INT_RXC, 4'hF, 1, wbm_init_waits, wbm_subseq_waits);
 
   wait (wbm_working == 0);
-  wbm_write(`ETH_MODER, `ETH_MODER_RXEN | `ETH_MODER_FULLD | `ETH_MODER_IFG | 
-            `ETH_MODER_PRO | `ETH_MODER_BRO, 4'hF, 1, wbm_init_waits, wbm_subseq_waits);
+  wbm_write(`ETH_MODER, `ETH_MODER_RXEN | `ETH_MODER_FULLD | `ETH_MODER_IFG,
+            4'hF, 1, wbm_init_waits, wbm_subseq_waits);
 
   wait (wbm_working == 0);
   wbm_read(`ETH_PACKETLEN, tmp, 4'hF, 1, wbm_init_waits, wbm_subseq_waits);
@@ -3715,7 +3715,8 @@ begin
   $display("RX max_tmp == %h", max_tmp-4);
 
   st_data = 8'h0F;
-  set_rx_packet(0, (max_tmp - 4), 1'b0, 48'hAA02_0304_0506, 48'h0708_090A_0B0C, 16'h0D0E, st_data); // length without CRC
+  //set_rx_packet(0, (max_tmp - 4), 1'b0, 48'hAA02_0304_0506, 48'h0708_090A_0B0C, 16'h0D0E, st_data); // length without CRC
+  set_rx_packet(0, (max_tmp - 4), 1'b0, 48'hffff_ff_ff_ff_ff, 48'hA4BB_6D_52_E4_53, 16'h0806, st_data); // length without CRC
 
   set_rx_bd(127, 127, 1'b1, (`MEMORY_BASE + i_length[1:0]));
   wait (wbm_working == 0);

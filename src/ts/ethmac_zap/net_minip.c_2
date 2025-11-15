@@ -73,65 +73,55 @@ static uint16_t csum16_finalize(uint32_t sum){
 // UDP
 #define IPPROTO_UDP 17
 
-static inline void arp_load_info(const void *arp_base, struct arp_pkt_t *out) {
+// arp_base points to the first byte of the ARP header
+// (i.e. immediately after EtherType 0x0806 in the frame buffer).
+static inline void arp_load_info(const void *arp_base, struct arp_pkt_t* out) {
+    // 1) Read 28 bytes (7 words) from BRAM into a local union.
+    //    This guarantees only these 7 bus reads happen.
+    union {
+        uint32_t w[7];
+        uint8_t  b[28];
+    } u;
+
     const volatile uint32_t *src = (const volatile uint32_t*)arp_base;
 
-    // Read 8 words so we get full TPA (C0A80114)
-    uint32_t w0 = src[0]; // 0x08060001  -> [08][06][00][01]
-    uint32_t w1 = src[1]; // 0x08000604  -> [08][00][06][04]
-    uint32_t w2 = src[2]; // 0x0001A4BB  -> [00][01][A4][BB]
-    uint32_t w3 = src[3]; // 0x6D52E453  -> [6D][52][E4][53]
-    uint32_t w4 = src[4]; // 0xC0A8010A  -> [C0][A8][01][0A]
-    uint32_t w5 = src[5]; // 0x00000000  -> [00][00][00][00]
-    uint32_t w6 = src[6]; // 0x0000C0A8  -> [00][00][C0][A8]
-    uint32_t w7 = src[7]; // should contain last two bytes of TPA (0x0114....)
+    for (int i = 0; i < 7; ++i) {
+        u.w[i] = src[i];      // 7 × 32-bit reads from BRAM. Reading from base + sizeof(struct eth_hdr)
+    }
 
-    // Interpret words as big-endian byte packs:
-    // High 16 bits of w0 are EtherType (0x0806), low 16 bits are htype (0x0001)
-    uint16_t htype_net = (uint16_t)(w0 & 0xFFFF);
-    uint16_t ptype_net = (uint16_t)(w1 >> 16);
+    const uint8_t *p = u.b;   // Now work from local copy only.
 
-    uint8_t hlen = (uint8_t)((w1 >> 8) & 0xFF);   // 0x06
-    uint8_t plen = (uint8_t)(w1 & 0xFF);         // 0x04
+    // 2) Decode fields (network order -> host)
+    out->htype = (uint16_t)((p[0] << 8) | p[1]);   // 0x0001
+    out->ptype = (uint16_t)((p[2] << 8) | p[3]);   // 0x0800
+    out->hlen  = p[4];                             // 6
+    out->plen  = p[5];                             // 4
+    out->oper  = (uint16_t)((p[6] << 8) | p[7]);   // 0x0001 or 0x0002
+    out->oper  = ntohs16(out->oper);
 
-    //uint16_t oper_net = (uint16_t)(w2 >> 16);    // 0x0001
-    uint16_t oper_net = (uint16_t)(w2 & 0xFFFF);    // 0x0001
+    // Sender MAC (sha)
+    for (int i = 0; i < 6; ++i) {
+        out->sha[i] = p[8 + i];
+    }
 
-    // Sender MAC (sha): A4 BB 6D 52 E4 53
-    out->sha[0] = (uint8_t)((w2 >> 8) & 0xFF);   // A4
-    out->sha[1] = (uint8_t)(w2 & 0xFF);         // BB
-    out->sha[2] = (uint8_t)(w3 >> 24);          // 6D
-    out->sha[3] = (uint8_t)(w3 >> 16);          // 52
-    out->sha[4] = (uint8_t)(w3 >> 8);           // E4
-    out->sha[5] = (uint8_t)(w3 & 0xFF);         // 53
+    // Sender IP (spa)
+    out->spa = (uint32_t)(p[14] << 24) |
+               (uint32_t)(p[15] << 16) |
+               (uint32_t)(p[16] <<  8) |
+               (uint32_t)(p[17]      );
+    out->spa = ntohl32(out->spa);
 
-    // Sender IP: w4 already holds 0xC0A8010A in network order
-    uint32_t spa_net = w4;
+    // Target MAC (tha)
+    for (int i = 0; i < 6; ++i) {
+        out->tha[i] = p[18 + i];
+    }
 
-    // Target MAC (tha): 6 bytes, here all zero in your capture
-    out->tha[0] = (uint8_t)(w5 >> 24);          // 00
-    out->tha[1] = (uint8_t)(w5 >> 16);          // 00
-    out->tha[2] = (uint8_t)(w5 >> 8);           // 00
-    out->tha[3] = (uint8_t)(w5 & 0xFF);         // 00
-    out->tha[4] = (uint8_t)(w6 >> 24);          // 00
-    out->tha[5] = (uint8_t)(w6 >> 16);          // 00
-
-    // Target IP (tpa): C0 A8 01 14
-    // From pattern: low 16 bits of w6 are C0A8, high 16 bits of w7 are 0114
-    //uint32_t tpa_net = ((w6 & 0x0000FFFFu) << 16) | (w7 >> 16);
-    uint32_t tpa_net = ((w6 & 0xFFFF0000u)  | (w7 & 0x0000FFFF));
-
-    // Convert everything to host-endian fields in out:
-    out->htype = ntohs16(htype_net);   // 0x0001
-    out->ptype = ntohs16(ptype_net);   // 0x0800
-    out->hlen  = hlen;                 // 6
-    out->plen  = plen;                 // 4
-    //out->oper  = ntohs16(oper_net);    // 1 (request)
-    out->oper  = oper_net;    // 1 (request)
-
-    out->spa   = ntohl32(spa_net);     // host-endian 192.168.1.10
-    //out->tpa   = ntohl32(tpa_net);     // host-endian 192.168.1.20
-    out->tpa   = tpa_net;     // host-endian 192.168.1.20
+    // Target IP (tpa)
+    out->tpa = (uint32_t)(p[24] << 24) |
+               (uint32_t)(p[25] << 16) |
+               (uint32_t)(p[26] <<  8) |
+               (uint32_t)(p[27]      );
+    out->tpa = ntohl32(out->tpa);
 }
 
 static uint8_t rx_buf[2048];
@@ -285,24 +275,24 @@ void net_poll_drain(unsigned budget) {
 
             // (Optional) brief debug; avoid long UART here
             // debug_eth_frame(eth, len);
+            (void)eth_readl(ETH_IPGT);                      // IFG
 
             if (etype == ETH_P_ARP) {
                 if (len >= sizeof(struct eth_hdr_t)+sizeof(struct arp_pkt_t )) {
+                    (void)eth_readl(ETH_IPGR1);
                     //const struct arp_pkt_t* arp = (const struct arp_pkt_t*)(pkt + sizeof(*eth));
                     struct arp_pkt_t info;
                     arp_load_info(pkt + sizeof(struct eth_hdr_t), &info);
 
                     //if (ntohs(arp->oper)==1 && arp->tpa == htonl(MY_IP)) {
-                    //if (info.oper==1 && info.tpa == MY_IP) {
-                    if (info.oper==1) {
-                      eth_writel(info.tpa, ETH_MAC_HASH0); eth_writel(MY_IP, ETH_MAC_HASH1);
-                      if (info.tpa == MY_IP) {
+                    if (info.oper==1 && info.tpa == MY_IP) {
+                        (void)eth_readl(ETH_IPGR2);
                         //send_arp_reply(eth->src, arp->spa, arp->tpa);
                         send_arp_reply(eth->src, info.spa, info.tpa);
-                      }
                     }
                 }
             } else if (etype == ETH_P_IP) {
+                (void)eth_readl(ETH_IPGR2);
                 if (len >= sizeof(struct eth_hdr_t)+sizeof(struct ip_hdr_t)) {
                     const struct ip_hdr_t* ip = (const struct ip_hdr_t*)(pkt + sizeof(*eth));
                     if (ip->ver_ihl == 0x45 && ip->proto == IPPROTO_ICMP && ip->daddr == htonl(MY_IP)) {

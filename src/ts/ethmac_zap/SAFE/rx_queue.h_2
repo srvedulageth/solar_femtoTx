@@ -1,0 +1,88 @@
+// rx_queue.h — robust SPSC queue for ISR → main
+#include <stdint.h>
+
+#define RXQ_DEPTH   8           // >=4 recommended; power-of-two not required
+#define RX_MTU      1536        // >=1518
+#define RX_MIN_LEN  14          // ignore runts (< Ethernet header)
+
+typedef struct {
+    volatile uint8_t ready;     // 0 = empty/in-progress, 1 = committed by ISR
+    uint16_t len;               // valid only when ready==1
+    uint8_t  buf[RX_MTU];
+} rx_msg_t;
+
+static volatile uint32_t rxq_head = 0;  // ISR producer index
+static volatile uint32_t rxq_tail = 0;  // main consumer index
+static rx_msg_t rxq[RXQ_DEPTH];
+
+// Optional debug counters
+static volatile uint32_t rxq_push_ok = 0;
+static volatile uint32_t rxq_push_drop_full = 0;
+static volatile uint32_t rxq_push_drop_runt = 0;
+
+static inline int rxq_is_full(void)  { return ((rxq_head + 1) % RXQ_DEPTH) == rxq_tail; }
+static inline int rxq_is_empty(void) { return rxq_head == rxq_tail; }
+
+// Call once before enabling interrupts/MAC RX
+static inline void rx_queue_init(void)
+{
+    rxq_head = rxq_tail = 0;
+    for (unsigned i=0;i<RXQ_DEPTH;i++) {
+        rxq[i].ready = 0;
+        rxq[i].len   = 0;
+        // buf[] not needed to clear
+    }
+    rxq_push_ok = rxq_push_drop_full = rxq_push_drop_runt = 0;
+}
+
+// Producer push (ISR): returns 0 on success, -1 on drop
+static inline int rxq_push_isr(uint16_t len, const uint8_t* data)
+{
+    if (len < RX_MIN_LEN) { rxq_push_drop_runt++; return -1; }
+    if (rxq_is_full())    { rxq_push_drop_full++; return -1; }
+
+    uint32_t h = rxq_head;
+    rxq[h].ready = 0;                 // mark in-progress
+
+    // Copy payload first
+    uint32_t n = (len > RX_MTU) ? RX_MTU : len;
+    for (uint32_t i=0; i<n; ++i) rxq[h].buf[i] = data[i];
+    rxq[h].len = (uint16_t)n;
+
+    // Publish: ensure above stores are visible before ready==1
+    __asm__ volatile ("" ::: "memory");
+    rxq[h].ready = 1;
+
+    // Advance head last
+    __asm__ volatile ("" ::: "memory");
+    rxq_head = (h + 1) % RXQ_DEPTH;
+
+    rxq_push_ok++;
+    return 0;
+}
+
+// Consumer pop (main): returns 1 if an entry was returned
+static inline int rxq_pop(uint8_t** out_ptr, uint16_t* out_len) {
+    if (rxq_is_empty()) return 0;
+    uint32_t t = rxq_tail;
+
+        (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2);
+        (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2);
+        (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2); (void)eth_readl(ETH_IPGR2);
+
+    // Only consume if producer committed it
+    if (rxq[t].ready == 0) return 0;
+
+        (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT);
+        (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT);
+        (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT); (void)eth_readl(ETH_IPGT);
+
+    if (out_ptr) *out_ptr = rxq[t].buf;
+    if (out_len) *out_len = rxq[t].len;
+
+    // Clear and advance
+    rxq[t].ready = 0;
+    __asm__ volatile ("" ::: "memory");
+    rxq_tail = (t + 1) % RXQ_DEPTH;
+    return 1;
+}

@@ -8,14 +8,6 @@
 #define INT_RXB  (1u<<2)
 #define INT_RXE  (1u<<3)
 
-static void uart_puts(const char* s){ UARTWrite((char*)s); }
-static void uart_puthex(unsigned x){
-  static const char h[]="0123456789ABCDEF";
-  char buf[11]; buf[0]='0'; buf[1]='x';
-  for (int i=0;i<8;i++) buf[2+i]=h[(x>>(28-4*i))&0xF];
-  buf[10]=0; UARTWrite(buf);
-}
-
 /* Call this from your existing uart.c irq_handler() when ETH IRQ is pending */
 void eth_irq_handler(void)
 {
@@ -24,30 +16,14 @@ void eth_irq_handler(void)
 
     if (!src) return;
 
-    /* Clear (W1C) */
+    if (src & (INT_RXB | INT_RXE)) {
+       rx_poll_scheduled = 1;  // schedule bottom-half
+    }
+
+    if (src & (INT_TXB | INT_TXE)) {
+      if (src & INT_TXB) uart_puts("eth: TX complete\r\n");
+      if (src & INT_TXE) uart_puts("eth: TX error\r\n");
+    }
+
     eth_writel(src, ETH_INT_SOURCE);
-    uart_puts("eth: Int Src=");
-    uart_puthex(src);
-    uart_puts("\r\n");
-
-    if (src & INT_RXB) {
-        unsigned len;
-        if (eth_rx_poll(64, 0, &len) == 1){
-            uart_puts("eth: RX len=");
-            uart_puthex(len);
-            uart_puts("\r\n");
-        } //else break;
-    }
-
-/*
-    if (src & INT_TXB) {
-       //Read MODER ...
-       unsigned moder = eth_readl(ETH_MODER);
-       moder &= ~MODER_TXEN;
-       eth_writel(moder, ETH_MODER);
-    }
-*/
-
-    if (src & INT_TXB) uart_puts("eth: TX complete\r\n");
-    if (src & INT_TXE) uart_puts("eth: TX error\r\n");
 }

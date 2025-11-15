@@ -315,6 +315,73 @@ begin
 end
 endtask // set_rx_packet
 
+reg [7:0] arp_payload [0:45] = {
+    8'h00,8'h01,8'h08,8'h00,8'h06,8'h04,8'h00,8'h01,
+    8'hA4,8'hBB,8'h6D,8'h52,8'hE4,8'h53,
+    8'hC0,8'hA8,8'h01,8'h0A,
+    8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,
+    8'hC0,8'hA8,8'h01,8'h14,
+    8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,
+    8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,
+    8'h00,8'h00
+};
+
+task set_rx_packet_1;
+  input  [31:0] rxpnt;
+  input  [15:0] len;
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input  [47:0] eth_dest_addr;
+  input  [47:0] eth_source_addr;
+  input  [15:0] eth_type_len;
+  input  [7:0]  eth_start_data;
+  integer       i, sd;
+  reg    [47:0] dest_addr;
+  reg    [47:0] source_addr;
+  reg    [15:0] type_len;
+  reg    [21:0] buffer;
+  reg           delta_t;
+begin
+  buffer = rxpnt[21:0];
+  dest_addr = eth_dest_addr;
+  source_addr = eth_source_addr;
+  type_len = eth_type_len;
+  sd = eth_start_data;
+  delta_t = 0;
+  for(i = 0; i < len; i = i + 1) 
+  begin
+    if (i < 6)
+    begin
+      eth_phy.rx_mem[buffer] = dest_addr[47:40];
+      dest_addr = dest_addr << 8;
+    end
+    else if (i < 12)
+    begin
+      eth_phy.rx_mem[buffer] = source_addr[47:40];
+      source_addr = source_addr << 8;
+    end
+    else if (i < 14)
+    begin
+      eth_phy.rx_mem[buffer] = type_len[15:8];
+      type_len = type_len << 8;
+    end
+    else if (i < 42)
+    begin
+      eth_phy.rx_mem[buffer] = arp_payload[i-14];
+    end
+    else
+    begin
+      eth_phy.rx_mem[buffer] = sd[7:0];
+      sd = sd + 1;
+    end
+    buffer = buffer + 1;
+  end
+  delta_t = !delta_t;
+  if (plus_dribble_nibble)
+    eth_phy.rx_mem[buffer] = {4'h0, 4'hD /*sd[3:0]*/};
+  delta_t = !delta_t;
+end
+endtask // set_rx_packet_1
+
 task append_rx_crc;
   input  [31:0] rxpnt_phy; // source
   input  [15:0] len; // length in bytes without CRC
@@ -476,22 +543,42 @@ begin
 end
 endtask // paralel_crc_phy_rx
 
-integer loop_count;
+/*
 initial begin
-  while(1) begin
-    #100ns;
-    wait(u_chip_top.ethmac.txethmac1.TxDone == 'b 0);
-    #100ns;
-    wait(u_chip_top.ethmac.txethmac1.TxDone == 'b 1);
+  //while(1) begin
+    //#100ns;
+    //wait(u_chip_top.ethmac.txethmac1.TxDone == 'b 0);
+    //#100ns;
+    //wait(u_chip_top.ethmac.txethmac1.TxDone == 'b 1);
+
     #20000ns;
     //Start Rx ...
     $display("Rx Begin");
-    set_rx_packet(0, 'h 5FC, 1'b0, 48'hAA02_0304_0506, 48'h0708_090A_0B0C, 16'h0D0E, 8'h0F); // length without CRC
+
+    //set_rx_packet(0, 'h 5FC, 1'b0, 48'hAA02_0304_0506, 48'h0708_090A_0B0C, 16'h0D0E, 8'h0F); // length without CRC
+    set_rx_packet(0, 'h 5FC, 1'b0, 48'hffff_ff_ff_ff_ff, 48'hA4BB_6D_52_E4_53, 16'h0806, 'h 0F); // length without CRC
+
     append_rx_crc (0, 'h 3c, 1'b0, 1'b0);
     #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'h 40, 1'b0);
-    repeat(10000) @(posedge i_clk);
+    repeat(20000) @(posedge i_clk);
     $display("Rx Done");
-  end
+    $finish;
+  //end
+end
+*/
+
+initial begin
+    #20000ns;
+    //Start Rx ...
+    $display("Rx Begin");
+
+    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'hffff_ff_ff_ff_ff, 48'hA4BB_6D_52_E4_53, 16'h0806, 'h 0F); // length without CRC
+
+    append_rx_crc (0, 'd 60, 1'b0, 1'b0); //ARP packet length 42 bytes + 18 bytes padding...
+    #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 64, 1'b0); //Length = 46(ARP Packet Length) +  + 18 bytes padding + 4 bytes CRC ...
+    repeat(20000) @(posedge i_clk);
+    $display("Rx Done");
+    $finish;
 end
 
 always @(posedge UART_SR_DAV_0) begin

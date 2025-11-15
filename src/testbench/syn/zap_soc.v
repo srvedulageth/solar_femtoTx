@@ -129,7 +129,6 @@ wire            stable_rst_sync;
 (* DONT_TOUCH = "true" *) wire mdio_oe_dbg_keep = mdio_oe_dbg;
 */
 
-
 // 2-FF synchronizer for reset de-assertion
 always @(posedge SYS_CLK or negedge SYS_RST) begin
   if (!SYS_RST) begin
@@ -150,9 +149,9 @@ wire i_reset = rst_sync;
 (* MARK_DEBUG = "true" *) wire mtx_clk_pad_dbg  = mtx_clk_pad_i;   // EthMAC MDC out
 (* MARK_DEBUG = "true" *) wire [3:0] mtxd_pad_dbg = mtxd_pad_o; // MDIO bidir
 (* MARK_DEBUG = "true" *) wire mtxen_pad_dbg = mtxen_pad_o; // MDIO bidir
-(* MARK_DEBUG = "true" *) wire mtxerr_pad_dbg = mtxerr_pad_o; // MDIO bidir
-(* MARK_DEBUG = "true" *) wire i_reset_dbg = i_reset; // MDIO bidir
-(* MARK_DEBUG = "true" *) wire stable_reset_dbg = stable_rst_sync; // MDIO bidir
+
+(* MARK_DEBUG = "true" *) wire [3:0] mrxd_pad_dbg = mrxd_pad_i;
+(* MARK_DEBUG = "true" *) wire mrxdv_pad_dbg = mrxdv_pad_i;
 
 //EthPHY Reference clock, 25MHz ...
 wire clk25;

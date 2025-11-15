@@ -1,8 +1,8 @@
 #include "ethmac_zap.h"
 #include "uart.h"
+#include "rx_queue.h"
 #include <string.h>
 #include <stdint.h>
-#include <stdio.h>
 
 /* ------------ MII management (MDIO) ------------ */
 static inline void mdio_wait_idle(void){
@@ -36,6 +36,43 @@ static inline void copy_from_ethram(void *dst, const void *src, unsigned len)
     }
 }
 
+// Drain up to 'budget' frames from hardware into the software queue.
+// Keep it light: copy and re-arm BDs quickly; minimal UART inside ISR.
+void rx_drain_isr(unsigned budget) {
+    for (unsigned n = 0; n < budget; ++n) {
+        unsigned len = 0;
+        // Try to fetch one HW frame; copy into a scratch local first to avoid
+        // publishing partial frames if queue is full.
+        static uint8_t isr_scratch[RX_MTU];
+
+        int got = eth_rx_poll_1(isr_scratch, &len);  // consumes + re-arms BD
+        if (got != 1) break;
+
+        if (len > RX_MTU) len = RX_MTU;              // clamp
+
+        // Enqueue to SW queue; if full, drop (BD already re-armed)
+        if (rxq_push_isr((uint16_t)len, isr_scratch) != 0) {
+            // Optional: count drops; avoid UART in ISR
+            // rx_drop_counter++;
+        }
+        else {
+        (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1);
+        (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1);
+        (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1); (void)eth_readl(ETH_IPGR1);
+
+        }
+    }
+}
+
+// Assumes BD pointer points to start of Ethernet frame in your shared RAM.
+uint16_t peek_ethertype(uint32_t buf_addr)
+{
+    volatile uint8_t* p = (volatile uint8_t*)buf_addr;
+    // bytes 12..13 are Ethertype (big-endian)
+    uint16_t t = ((uint16_t)p[12] << 8) | p[13];
+    return t;
+}
+
 void rxbd_read(unsigned idx, uint32_t* status, uint32_t* ptr)
 {
     volatile uint32_t* bd = (volatile uint32_t*)(ETH_BD_BASE + (idx * 8u));
@@ -63,6 +100,46 @@ static void rxbd_print_packet(unsigned idx){
     uart_puts("  src="); for (int i=6;i<12;i++){ uart_puthex8(p[i]); UARTWriteByte(i==11?' ':' '); }
     uart_puts("  type="); uart_puthex8(p[12]); uart_puthex8(p[13]); uart_puts("\r\n");
 }
+
+/*
+// In your eth IRQ handler when you see INT_RXB/INT_RXF:
+void debug_rx_bd(unsigned bd_idx, unsigned len1) {
+    uint32_t st=0, ptr=0;
+
+    uart_puts("debug_rx_bd: ");
+    rxbd_read(bd_idx, &st, &ptr);
+    uart_puts("st ");
+    uart_puthex32(st);
+    uart_puts(" ptr ");
+    uart_puthex32(ptr);
+    uart_puts("\r\n");
+
+    // Length is usually low 16 bits in RX status word (check your BD format)
+    //unsigned len = (st >> 16) & BD_LEN_MASK; //** Length is being made 0 in eth_rx_poll. Hence can't use it.
+    unsigned len = len1;
+
+    // Optional: cache invalidate before peeking payload
+    dcache_inval_range((void*)ptr, len);
+
+    uint16_t et = peek_ethertype(ptr);
+
+    uart_puts("debug_rx_bd ");
+    uart_puts("RX bd=");
+    uart_puthex32(bd_idx);
+    uart_puts(" len=");
+    uart_puthex32(len);
+    uart_puts(" type=");
+    uart_puthex32(et);
+
+    // Print a hint
+    if (et == ETH_P_ARP)      uart_puts(" (ARP)\r\n");
+    else if (et == ETH_P_IP)  uart_puts(" (IP)\r\n");
+    else                      uart_puts("\r\n");
+
+    // Optional short dump:
+    hexdump64(ptr, len);
+}
+*/
 
 // MDC <= 2.5 MHz. For many OC drops: MDC = SYS / (2*(CLKDIV+1))
 static inline uint32_t mdio_clkdiv(uint32_t sys_hz){
@@ -174,35 +251,61 @@ void eth_set_bd_addr0(unsigned index, uint16_t length, uint16_t flags) {
     bd[0] = status;                          // status/length word
 }
 
+/*
+void eth_rx_init_ring(void) {
+  //TX_BD_NUM
+  //eth_writel(64, ETH_TX_BD_NUM_REG);    // first 0x40(64) BDs TX i.e. remaining 0x40(64) BDs for RX
+
+  //Enable RX
+  //eth_writel((MODER_RXEN | MODER_FULLD | MODER_IFG | MODER_PRO | MODER_BRO), ETH_MODER);
+
+  uint32_t len = eth_readl(ETH_PACKETLEN);
+  uint16_t max_len = (uint16_t)(len & 0xFFFF);
+  uint16_t min_len = (uint16_t)((len >> 16) & 0xFFFF);
+
+  //RX BD ...
+  uint16_t i_length = (max_len - 4); 
+
+  uint16_t flags = 0;
+  flags |= BD_E_R; //E=1 i.e. ready to receive data ...
+  flags |= BD_IRQ; //1= When data is received, an RXF interrupt will be generated ...
+  flags |= BD_WRAP; //1= this BD is the last ...
+
+  //Set Buffer Descriptor
+  (void)eth_set_bd(64, i_length, flags, ETHMAC_RX_BUF_RAM_BASE); //Rx Data Buffer located at BASE + 4K
+}
+*/
+
 // Choose how many RX buffers you want.
-void eth_rx_ring_init(void)
-{
-    // Split TX/RX ring
-    eth_writel(RX_BD_FIRST, ETH_TX_BD_NUM_REG); // 0..63 TX, 64..127 RX
+#define RX_BD_FIRST   64u        // you set TX_BD_NUM=64, so RX starts at 64
+#define RX_BD_COUNT    8u        // give yourself 8 RX buffers
+#define RX_BUF_SIZE  2048u
+#define RX_BUF_BASE  ETHMAC_RX_BUF_RAM_BASE  // your RX data region start
+
+void eth_rx_init_ring_multiple(void) {
+    // BD0..63 are TX, 64..127 are RX (since TX_BD_NUM=64)
+    eth_writel(64, ETH_TX_BD_NUM_REG);
 
     for (unsigned i = 0; i < RX_BD_COUNT; ++i) {
         unsigned bd_idx = RX_BD_FIRST + i;
-        uint32_t ptr    = ETHMAC_RX_BUF_RAM_BASE + i*RX_BUF_SIZE;
-
-        uint16_t flags  = BD_E_R | BD_IRQ;        // EMPTY=1 hands to MAC
-        if (i == RX_BD_COUNT - 1) flags |= BD_WRAP;
-
-        volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + bd_idx*8u);
-        bd[0] = ((uint32_t)RX_BUF_SIZE << 16) | flags;  // capacity in [31:16]
+        uint32_t ptr    = RX_BUF_BASE + i*RX_BUF_SIZE;
+        uint16_t cap    = RX_BUF_SIZE;                // capacity in upper 16
+        uint16_t flags  = BD_E_R | BD_IRQ;            // EMPTY=1 hands to MAC
+        if (i == RX_BD_COUNT - 1) flags |= BD_WRAP;   // wrap on last
+        volatile uint32_t* bd = (volatile uint32_t*)(ETH_BD_BASE + bd_idx*8u);
+        bd[0] = ((uint32_t)cap << 16) | flags;
         bd[1] = ptr;
     }
 
-    rx_tail = RX_BD_FIRST;
-
 /*
-    // Enable RX (broadcast okay; promiscuous off)
+    // Enable RX (broadcast allowed; promiscuous off)
     uint32_t m = eth_readl(ETH_MODER);
     m |=  (MODER_RXEN | MODER_BRO | MODER_PAD | MODER_CRCEN | MODER_FULLD);
     m &= ~(MODER_PRO);
     eth_writel(m, ETH_MODER);
 */
 
-    // Reasonable min/max frame
+    // Reasonable packet length window
     eth_writel((64u<<16) | 1518u, ETH_PACKETLEN);
 }
 
@@ -210,6 +313,9 @@ void eth_rx_ring_init(void)
 int eth_init(const uint8_t mac[6]){
     // Disable MAC
     eth_writel(0, ETH_MODER);
+
+    //
+    rx_queue_init();
 
     // MDIO
     mdio_init();
@@ -223,7 +329,7 @@ int eth_init(const uint8_t mac[6]){
     //eth_init_bds();
 
     //eth_rx_init_ring();
-    eth_rx_ring_init();
+    eth_rx_init_ring_multiple();
 
     //Unmask Interrupts ...
     eth_writel((ETH_INT_TXB | ETH_INT_TXE | ETH_INT_RXB | ETH_INT_RXE | ETH_INT_BUSY | ETH_INT_TXC | ETH_INT_RXC), ETH_INT_MASK);
@@ -236,6 +342,35 @@ int eth_init(const uint8_t mac[6]){
     eth_writel(m, ETH_MODER);
     return 0;
 }
+
+// Enqueue a TX buffer (blocking; picks first free BD)
+/*
+int eth_tx_enqueue(const void* buf, unsigned len){
+    dcache_clean_range((void*)buf, len);
+
+    for (unsigned i=0;i<ETH_TX_BD_NUM;i++){
+        uint32_t st = BD(i)->stat;
+        if ((st & BD_E_R)==0){ // READY==0 → free
+            BD(i)->ptr  = (uint32_t)buf;  // physical address expected
+            BD(i)->stat = (st & BD_WRAP) | BD_IRQ | BD_TX_PAD | BD_TX_CRC | BD_E_R | ((len >> 16) & BD_LEN_MASK);
+            return 0;
+        }
+    }
+    return -1; // no free TX descriptor
+}
+
+static inline void write_payload_to_bufram32(const uint8_t *src, unsigned len)
+{
+    volatile uint32_t *dst = (volatile uint32_t *)ETHMAC_BUF_RAM_BASE;
+    unsigned i = 0;
+    while (i < len) {
+        uint32_t word = 0;
+        for (int b = 0; b < 4 && i < len; b++, i++)
+            word |= ((uint32_t)src[i]) << (b * 8);
+        *dst++ = word;
+    }
+}
+*/
 
 static inline void write_payload_to_bufram32_be(const uint8_t *src, unsigned len)
 {
@@ -284,4 +419,85 @@ int eth_tx_enqueue(const void* buf, unsigned buf_len) {
   //eth_writel(m, ETH_MODER);
 
   return 0;
+}
+
+/*
+// Poll for one RX frame; copies into out_buf if provided.
+// Return: 1 if a frame delivered, 0 if none, <0 on error.
+int eth_rx_poll(void* out_buf, unsigned* out_len){
+    for (unsigned i=ETH_TX_BD_NUM;i<ETH_BD_COUNT;i++){
+        uint32_t st = BD(i)->stat;
+        if ((st & BD_E_R)==0){ // EMPTY==0 → filled by MAC
+            unsigned len = st & BD_LEN_MASK;
+            dcache_inval_range((void*)BD(i)->ptr, len);
+            if (out_len) *out_len = len;
+            if (out_buf) memcpy(out_buf, (void*)BD(i)->ptr, len);
+            // hand BD back to MAC
+            ;BD(i)->stat = (st & BD_WRAP) | BD_IRQ | BD_E_R;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int eth_rx_poll(unsigned index, void* out_buf, unsigned* out_len){
+    uint32_t st = BD(index)->stat;
+    uint32_t st1=0, ptr1=0;
+
+    if ((st & BD_E_R)==0){ // EMPTY==0 → filled by MAC
+
+        rxbd_read(index, &st1, &ptr1);
+        uart_puts("st "); uart_puthex32(st1); uart_puts(" ptr "); uart_puthex32(ptr1); uart_puts("\r\n");
+
+        rxbd_print_packet(index);
+
+        unsigned len = (st >> 16) & BD_LEN_MASK;
+        dcache_inval_range((void*)BD(index)->ptr, len);
+        if (out_len) *out_len = len;
+        if (out_buf) memcpy(out_buf, (void*)BD(index)->ptr, len);
+
+        // hand BD back to MAC
+        BD(index)->stat = (st & BD_WRAP) | BD_IRQ | BD_E_R; //Length is set to 0 as the we are setting things for the next packet ...
+        return 1;
+    }
+    return 0;
+}
+*/
+
+static unsigned rx_idx = RX_BD_FIRST;
+
+int eth_rx_poll_1(void* out_buf, unsigned* out_len){
+    for (unsigned n=0; n<RX_BD_COUNT; ++n) {
+        uint32_t st1=0, ptr1=0;
+        volatile uint32_t* bd = (volatile uint32_t*)(ETH_BD_BASE + rx_idx*8u);
+        uint32_t st  = bd[0]; //Reading BD Status ...
+        uint16_t flg = (uint16_t)(st & 0xFFFF);
+        uint16_t len = (uint16_t)(st >> 16);
+
+        //rxbd_read(rx_idx, &st1, &ptr1);
+        //uart_puts("st "); uart_puthex32(st1); uart_puts(" ptr "); uart_puthex32(ptr1); uart_puts("\r\n");
+
+        if ((flg & BD_E_R) == 0) {                // frame ready
+            uint32_t ptr = bd[1]; //Reading BD Pointer ...
+            dcache_inval_range((void*)ptr, len);
+
+            if (out_len) *out_len = len;
+            //if (out_buf) memcpy(out_buf, (void*)ptr, len);
+            if (out_buf) copy_from_ethram(out_buf, (const void*)ptr, len);
+
+            // quick debug (optional, but keep it tiny)
+            //rxbd_print_packet(rx_idx);
+
+            // re-arm immediately (capacity back in [31:16])
+            uint16_t wrap = flg & BD_WRAP;
+            bd[0] = ((uint32_t)RX_BUF_SIZE << 16) | (wrap | BD_IRQ | BD_E_R);
+
+            rx_idx = (rx_idx == RX_BD_FIRST + RX_BD_COUNT - 1) ? RX_BD_FIRST : (rx_idx + 1);
+            return 1;
+        }
+
+        // advance if this one wasn’t ready
+        rx_idx = (rx_idx == RX_BD_FIRST + RX_BD_COUNT - 1) ? RX_BD_FIRST : (rx_idx + 1);
+    }
+    return 0;
 }

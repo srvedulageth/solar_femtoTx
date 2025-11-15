@@ -1,0 +1,75 @@
+// ====== rx_queue.h (or top of your C) ======
+#include <stdint.h>
+
+#define RXQ_DEPTH  4          // small, ISR-friendly
+#define RX_MTU     1536       // >= max frame you expect (1518 ok)
+#define MIN_FRAME_BYTES 60
+
+typedef struct {
+    volatile uint8_t ready; //Vedula
+    uint16_t len;
+    uint8_t  buf[RX_MTU];
+} rx_msg_t;
+
+static volatile uint32_t rxq_head = 0;  // ISR producer
+static volatile uint32_t rxq_tail = 0;  // main consumer
+static rx_msg_t rxq[RXQ_DEPTH];
+
+static inline int rxq_is_full(void)  { return ((rxq_head + 1) % RXQ_DEPTH) == rxq_tail; }
+static inline int rxq_is_empty(void) { return rxq_head == rxq_tail; }
+
+static inline int rxq_push_isr(uint16_t len, const uint8_t* data)
+{
+    if (len < MIN_FRAME_BYTES) return -1;
+    if (rxq_is_full()) return -1;
+
+    uint32_t h = rxq_head;
+    rxq[h].ready = 0;
+    for (uint32_t i=0; i<len && i<RX_MTU; ++i) rxq[h].buf[i] = data[i];
+    rxq[h].len = len;
+    __asm__ volatile("" ::: "memory");
+    rxq[h].ready = 1;                         // commit
+    rxq_head = (h + 1) % RXQ_DEPTH;
+    return 0;
+}
+
+static inline int rxq_pop(uint8_t** out_ptr, uint16_t* out_len)
+{
+    if (rxq_is_empty()) return 0;
+    uint32_t t = rxq_tail;
+    if (!rxq[t].ready) return 0;              // not committed yet
+    if (out_ptr) *out_ptr = rxq[t].buf;
+    if (out_len) *out_len = rxq[t].len;
+    rxq[t].ready = 0;                          // clear for reuse
+    rxq_tail = (t + 1) % RXQ_DEPTH;
+    return 1;
+}
+
+/*
+// Producer push (ISR): returns 0 on success, -1 if full (drop)
+static inline int rxq_push_isr(uint16_t len, const uint8_t* data)
+{
+    if (rxq_is_full()) return -1;            // queue full → drop
+    uint32_t h = rxq_head;
+    rxq[h].len = len;
+
+    // Copy payload
+    // (If you have cache, ensure writeback from this buffer if required)
+    for (uint32_t i=0; i<len && i<RX_MTU; ++i) rxq[h].buf[i] = data[i];
+
+    // Publish
+    rxq_head = (h + 1) % RXQ_DEPTH;
+    return 0;
+}
+
+// Consumer pop (main): returns 1 if a message is returned
+static inline int rxq_pop(uint8_t** out_ptr, uint16_t* out_len)
+{
+    if (rxq_is_empty()) return 0;
+    uint32_t t = rxq_tail;
+    if (out_ptr) *out_ptr = rxq[t].buf;
+    if (out_len) *out_len = rxq[t].len;
+    rxq_tail = (t + 1) % RXQ_DEPTH;          // consume
+    return 1;
+}
+*/

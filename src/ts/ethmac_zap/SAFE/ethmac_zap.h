@@ -13,14 +13,6 @@
 #define ETH_P_ARP  0x0806
 #define ETH_P_IP   0x0800
 
-// RX ring: BD 64..(64+RX_BD_COUNT-1) are RX
-#define RX_BD_FIRST    64u
-#define RX_BD_COUNT     8u           // 8 is a good start
-#define RX_BUF_SIZE  2048u           // per-BD capacity (>= 1536)
-
-static volatile unsigned rx_tail = RX_BD_FIRST;   // next BD to consume
-static volatile int      rx_poll_scheduled = 0;   // set by ISR, cleared by main
-
 /* ================= Platform glue (EDIT THESE) ================= */
 
 // EthMAC Wishbone slave base (your map: 0xFFFF_E000 .. 0xFFFF_EFFF)
@@ -82,9 +74,6 @@ static inline uint32_t eth_readl(uintptr_t a){ return *(volatile uint32_t*)a; }
 #define ETH_MIISTATUS        ETH_REG(0x0F)
 #define ETH_MAC_ADDR0        ETH_REG(0x10)  // low 32 bits
 #define ETH_MAC_ADDR1        ETH_REG(0x11)  // high 16 bits in low half
-
-#define ETH_MAC_HASH0        ETH_REG(0x12)  //
-#define ETH_MAC_HASH1        ETH_REG(0x13)  //
 
 /* ================= MODER bits (common OC EthMAC) ================= */
 #define MODER_RXEN           (1u<<0)
@@ -174,10 +163,14 @@ typedef struct {
 /* ================= Public API ================= */
 int  eth_init(const uint8_t mac[6]);
 int  eth_tx_enqueue(const void* buf, unsigned len);
-void eth_rx_ring_init(void);
+int  eth_rx_poll(unsigned index, void* out_buf, unsigned* out_len);
+int  eth_rx_poll_1(void* out_buf, unsigned* out_len);
+void eth_rx_init_ring(void);
 void eth_set_bd_addr0(unsigned index, uint16_t length, uint16_t flags);
+uint16_t peek_ethertype(uint32_t buf_addr);
 void rxbd_read(unsigned idx, uint32_t* status, uint32_t* ptr);
 void debug_rx_bd(unsigned bd_idx, unsigned len);
+void rx_drain_isr(unsigned budget);
 
 // Optional helpers if you want to expose MDIO
 int  eth_mdio_write(uint8_t phy, uint8_t reg, uint16_t val);

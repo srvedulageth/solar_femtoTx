@@ -30,7 +30,7 @@ void phy_autoneg_and_wait(void);
 void phy_verify(int pa);
 void mdio_burner(int pa);
 void eth_transmit(void);
-void net_poll_drain(unsigned budget);
+void net_poll(void);
 void net_init(void);
 
 void irq_handler ()
@@ -59,25 +59,35 @@ int main(void)
 {
         // Just bringup the UART TX and RX - enable interrupts and exit.
         UARTInit();
+
+        //UARTPrintBanner();
+
         eth_demo_init();
+
+/*
+        phy_hw_reset();
+        phy_scan_all();
+        phy_autoneg_and_wait();
+        eth_print_phy_status();
+        phy_verify(1);
+        //phy_verify(2);
+        mdio_burner(1);
+*/
 
         //eth_transmit();
         //net_init();
+
         //UARTWrite("Net up. Try: ping 192.168.1.20\r\n");
 
         // Respond to ARP + PING forever
         for (;;) {
-            if (rx_poll_scheduled) {
-               // Drain up to a budget; prevents livelock under heavy RX
-               net_poll_drain(/*budget*/ 16);
-            }
+            net_poll();
 
             // Example: fire a UDP packet to Windows: 192.168.1.10:9000
             // const char msg[] = "hello from FPGA";
             // udp_send_to_ip(htonl(PC_IP), 9000, msg, sizeof(msg)-1);
 
             // small idle if you want
-            for (volatile unsigned k = 0; k < 2; ++k) __asm__ volatile("" ::: "memory");
         }
 
         UARTEnableRXInterrupt();

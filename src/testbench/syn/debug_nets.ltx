@@ -97,7 +97,7 @@
                                 "portIndex": 3,
                                 "nets": [
                                     {
-                                        "name": "mtxerr_pad_dbg",
+                                        "name": "mrxdv_pad_dbg",
                                         "isBus": false
                                     }
                                 ]
@@ -107,64 +107,28 @@
                                 "id": 4,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
-                                "isVector": false,
+                                "isVector": true,
                                 "leftIndex": 0,
-                                "rightIndex": 0,
+                                "rightIndex": 3,
                                 "portIndex": 4,
                                 "nets": [
                                     {
-                                        "name": "i_reset_dbg",
-                                        "isBus": false,
-                                        "parentNetId": 7
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe5",
-                                "id": 5,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": false,
-                                "leftIndex": 0,
-                                "rightIndex": 0,
-                                "portIndex": 5,
-                                "nets": [
-                                    {
-                                        "name": "stable_reset_dbg",
-                                        "isBus": false
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "parent_nets": [
-                    {
-                        "id": 7,
-                        "name": "i_reset_dbg",
-                        "state_reg": [
-                            {
-                                "name": "u_vic/FSM_sequential_wbstate_reg[0]",
-                                "states": [
-                                    {
-                                        "name": "WBIDLE",
-                                        "val": "000"
-                                    },
-                                    {
-                                        "name": "WBACK",
-                                        "val": "011"
-                                    },
-                                    {
-                                        "name": "WBDONE",
-                                        "val": "100"
-                                    },
-                                    {
-                                        "name": "WBREAD",
-                                        "val": "010"
-                                    },
-                                    {
-                                        "name": "WBWRITE",
-                                        "val": "001"
+                                        "name": "mrxd_pad_dbg",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "mrxd_pad_dbg[3]"
+                                            },
+                                            {
+                                                "name": "mrxd_pad_dbg[2]"
+                                            },
+                                            {
+                                                "name": "mrxd_pad_dbg[1]"
+                                            },
+                                            {
+                                                "name": "mrxd_pad_dbg[0]"
+                                            }
+                                        ]
                                     }
                                 ]
                             }

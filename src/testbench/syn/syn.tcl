@@ -180,7 +180,6 @@ connect_debug_port u_ila_0/probe0 [get_nets [list mtx_clk_pad_dbg ]]
 create_debug_port u_ila_0 probe
 set_property port_width 4 [get_debug_ports u_ila_0/probe1]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-#connect_debug_port u_ila_0/probe1 [get_nets [list mtxd_pad_dbg ]]
 connect_debug_port u_ila_0/probe1 [get_nets {mtxd_pad_dbg[*]}]
 
 create_debug_port u_ila_0 probe
@@ -191,17 +190,12 @@ connect_debug_port u_ila_0/probe2 [get_nets [list mtxen_pad_dbg ]]
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe3]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
-connect_debug_port u_ila_0/probe3 [get_nets [list mtxerr_pad_dbg ]]
+connect_debug_port u_ila_0/probe3 [get_nets [list mrxdv_pad_dbg ]]
 
 create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe4]
+set_property port_width 4 [get_debug_ports u_ila_0/probe4]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
-connect_debug_port u_ila_0/probe4 [get_nets [list i_reset_dbg ]]
-
-create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe5]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
-connect_debug_port u_ila_0/probe5 [get_nets [list stable_reset_dbg ]]
+connect_debug_port u_ila_0/probe4 [get_nets {mrxd_pad_dbg[*]}]
 
 #Debug
 #link_design -debug
