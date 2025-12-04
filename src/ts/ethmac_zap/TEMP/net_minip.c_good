@@ -390,119 +390,109 @@ void net_init(void){
 // Processes completed RX BDs in order, zero-copy (directly from BRAM),
 // re-arms each BD, and stops when no more ready or budget consumed.
 //void net_poll_drain(unsigned budget) {
-void net_poll_drain(void) {
+void net_poll_drain() {
     unsigned done = 0;
 
     while (done < 1) {
+        //eth_writel(0x11223344, ETH_MAC_HASH1);
         volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + rx_tail*8u);
         uint32_t st = bd[0];
 
-        if (st & BD_E_R)
-            break;                 // BD still owned by MAC, nothing to do
+        if (st & BD_E_R) break;                 // not ready yet
 
         uint16_t len  = (uint16_t)((st >> 16) & 0xFFFF);   // actual frame length
         uint32_t ptr  = bd[1];
 
-        // Re-arm BD (capacity back in [31:16]) *before* we start decoding.
+        // Snapshot which BD we’re processing in case you want debug
+        //unsigned this_bd = rx_tail;
+
+        // Re-arm BD (capacity back in [31:16])
         uint16_t wrap = (uint16_t)(st & BD_WRAP);
         bd[0] = ((uint32_t)RX_BUF_SIZE << 16) | (wrap | BD_IRQ | BD_E_R);
 
         // Advance ring index now
-        rx_tail = (rx_tail == RX_BD_FIRST + RX_BD_COUNT - 1)
-                  ? RX_BD_FIRST
-                  : (rx_tail + 1);
+        rx_tail = (rx_tail == RX_BD_FIRST + RX_BD_COUNT - 1) ? RX_BD_FIRST : (rx_tail + 1);
 
         done++;
 
         // Ensure CPU sees fresh data
         dcache_inval_range((void*)ptr, len);
 
+        //uart_puthex16(len); uart_puts("\r\n");
+
+        //eth_writel(len, ETH_MAC_HASH0);
         // --- process directly from BRAM (zero-copy) ---
         if (len >= sizeof(struct eth_hdr_t)) {
-            const uint8_t  *pkt  = (const uint8_t*)ptr;
+            const uint8_t *pkt = (const uint8_t*)ptr;
             const uint32_t *pkt1 = (const uint32_t*)ptr;
             const struct eth_hdr_t *eth = (const struct eth_hdr_t*)pkt;
 
-            uint16_t etype = load_ethertype(pkt1);   // 0x0806 ARP, 0x0800 IPv4, etc.
-
+            //uint16_t etype = ntohs(eth->type);
+            uint16_t etype = load_ethertype(pkt1);   // this should be 0x0806 for ARP
 #ifdef DEBUG_1
-            uart_puts("net_mini etype=0x"); uart_puthex16(etype); uart_puts("\r\n");
+            uart_puts("net_mini etype= 0x"); uart_puthex16(etype); uart_puts("\r\n");
 #endif
 
-            // ----------------- ARP -----------------
             if (etype == ETH_P_ARP) {
-                if (len >= sizeof(struct eth_hdr_t) + sizeof(struct arp_pkt_t)) {
+                if (len >= sizeof(struct eth_hdr_t)+sizeof(struct arp_pkt_t )) {
+                    //const struct arp_pkt_t* arp = (const struct arp_pkt_t*)(pkt + sizeof(*eth));
                     struct arp_pkt_t info;
                     load_arp_info(pkt + sizeof(struct eth_hdr_t), &info);
 
 #ifdef DEBUG_1
-                    uart_puts("ARP oper=0x"); uart_puthex16(info.oper);
-                    uart_puts(" tpa=0x"); uart_puthex32(info.tpa);
-                    uart_puts("\r\n");
+                    uart_puts("ARP oper=0x"); uart_puthex16(info.oper); uart_puts(" "); uart_puts("\r\n");
 #endif
-                    // Only answer ARP request (oper = 1) for our IP
-                    if (info.oper == 1 && info.tpa == MY_IP) {
-                        // reply to sender MAC/IP
+
+                    if (info.oper==1) {
+#ifdef DEBUG_1
+                      uart_puts("ARP tpa=0x"); uart_puthex32(info.tpa); uart_puts(" \r\n"); uart_puts("\r\n"); 
+#endif
+                      if (info.tpa == MY_IP) {
+                        //send_arp_reply(eth->src, arp->spa, arp->tpa);
+                        //send_arp_reply(eth->src, info.spa, info.tpa);
                         send_arp_reply(info.sha, info.spa, info.tpa);
+                      }
+                    }
+                }
+            } else if (etype == ETH_P_IP) {
+                if (len >= sizeof(struct eth_hdr_t)+sizeof(struct ip_hdr_t)) {
+                    //const struct ip_hdr_t* ip = (const struct ip_hdr_t*)(pkt + sizeof(*eth));
+                    struct ip_hdr_t ip_info;
+                    //load_ip_info(pkt + sizeof(struct ip_hdr_t), &ip_info);
+                    load_ip_info(pkt + sizeof(struct eth_hdr_t), &ip_info);
+
+                    //struct eth_hdr_t eth_hdr_info;
+                    //load_eth_info(pkt1, &eth_hdr_info); //COMMENTING THIS WORKS
+                    uint8_t dst_mac[6];
+                    load_eth_dst(pkt1, dst_mac);
+
+                    //eth_writel(ip_info.ver_ihl, ETH_MAC_HASH1); eth_writel(ip_info.proto, ETH_MAC_HASH1); eth_writel(ip_info.daddr, ETH_MAC_HASH1);
+                    if (ip_info.ver_ihl == 0x45 && ip_info.proto   == IPPROTO_ICMP && ip_info.daddr   == MY_IP) {       // already host endian
+                        unsigned ihl = 20;               // no options
+                        unsigned icmp_len = ip_info.tot_len - ihl;  // tot_len is host endian
+
+                        if (len >= sizeof(struct eth_hdr_t) + ihl + sizeof(struct icmp_hdr_t)) {
+                            const uint8_t* ip_start = pkt + sizeof(struct eth_hdr_t);
+                            const uint8_t* icmp_ptr = ip_start + ihl;
+                            const struct icmp_hdr_t* icmp = (const struct icmp_hdr_t*)icmp_ptr;
+
+                            if (ip_info.icmp_type == ICMP_ECHO_REQUEST) {
+                                //eth_writel(0x11111111, ETH_MAC_HASH1);
+                                //send_icmp_echo_reply(eth_hdr_info.src, ip_info.saddr, (const uint8_t*)icmp, icmp_len);
+                                send_icmp_echo_reply(dst_mac, ip_info.saddr, (const uint8_t*)icmp, icmp_len);
+                            }
+                        }
                     }
                 }
             }
-
-            // ----------------- IPv4 -----------------
-            else if (etype == ETH_P_IP) {
-                if (len < sizeof(struct eth_hdr_t) + sizeof(struct ip_hdr_t)) {
-                    // Too short to even contain full IPv4 header → drop
-                    goto next_packet;
-                }
-
-                struct ip_hdr_t ip_info;
-                load_ip_info(pkt + sizeof(struct eth_hdr_t), &ip_info);
-
-                // Fast drop filters:
-                //  - must be IPv4 header 0x45 (no options)
-                //  - must be addressed to us
-                if (ip_info.ver_ihl != 0x45)
-                    goto next_packet;
-                if (ip_info.daddr != MY_IP)
-                    goto next_packet;
-
-                // We only support ICMP. Drop UDP/TCP/others.
-                if (ip_info.proto != IPPROTO_ICMP)
-                    goto next_packet;
-
-                unsigned ihl      = 20;                  // ver_ihl == 0x45 guaranteed
-                unsigned icmp_len = ip_info.tot_len - ihl;
-
-                if (len < sizeof(struct eth_hdr_t) + ihl + sizeof(struct icmp_hdr_t))
-                    goto next_packet;   // truncated
-
-                const uint8_t *ip_start  = pkt + sizeof(struct eth_hdr_t);
-                const uint8_t *icmp_ptr  = ip_start + ihl;
-                const struct icmp_hdr_t *icmp =
-                    (const struct icmp_hdr_t*)icmp_ptr;
-
-                // Only answer echo requests
-                if (ip_info.icmp_type != ICMP_ECHO_REQUEST)
-                    goto next_packet;
-
-                // Extract destination MAC (sender of the request)
-                uint8_t dst_mac[6];
-                load_eth_dst(pkt1, dst_mac);
-
-                // Send echo reply back
-                send_icmp_echo_reply(dst_mac, ip_info.saddr,
-                                     (const uint8_t*)icmp, icmp_len);
-            }
-
-            // Any other EtherType is silently ignored (IPv6, 802.1Q, etc.)
         }
-
-next_packet:
-        // Tiny barrier/delay
-        for (volatile unsigned k = 0; k < 2; ++k)
-            __asm__ volatile("" ::: "memory");
+        //eth_writel(done, ETH_MAC_HASH1);
+        for (volatile unsigned k = 0; k < 2; ++k) __asm__ volatile("" ::: "memory");
     }
-
     // Finished draining → allow new interrupts
     rx_poll_scheduled = 0;
+
+    // If you masked RX in the ISR, unmask here:
+    // uint32_t mask = eth_readl(ETH_INT_MASK);
+    // eth_writel(mask | (ETH_INT_RXB | ETH_INT_RXF), ETH_INT_MASK); // if 1=en
 }

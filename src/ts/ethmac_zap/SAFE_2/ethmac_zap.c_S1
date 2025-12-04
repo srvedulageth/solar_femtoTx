@@ -3,9 +3,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "uart.h"
-#include "ethmac_shared.h"
-
-volatile int rx_poll_scheduled = 0;
 
 /* ------------ MII management (MDIO) ------------ */
 static inline void mdio_wait_idle(void){
@@ -152,7 +149,6 @@ void eth_tx_ring_init(void) {
 
 /* ------------ Public API ------------ */
 int eth_init(const uint8_t mac[6]){
-
     // Disable MAC
     eth_writel(0, ETH_MODER);
 
@@ -205,6 +201,57 @@ static inline void write_payload_to_bufram32_be(uint32_t dst_addr,
         *dst++ = word;
     }
 }
+
+/*
+static inline void write_payload_to_bufram32_be(const uint8_t *src, unsigned len)
+{
+    volatile uint32_t *dst = (volatile uint32_t *)ETHMAC_BUF_RAM_BASE;
+    unsigned i = 0;
+
+    while (i < len) {
+        uint32_t word = 0;
+        for (int b = 0; b < 4 && i < len; b++, i++)
+            word |= ((uint32_t)src[i]) << ((3 - b) * 8);  // <-- reverse order
+        *dst++ = word;
+    }
+}
+
+int eth_tx_enqueue(const void* buf, unsigned buf_len) {
+  //Write Payload data to buffer ram ...
+  write_payload_to_bufram32_be(buf, buf_len);
+
+  //TX_BD_NUM
+  //eth_writel(ETH_TX_BD_NUM, ETH_TX_BD_NUM_REG);    // first N BDs TX
+
+  //Unmask Interrupts ...
+  //eth_writel((ETH_INT_TXB | ETH_INT_TXE | ETH_INT_RXB | ETH_INT_RXE | ETH_INT_BUSY | ETH_INT_TXC | ETH_INT_RXC), ETH_INT_MASK);
+
+  uint32_t len = eth_readl(ETH_PACKETLEN);
+  uint16_t max_len = (uint16_t)(len & 0xFFFF);
+  uint16_t min_len = (uint16_t)((len >> 16) & 0xFFFF);
+
+  //TX BD ...
+  uint16_t i_length = (min_len - 4); 
+  uint16_t flags = 0;
+  flags |= (1u << 15); //rd ready
+  flags |= (1u << 14); //irq en
+  flags |= (1u << 13); //wrap set to 1 => this buffer descriptor is the last ...
+  flags |= (1u << 12); //pad padding en
+  flags |= (1u << 11); //crc append crc
+
+  //Set Buffer Descriptor
+  (void)eth_set_bd(0, i_length, flags, ETHMAC_BUF_RAM_BASE);
+
+  //Set WR bit to 1 in TXBD ...
+  //uint32_t m = eth_readl();
+
+  //uint32_t m = (MODER_RXEN | MODER_TXEN | MODER_PRO | MODER_BRO | MODER_PAD | MODER_FULLD | MODER_CRCEN);
+  //uint32_t m = (MODER_TXEN | MODER_PAD | MODER_FULLD | MODER_CRCEN);
+  //eth_writel(m, ETH_MODER);
+
+  return 0;
+}
+*/
 
 int eth_tx_enqueue(const void *buf, unsigned len) {
     unsigned idx = tx_head;

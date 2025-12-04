@@ -1,15 +1,67 @@
 #include "ethmac_zap.h"
+#include "uart.h"
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "uart.h"
-#include "ethmac_shared.h"
-
-volatile int rx_poll_scheduled = 0;
 
 /* ------------ MII management (MDIO) ------------ */
 static inline void mdio_wait_idle(void){
     while (eth_readl(ETH_MIICOMMAND) & (MIICOMMAND_RSTAT | MIICOMMAND_WCTRLDATA)) { /* spin */ }
+}
+
+static inline void copy_from_ethram(void *dst, const void *src, unsigned len)
+{
+    uint8_t       *d  = (uint8_t*)dst;
+    const uint8_t *s  = (const uint8_t*)src;
+
+    // Align source to 4 bytes (ARMv5 prefers aligned LDR)
+    while (((uintptr_t)s & 3u) && len) {
+        *d++ = *s++;
+        --len;
+    }
+
+    // Bulk copy as 32-bit words
+    const volatile uint32_t *s32 = (const volatile uint32_t*)s;
+    while (len >= 4) {
+        uint32_t w = *s32++;              // exactly one 32-bit read from IO RAM
+        *(uint32_t*)d = w;                // one 32-bit store to system RAM
+        d   += 4;
+        len -= 4;
+    }
+
+    // Trailing bytes
+    s = (const uint8_t*)s32;
+    while (len--) {
+        *d++ = *s++;
+    }
+}
+
+void rxbd_read(unsigned idx, uint32_t* status, uint32_t* ptr)
+{
+    volatile uint32_t* bd = (volatile uint32_t*)(ETH_BD_BASE + (idx * 8u));
+    // Order matters a bit less for RX, but read status first, then pointer
+    uint32_t st  = bd[0];
+    uint32_t ptr1 = bd[1];
+
+    if (status) *status = st;
+    if (ptr)    *ptr    = ptr1;
+}
+
+static void rxbd_print_packet(unsigned idx){
+    volatile uint32_t* bd = (volatile uint32_t*)(ETH_BD_BASE + idx*8u);
+    uint32_t st = bd[0], ptr = bd[1];
+    uint16_t flags = st & 0xFFFF, len = st >> 16;
+
+    //if (flags & BD_E) return;   // not ready
+
+    dcache_inval_range((void*)ptr, len);
+    volatile uint8_t* p = (volatile uint8_t*)ptr;
+
+    uart_puts("RX#"); uart_puthex(idx);
+    uart_puts(" len="); uart_puthex(len);
+    uart_puts(" dst="); for (int i=0;i<6;i++){ uart_puthex8(p[i]); UARTWriteByte(i==5? ' ':' '); }
+    uart_puts("  src="); for (int i=6;i<12;i++){ uart_puthex8(p[i]); UARTWriteByte(i==11?' ':' '); }
+    uart_puts("  type="); uart_puthex8(p[12]); uart_puthex8(p[13]); uart_puts("\r\n");
 }
 
 // MDC <= 2.5 MHz. For many OC drops: MDC = SYS / (2*(CLKDIV+1))
@@ -70,10 +122,9 @@ static int phy_full_duplex(void){
 }
 
 /* ------------ MAC config ------------ */
-    const unsigned char mac[6] = {0x02,0x12,0x34,0x56,0x78,0x9A};
 static void eth_set_mac(const uint8_t mac[6]){
-    uint32_t lo = (mac[5]) | (mac[4]<<8) | (mac[3]<<16) | (mac[2]<<24);
-    uint32_t hi = (mac[1]) | (mac[0]<<8);
+    uint32_t lo = (mac[3]) | (mac[2]<<8) | (mac[1]<<16) | (mac[0]<<24);
+    uint32_t hi = (mac[5]) | (mac[4]<<8);
     eth_writel(lo, ETH_MAC_ADDR0);
     eth_writel(hi, ETH_MAC_ADDR1);
 }
@@ -84,6 +135,26 @@ static void eth_config_defaults(void){
     eth_writel(0x12, ETH_IPGR2);
     eth_writel((64u<<16) | 1518u, ETH_PACKETLEN);    // min/max frame
     eth_writel(ETH_TX_BD_NUM, ETH_TX_BD_NUM_REG);    // first N BDs TX
+}
+
+static void eth_init_bds(void){
+    // Zero all BDs
+    for (unsigned i=0;i<ETH_BD_COUNT;i++){ BD(i)->stat = 0; BD(i)->ptr = 0; }
+    // Mark wrap bits (last TX and last RX descriptors)
+    BD(ETH_TX_BD_NUM-1)->stat = BD_WRAP;           // TX wrap
+    BD(ETH_BD_COUNT-1)->stat |= BD_WRAP;           // RX wrap
+
+    // Initialize RX descriptors to EMPTY with buffers
+    const unsigned RX_START = ETH_TX_BD_NUM;
+    const unsigned RX_COUNT = ETH_BD_COUNT - ETH_TX_BD_NUM;
+    unsigned offs = 0;
+    const unsigned rx_buf_size = 2048; // adjust
+    for (unsigned i=0;i<RX_COUNT;i++){
+        uintptr_t buf = ETH_DMA_MEM_BASE + offs;
+        BD(RX_START+i)->ptr  = (uint32_t)buf;
+        BD(RX_START+i)->stat = (BD(RX_START+i)->stat & BD_WRAP) | BD_IRQ | BD_E_R; // EMPTY=1
+        offs += rx_buf_size;
+    }
 }
 
 //Same function can be used for both Tx and Rx ...
@@ -104,7 +175,8 @@ void eth_set_bd_addr0(unsigned index, uint16_t length, uint16_t flags) {
 }
 
 // Choose how many RX buffers you want.
-void eth_rx_ring_init(void) {
+void eth_rx_ring_init(void)
+{
     // Split TX/RX ring
     eth_writel(RX_BD_FIRST, ETH_TX_BD_NUM_REG); // 0..63 TX, 64..127 RX
 
@@ -134,25 +206,8 @@ void eth_rx_ring_init(void) {
     eth_writel((64u<<16) | 1518u, ETH_PACKETLEN);
 }
 
-void eth_tx_ring_init(void) {
-    //eth_writel(TX_BD_COUNT, ETH_TX_BD_NUM_REG);  // 0..3 used for TX
-
-    for (unsigned i = 0; i < TX_BD_COUNT; ++i) {
-        uint32_t ptr = ETHMAC_BUF_RAM_BASE + i * TX_BUF_SIZE;
-
-        uint16_t flags = BD_IRQ;     // IRQ on done only
-        if (i == TX_BD_COUNT - 1)
-            flags |= BD_WRAP;
-
-        volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + i * 8u);
-        bd[0] = ((uint32_t)TX_BUF_SIZE << 16) | flags;   // capacity
-        bd[1] = ptr;
-    }
-}
-
 /* ------------ Public API ------------ */
 int eth_init(const uint8_t mac[6]){
-
     // Disable MAC
     eth_writel(0, ETH_MODER);
 
@@ -160,16 +215,15 @@ int eth_init(const uint8_t mac[6]){
     mdio_init();
 
     // PHY bring-up
-#ifdef DEBUG
-    (void)phy_wait_link(30);
-#endif
+    //(void)phy_wait_link(30);
 
     // Program MAC + BDs
     eth_set_mac(mac);
     eth_config_defaults();
+    //eth_init_bds();
 
+    //eth_rx_init_ring();
     eth_rx_ring_init();
-    eth_tx_ring_init();
 
     //Unmask Interrupts ...
     eth_writel((ETH_INT_TXB | ETH_INT_TXE | ETH_INT_RXB | ETH_INT_RXE | ETH_INT_BUSY | ETH_INT_TXC | ETH_INT_RXC), ETH_INT_MASK);
@@ -183,54 +237,51 @@ int eth_init(const uint8_t mac[6]){
     return 0;
 }
 
-// dst_addr = BD payload pointer (bd[1])
-// src      = contiguous Ethernet frame (bytes)
-// len      = frame length in bytes
-static inline void write_payload_to_bufram32_be(uint32_t dst_addr,
-                                                const uint8_t *src,
-                                                unsigned len)
+static inline void write_payload_to_bufram32_be(const uint8_t *src, unsigned len)
 {
-    volatile uint32_t *dst = (volatile uint32_t *)dst_addr;
+    volatile uint32_t *dst = (volatile uint32_t *)ETHMAC_BUF_RAM_BASE;
     unsigned i = 0;
 
     while (i < len) {
         uint32_t word = 0;
-
-        // Pack up to 4 bytes into one 32-bit word, big-endian in the word:
-        // byte0 → bits[31:24], byte1 → [23:16], byte2 → [15:8], byte3 → [7:0]
-        for (int b = 0; b < 4 && i < len; ++b, ++i) {
-            word |= ((uint32_t)src[i]) << ((3 - b) * 8);
-        }
-
+        for (int b = 0; b < 4 && i < len; b++, i++)
+            word |= ((uint32_t)src[i]) << ((3 - b) * 8);  // <-- reverse order
         *dst++ = word;
     }
 }
 
-int eth_tx_enqueue(const void *buf, unsigned len) {
-    unsigned idx = tx_head;
+int eth_tx_enqueue(const void* buf, unsigned buf_len) {
+  //Write Payload data to buffer ram ...
+  write_payload_to_bufram32_be(buf, buf_len);
 
-    volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + idx*8u);
-    uint32_t st = bd[0];
+  //TX_BD_NUM
+  //eth_writel(ETH_TX_BD_NUM, ETH_TX_BD_NUM_REG);    // first N BDs TX
 
-    // Check BD free?
-    if (st & BD_TX_RD) {      // EN (Ready) still = busy
-        return -1;         // all TX BDs full
-    }
+  //Unmask Interrupts ...
+  //eth_writel((ETH_INT_TXB | ETH_INT_TXE | ETH_INT_RXB | ETH_INT_RXE | ETH_INT_BUSY | ETH_INT_TXC | ETH_INT_RXC), ETH_INT_MASK);
 
-    // Copy frame to buffer RAM
-    uint32_t ptr = bd[1];
-    write_payload_to_bufram32_be(ptr, buf, len);
+  uint32_t len = eth_readl(ETH_PACKETLEN);
+  uint16_t max_len = (uint16_t)(len & 0xFFFF);
+  uint16_t min_len = (uint16_t)((len >> 16) & 0xFFFF);
 
-    // Mark BD ready
-    uint32_t wrap = st & BD_WRAP;
-    uint32_t flags = wrap | BD_IRQ | BD_TX_RD | BD_TX_PAD | BD_TX_CRC;
+  //TX BD ...
+  uint16_t i_length = (min_len - 4); 
+  uint16_t flags = 0;
+  flags |= (1u << 15); //rd ready
+  flags |= (1u << 14); //irq en
+  flags |= (1u << 13); //wrap set to 1 => this buffer descriptor is the last ...
+  flags |= (1u << 12); //pad padding en
+  flags |= (1u << 11); //crc append crc
 
-    bd[0] = ((uint32_t)len << 16) | flags;
+  //Set Buffer Descriptor
+  (void)eth_set_bd(0, i_length, flags, ETHMAC_BUF_RAM_BASE);
 
-    // Advance producer pointer
-    tx_head = (idx == TX_BD_FIRST + TX_BD_COUNT - 1)
-              ? TX_BD_FIRST
-              : (idx + 1);
+  //Set WR bit to 1 in TXBD ...
+  //uint32_t m = eth_readl();
 
-    return 0;
+  //uint32_t m = (MODER_RXEN | MODER_TXEN | MODER_PRO | MODER_BRO | MODER_PAD | MODER_FULLD | MODER_CRCEN);
+  //uint32_t m = (MODER_TXEN | MODER_PAD | MODER_FULLD | MODER_CRCEN);
+  //eth_writel(m, ETH_MODER);
+
+  return 0;
 }

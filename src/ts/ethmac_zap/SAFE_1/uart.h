@@ -20,7 +20,6 @@
 #ifndef UART_H
 #define UART_H
 #include <stdint.h>
-//#define DEBUG
 
         // Non virtualized addresses for UART0
         #define UART0_DLAB1   ((char*)0xFFFFFFE0)
@@ -62,21 +61,9 @@ static void uart_puthex(unsigned x){
   buf[10]=0; UARTWrite(buf);
 }
 
-static void uart_puthex_sml(unsigned x){
-  static const char h[]="0123456789ABCDEF";
-  char buf[3];
-  for (int i=6;i<8;i++) buf[i-6]=h[(x>>(28-4*i))&0xF];
-  UARTWrite(buf); uart_puts(" ");
-}
-
 static void uart_puthex8(uint8_t v){
     const char* H = "0123456789ABCDEF";
     UARTWriteByte(H[v>>4]); UARTWriteByte(H[v&0xF]);
-}
-
-static void uart_puthex16(uint16_t v){
-    uart_puthex8((uint8_t)(v>>8));
-    uart_puthex8((uint8_t)(v>>0));
 }
 
 static void uart_puthex32(uint32_t v){

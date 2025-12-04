@@ -15,15 +15,11 @@
 
 // RX ring: BD 64..(64+RX_BD_COUNT-1) are RX
 #define RX_BD_FIRST    64u
-#define RX_BD_COUNT     4u           // 8 is a good start
-#define RX_BUF_SIZE  1024u           // per-BD capacity (>= 1536)
+#define RX_BD_COUNT     8u           // 8 is a good start
+#define RX_BUF_SIZE  2048u           // per-BD capacity (>= 1536)
 
-#define TX_BD_FIRST   0u
-#define TX_BD_COUNT   4u
-#define TX_BUF_SIZE   1024u     // ARP(42B) OK, ICMP(74B) OK
-
-static volatile unsigned tx_head = TX_BD_FIRST;
 static volatile unsigned rx_tail = RX_BD_FIRST;   // next BD to consume
+static volatile int      rx_poll_scheduled = 0;   // set by ISR, cleared by main
 
 /* ================= Platform glue (EDIT THESE) ================= */
 
@@ -180,6 +176,8 @@ int  eth_init(const uint8_t mac[6]);
 int  eth_tx_enqueue(const void* buf, unsigned len);
 void eth_rx_ring_init(void);
 void eth_set_bd_addr0(unsigned index, uint16_t length, uint16_t flags);
+void rxbd_read(unsigned idx, uint32_t* status, uint32_t* ptr);
+void debug_rx_bd(unsigned bd_idx, unsigned len);
 
 // Optional helpers if you want to expose MDIO
 int  eth_mdio_write(uint8_t phy, uint8_t reg, uint16_t val);

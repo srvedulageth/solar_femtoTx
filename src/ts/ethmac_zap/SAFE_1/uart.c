@@ -20,7 +20,6 @@
 
 #include "uart.h"
 #include "ethmac_zap.h"
-#include "ethmac_shared.h"
 
 void eth_demo_init(void);
 void eth_print_phy_status(void);
@@ -31,8 +30,7 @@ void phy_autoneg_and_wait(void);
 void phy_verify(int pa);
 void mdio_burner(int pa);
 void eth_transmit(void);
-//void net_poll_drain(unsigned budget);
-void net_poll_drain();
+void net_poll_drain(unsigned budget);
 void net_init(void);
 
 void irq_handler ()
@@ -61,22 +59,7 @@ int main(void)
 {
         // Just bringup the UART TX and RX - enable interrupts and exit.
         UARTInit();
-
-#ifdef DEBUG
-        UARTPrintBanner();
-#endif
-
         eth_demo_init();
-
-#ifdef DEBUG
-        phy_hw_reset();
-        phy_scan_all();
-        phy_autoneg_and_wait();
-        eth_print_phy_status();
-        phy_verify(1);
-        //phy_verify(2);
-        mdio_burner(1);
-#endif
 
         //eth_transmit();
         //net_init();
@@ -85,9 +68,8 @@ int main(void)
         // Respond to ARP + PING forever
         for (;;) {
             if (rx_poll_scheduled) {
-               //eth_writel(0x11111111, ETH_MAC_HASH0);
                // Drain up to a budget; prevents livelock under heavy RX
-               net_poll_drain();
+               net_poll_drain(/*budget*/ 16);
             }
 
             // Example: fire a UDP packet to Windows: 192.168.1.10:9000

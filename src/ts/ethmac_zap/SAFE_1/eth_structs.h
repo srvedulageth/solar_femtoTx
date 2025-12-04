@@ -14,21 +14,6 @@ struct __attribute__((packed)) eth_hdr_t {
 struct __attribute__((packed)) ip_hdr_t {
     uint8_t  ver_ihl;     // 0x45
     uint8_t  tos;
-    uint8_t  icmp_type;
-    uint16_t tot_len;     // be
-    uint16_t id;          // be
-    uint16_t frag_off;    // be
-    uint8_t  ttl;
-    uint8_t  proto;
-    uint16_t hdr_csum;    // be
-    uint32_t saddr;       // be
-    uint32_t daddr;       // be
-};
-
-// IPv4 header (no options)
-struct __attribute__((packed)) ip_hdr_r_t {
-    uint8_t  ver_ihl;     // 0x45
-    uint8_t  tos;
     uint16_t tot_len;     // be
     uint16_t id;          // be
     uint16_t frag_off;    // be

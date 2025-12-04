@@ -1,8 +1,10 @@
 // ethmac_demo.c — init + optional polling helpers for EthMAC demo
 #include <stdint.h>
-#include <stdint.h>
-#include "uart.h"
 #include "ethmac_zap.h"
+#include "uart.h"
+#include <stdint.h>
+#include "ethmac_zap.h"
+#include "uart.h"
 
 // Tweak as needed (rough spin-loop timeout)
 #define TX_TIMEOUT_ITERS  (1000000u)
@@ -22,13 +24,9 @@ static inline volatile uint32_t* tx_bd(void) {
 void eth_demo_init(void)
 {
     const unsigned char mac[6] = {0x02,0x12,0x34,0x56,0x78,0x9A};
-#ifdef DEBUG
-    uart_puts("eth: init\r\n");
-#endif
+    //uart_puts("eth: init\r\n");
     eth_init(mac);
-#ifdef DEBUG
-    uart_puts("eth: init done\r\n");
-#endif
+    //uart_puts("eth: init done\r\n");
 }
 
 // put this near your other helpers

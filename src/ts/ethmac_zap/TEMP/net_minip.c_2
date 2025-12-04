@@ -1,0 +1,328 @@
+// net_minip.c — tiny LAN stack for OpenCores EthMAC
+#include <stdint.h>
+#include <string.h>   // for memset if you link it; else hand-roll
+#include "ethmac_zap.h"
+#include "eth_structs.h"
+#include "uart.h"
+
+// ---------------- CONFIG ----------------
+static const uint8_t MY_MAC[6] = {0x02,0x12,0x34,0x56,0x78,0x9A};
+#define MY_IP   0xC0A80114u   // 192.168.1.20
+#define PC_IP   0xC0A8010Au   // 192.168.1.10 (your Windows box)
+// ----------------------------------------
+
+// Helpers (endianness)
+static inline uint16_t bswap16(uint16_t x){ return (uint16_t)((x<<8)|(x>>8)); }
+static inline uint32_t bswap32(uint32_t x) {
+    return ((x & 0x000000FFu) << 24) |
+           ((x & 0x0000FF00u) <<  8) |
+           ((x & 0x00FF0000u) >>  8) |
+           ((x & 0xFF000000u) >> 24);
+}
+static inline uint16_t htons(uint16_t x){ return bswap16(x); }
+static inline uint16_t ntohs(uint16_t x){ return bswap16(x); }
+static inline uint32_t htonl(uint32_t x){
+    return ((x&0x000000FFu)<<24)|((x&0x0000FF00u)<<8)|((x&0x00FF0000u)>>8)|((x&0xFF000000u)>>24);
+}
+static inline uint32_t ntohl(uint32_t x){ return htonl(x); }
+static inline uint16_t ntohs16(uint16_t x){ return bswap16(x); }
+static inline uint32_t ntohl32(uint32_t x){ return bswap32(x); }
+
+static inline uint16_t load_ethertype(const void *base) {
+/*
+    const uint8_t *p = (const uint8_t*)base;
+    // On wire: p[12] = high, p[13] = low (network order)
+    //uint16_t net = ((uint16_t)p[12] << 8) | p[13];
+    uint16_t net = ((uint16_t)p[15] << 8) | p[14];
+*/
+
+    const uint32_t *p = (const uint32_t *)((const uint8_t *)base + 12);
+    uint32_t temp = *p; //Reading from Base + 'h C
+    uint8_t byte3 = (temp >> 24) & 0xFF; uint8_t byte2 = (temp >> 16) & 0xFF;
+    uint16_t net = ((uint16_t)byte3 << 8) | byte2;
+
+    return net;                // this is already in network order
+}
+
+// Checksums (RFC 1071)
+static uint16_t csum16(const void* data, unsigned len){
+    const uint8_t* p = (const uint8_t*)data;
+    uint32_t sum = 0;
+    while (len > 1){ sum += ((uint16_t)p[0]<<8) | p[1]; p+=2; len-=2; }
+    if (len) sum += ((uint16_t)p[0]<<8);
+    while (sum>>16) sum = (sum & 0xFFFF) + (sum>>16);
+    return (uint16_t)~sum;
+}
+static uint16_t csum16_add(uint32_t sum, const void* data, unsigned len){
+    const uint8_t* p = (const uint8_t*)data;
+    while (len > 1){ sum += ((uint16_t)p[0]<<8) | p[1]; p+=2; len-=2; }
+    if (len) sum += ((uint16_t)p[0]<<8);
+    while (sum>>16) sum = (sum & 0xFFFF) + (sum>>16);
+    return (uint16_t)sum;
+}
+static uint16_t csum16_finalize(uint32_t sum){
+    while (sum>>16) sum = (sum & 0xFFFF) + (sum>>16);
+    return (uint16_t)~sum;
+}
+
+// ICMP
+#define IPPROTO_ICMP 1
+#define ICMP_ECHO_REQUEST 8
+#define ICMP_ECHO_REPLY   0
+
+// UDP
+#define IPPROTO_UDP 17
+
+// arp_base points to the first byte of the ARP header
+// (i.e. immediately after EtherType 0x0806 in the frame buffer).
+static inline void arp_load_info(const void *arp_base, struct arp_pkt_t* out) {
+    // 1) Read 28 bytes (7 words) from BRAM into a local union.
+    //    This guarantees only these 7 bus reads happen.
+    union {
+        uint32_t w[7];
+        uint8_t  b[28];
+    } u;
+
+    const volatile uint32_t *src = (const volatile uint32_t*)arp_base;
+
+    for (int i = 0; i < 7; ++i) {
+        u.w[i] = src[i];      // 7 × 32-bit reads from BRAM. Reading from base + sizeof(struct eth_hdr)
+    }
+
+    const uint8_t *p = u.b;   // Now work from local copy only.
+
+    // 2) Decode fields (network order -> host)
+    out->htype = (uint16_t)((p[0] << 8) | p[1]);   // 0x0001
+    out->ptype = (uint16_t)((p[2] << 8) | p[3]);   // 0x0800
+    out->hlen  = p[4];                             // 6
+    out->plen  = p[5];                             // 4
+    out->oper  = (uint16_t)((p[6] << 8) | p[7]);   // 0x0001 or 0x0002
+    out->oper  = ntohs16(out->oper);
+
+    // Sender MAC (sha)
+    for (int i = 0; i < 6; ++i) {
+        out->sha[i] = p[8 + i];
+    }
+
+    // Sender IP (spa)
+    out->spa = (uint32_t)(p[14] << 24) |
+               (uint32_t)(p[15] << 16) |
+               (uint32_t)(p[16] <<  8) |
+               (uint32_t)(p[17]      );
+    out->spa = ntohl32(out->spa);
+
+    // Target MAC (tha)
+    for (int i = 0; i < 6; ++i) {
+        out->tha[i] = p[18 + i];
+    }
+
+    // Target IP (tpa)
+    out->tpa = (uint32_t)(p[24] << 24) |
+               (uint32_t)(p[25] << 16) |
+               (uint32_t)(p[26] <<  8) |
+               (uint32_t)(p[27]      );
+    out->tpa = ntohl32(out->tpa);
+}
+
+static uint8_t rx_buf[2048];
+
+// Transmit helper
+static int eth_send(const void* buf, unsigned len){
+    // If your cache needs cleaning, do it here
+    return eth_tx_enqueue(buf, len);
+}
+
+// ---------------- ARP ----------------
+static void send_arp_reply(const uint8_t req_src_mac[6], uint32_t req_spa, uint32_t req_tpa){
+    uint8_t pkt[64];
+    struct eth_hdr_t* eth = (struct eth_hdr_t*)pkt;
+    struct arp_pkt_t* arp = (struct arp_pkt_t*)(pkt + sizeof(*eth));
+
+    // Ethernet
+    memcpy(eth->dst, req_src_mac, 6);
+    memcpy(eth->src, MY_MAC, 6);
+    eth->type = htons(ETH_P_ARP);
+
+    // ARP
+    arp->htype = htons(1);
+    arp->ptype = htons(ETH_P_IP);
+    arp->hlen  = 6;
+    arp->plen  = 4;
+    arp->oper  = htons(2); // reply
+    memcpy(arp->sha, MY_MAC, 6);
+    arp->spa = htonl(MY_IP);
+    memcpy(arp->tha, req_src_mac, 6);
+    arp->tpa = req_spa; // requester IP (be)
+
+    eth_send(pkt, sizeof(*eth) + sizeof(*arp));
+}
+
+// ---------------- ICMP Echo ----------------
+static void send_icmp_echo_reply(const uint8_t src_mac[6], uint32_t saddr_be,
+                                 const uint8_t* req_icmp, unsigned icmp_len)
+{
+    uint8_t pkt[1518];
+    struct eth_hdr_t* eth = (struct eth_hdr_t*)pkt;
+    struct ip_hdr_t*  ip  = (struct ip_hdr_t*)(pkt + sizeof(*eth));
+    struct icmp_hdr_t* icmp = (struct icmp_hdr_t*)((uint8_t*)ip + sizeof(*ip));
+
+    // Ethernet
+    memcpy(eth->dst, src_mac, 6);
+    memcpy(eth->src, MY_MAC, 6);
+    eth->type = htons(ETH_P_IP);
+
+    // IP
+    ip->ver_ihl = 0x45;
+    ip->tos     = 0;
+    ip->tot_len = htons(sizeof(*ip) + icmp_len);
+    ip->id      = 0;
+    ip->frag_off= 0;
+    ip->ttl     = 64;
+    ip->proto   = IPPROTO_ICMP;
+    ip->hdr_csum= 0;
+    ip->saddr   = htonl(MY_IP);
+    ip->daddr   = saddr_be;
+
+    // ICMP
+    memcpy(icmp, req_icmp, icmp_len);
+    icmp->type = ICMP_ECHO_REPLY;
+    icmp->code = 0;
+    icmp->csum = 0;
+    icmp->csum = csum16(icmp, icmp_len);
+
+    // IP checksum
+    ip->hdr_csum = csum16(ip, sizeof(*ip));
+
+    eth_send(pkt, sizeof(*eth) + sizeof(*ip) + icmp_len);
+}
+
+// ---------------- Poller: handle ARP + ICMP ----------------
+void net_init(void){
+    // program MAC into EthMAC HW (you already do this in eth_init, shown here for clarity)
+    uint32_t lo = (MY_MAC[3]) | (MY_MAC[2]<<8) | (MY_MAC[1]<<16) | (MY_MAC[0]<<24);
+    uint32_t hi = (MY_MAC[5]) | (MY_MAC[4]<<8);
+    eth_writel(lo, ETH_MAC_ADDR0);
+    eth_writel(hi, ETH_MAC_ADDR1);
+}
+
+// assumes you already have:
+//   struct eth_hdr_t { uint8_t dst[6]; uint8_t src[6]; uint16_t type; } __attribute__((packed));
+//   uint16_t ntohs(uint16_t);
+
+static inline void print_mac(const uint8_t mac[6]){
+    for (int i=0;i<6;i++){ uart_puthex8(mac[i]); if (i!=5) UARTWriteByte(':'); }
+}
+
+// print eth header + first up-to-32 bytes of payload (starting at dst)
+static void debug_eth_frame(const struct eth_hdr_t* eth, uint16_t len) {
+    // Header sanity
+    if (len < sizeof(*eth)) return;
+
+    uint16_t etype = ntohs(eth->type);
+
+    uart_puts("ETH dst=");
+    print_mac(eth->dst);
+    uart_puts(" src=");
+    print_mac(eth->src);
+    uart_puts(" type=0x"); uart_puthex8((uint8_t)(etype>>8)); uart_puthex8((uint8_t)etype);
+
+    if (etype == 0x0806) uart_puts(" (ARP)");
+    else if (etype == 0x0800) uart_puts(" (IP)");
+    uart_puts("\r\n");
+
+    // Dump first 32 bytes of the frame (including L2 header)
+    const uint8_t* p = (const uint8_t*)eth;
+    uint16_t n = (len < 32) ? len : 32;
+
+    // 16B rows
+    for (uint16_t i=0; i<n; i++){
+        if ((i & 0x0F) == 0){
+            uart_puts("  ");
+            uart_puthex8((i >> 8) & 0xFF);
+            uart_puthex8(i & 0xFF);
+            uart_puts(": ");
+        }
+        uart_puthex8(p[i]); UARTWriteByte(' ');
+        if ((i & 0x0F) == 0x0F) uart_puts("\r\n");
+    }
+    if ((n & 0x0F) != 0) uart_puts("\r\n");
+}
+
+// Processes completed RX BDs in order, zero-copy (directly from BRAM),
+// re-arms each BD, and stops when no more ready or budget consumed.
+void net_poll_drain(unsigned budget) {
+    unsigned done = 0;
+
+    while (done < budget) {
+        volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + rx_tail*8u);
+        uint32_t st = bd[0];
+
+        if (st & BD_E_R) break;                 // not ready yet
+
+        uint16_t len  = (uint16_t)(st >> 16);   // actual frame length
+        uint32_t ptr  = bd[1];
+
+        // Ensure CPU sees fresh data
+        dcache_inval_range((void*)ptr, len);
+
+        // --- process directly from BRAM (zero-copy) ---
+        if (len >= sizeof(struct eth_hdr_t)) {
+            const uint8_t *pkt = (const uint8_t*)ptr;
+            const uint32_t *pkt1 = (const uint32_t*)ptr;
+            const struct eth_hdr_t *eth = (const struct eth_hdr_t*)pkt;
+            //uint16_t etype = ntohs(eth->type);
+            uint16_t etype = load_ethertype(pkt1);   // this should be 0x0806 for ARP
+
+            // (Optional) brief debug; avoid long UART here
+            // debug_eth_frame(eth, len);
+            (void)eth_readl(ETH_IPGT);                      // IFG
+
+            if (etype == ETH_P_ARP) {
+                if (len >= sizeof(struct eth_hdr_t)+sizeof(struct arp_pkt_t )) {
+                    (void)eth_readl(ETH_IPGR1);
+                    //const struct arp_pkt_t* arp = (const struct arp_pkt_t*)(pkt + sizeof(*eth));
+                    struct arp_pkt_t info;
+                    arp_load_info(pkt + sizeof(struct eth_hdr_t), &info);
+
+                    //if (ntohs(arp->oper)==1 && arp->tpa == htonl(MY_IP)) {
+                    if (info.oper==1 && info.tpa == MY_IP) {
+                        (void)eth_readl(ETH_IPGR2);
+                        //send_arp_reply(eth->src, arp->spa, arp->tpa);
+                        send_arp_reply(eth->src, info.spa, info.tpa);
+                    }
+                }
+            } else if (etype == ETH_P_IP) {
+                (void)eth_readl(ETH_IPGR2);
+                if (len >= sizeof(struct eth_hdr_t)+sizeof(struct ip_hdr_t)) {
+                    const struct ip_hdr_t* ip = (const struct ip_hdr_t*)(pkt + sizeof(*eth));
+                    if (ip->ver_ihl == 0x45 && ip->proto == IPPROTO_ICMP && ip->daddr == htonl(MY_IP)) {
+                        unsigned ihl = 20;
+                        if (len >= sizeof(*eth)+ihl+sizeof(struct icmp_hdr_t)) {
+                            const struct icmp_hdr_t* icmp = (const struct icmp_hdr_t*)(pkt + sizeof(*eth) + ihl);
+                            unsigned icmp_len = ntohs(ip->tot_len) - ihl;
+                            if (icmp->type == ICMP_ECHO_REQUEST) {
+                                send_icmp_echo_reply(eth->src, ip->saddr, (const uint8_t*)icmp, icmp_len);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // ----------------------------------------------
+
+        // Re-arm BD (capacity back in [31:16])
+        uint16_t wrap = (uint16_t)(st & BD_WRAP);
+        bd[0] = ((uint32_t)RX_BUF_SIZE << 16) | (wrap | BD_IRQ | BD_E_R);
+
+        // advance ring
+        rx_tail = (rx_tail == RX_BD_FIRST + RX_BD_COUNT - 1) ? RX_BD_FIRST : (rx_tail + 1);
+        done++;
+    }
+
+    // Finished draining → allow new interrupts
+    rx_poll_scheduled = 0;
+
+    // If you masked RX in the ISR, unmask here:
+    // uint32_t mask = eth_readl(ETH_INT_MASK);
+    // eth_writel(mask | (ETH_INT_RXB | ETH_INT_RXF), ETH_INT_MASK); // if 1=en
+}
