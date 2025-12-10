@@ -315,15 +315,25 @@ begin
 end
 endtask // set_rx_packet
 
-reg [7:0] arp_payload [0:45] = {
+reg [7:0] arp_payload [0:27] = {
     8'h00,8'h01,8'h08,8'h00,8'h06,8'h04,8'h00,8'h01,
     8'hA4,8'hBB,8'h6D,8'h52,8'hE4,8'h53,
     8'hC0,8'hA8,8'h01,8'h0A,
     8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,
-    8'hC0,8'hA8,8'h01,8'h14,
-    8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,
-    8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,
-    8'h00,8'h00
+    8'hC0,8'hA8,8'h01,8'h14
+};
+
+reg [7:0] ip_icmp_payload [0:59] = {
+    8'h45, 8'h00, 8'h00, 8'h3C, 8'hD7, 8'h06, 8'h00, 8'h00,
+    8'h80, 8'h01, 8'h00, 8'h00, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    // ICMP (type 8 echo request + data)
+    8'h08, 8'h00, 8'h4A, 8'h07, 8'h00, 8'h01, 8'h03, 8'h54,
+    8'h61, 8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68,
+    8'h69, 8'h6A, 8'h6B, 8'h6C, 8'h6D, 8'h6E, 8'h6F, 8'h70,
+    8'h71, 8'h72, 8'h73, 8'h74, 8'h75, 8'h76, 8'h77, 8'h61,
+    8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68, 8'h69
 };
 
 reg [7:0] ip_icmp_payload_1 [0:115] = {
@@ -401,10 +411,19 @@ begin
       eth_phy.rx_mem[buffer] = type_len[15:8];
       type_len = type_len << 8;
     end
-    else if (i < 42)
-    begin
-      eth_phy.rx_mem[buffer] = arp_payload[i-14];
+
+    else if(eth_type_len == 'h 0806) begin //ARP Pkt ...
+      if (i < 42) begin //28 bytes from arp payload
+        eth_phy.rx_mem[buffer] = arp_payload[i-14];
+      end
     end
+
+    else if(eth_type_len == 'h 0800) begin //ICMP Pkt ...
+      if (i < 74) begin //60 bytes from icmp payload
+        eth_phy.rx_mem[buffer] = ip_icmp_payload[i-14];
+      end
+    end
+
     else
     begin
       eth_phy.rx_mem[buffer] = sd[7:0];
@@ -736,6 +755,7 @@ initial begin
   end
   $finish;
 end
+*/
 
 initial begin
   #20000ns;
@@ -748,28 +768,22 @@ initial begin
     append_rx_crc (0, 'd 60, 1'b0, 1'b0); //ARP packet length 42 bytes + 18 bytes padding...
     #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 64, 1'b0); //Length = 42(ARP Packet Length) + 18 bytes padding + 4 bytes CRC ...
 
-    repeat(10000) @(posedge i_clk);
+    repeat(20000) @(posedge i_clk);
 
     //For ICMP, uncomment below 3 and comment above ARP ...
     set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'hA4_BB_6D_52_E4_53, 16'h0800, 'h 0F);
     append_rx_crc (0, 'd 74, 1'b0, 1'b0); //ICMP packet length 74 bytes... without CRC
     #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 78, 1'b0); //Length = 74(ICMP Packet Length) + 4 bytes CRC ...
 
-//    repeat(10000) @(posedge i_clk);
-//    //For ICMP, uncomment below 3 and comment above ARP ...
-//    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'hA4_BB_6D_52_E4_53, 16'h0800, 'h 0F);
-//    append_rx_crc (0, 'd 74, 1'b0, 1'b0); //ICMP packet length 74 bytes... without CRC
-//    #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 78, 1'b0); //Length = 74(ICMP Packet Length) + 4 bytes CRC ...
+    repeat(20000) @(posedge i_clk);
 
-
-    repeat(15000) @(posedge i_clk);
     $display("Rx Done");
   end
   #50000ns;
   $finish;
 end
-*/
 
+/*
 initial begin
   #20000ns;
   $display("Rx Begin");
@@ -784,6 +798,7 @@ initial begin
   $display("Rx Done");
   #50000ns; $finish;
 end
+*/
 
 always @(posedge UART_SR_DAV_0) begin
   $display("Transmitted UART Data = %h", UART_SR_0);
