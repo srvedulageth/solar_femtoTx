@@ -10,6 +10,10 @@ Rev 2
 Added EthMac
 */
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_soc #(
 
 // CPU config.

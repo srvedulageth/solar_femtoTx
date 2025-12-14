@@ -1,3 +1,8 @@
+
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module uart_tx_dumper ( input wire i_clk, input wire i_line,
                         output reg UART_SR_DAV = 1'd0, output reg [7:0] UART_SR = 8'd0 );
 

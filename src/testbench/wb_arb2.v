@@ -2,6 +2,10 @@
 // Fixed/sticky grant: grant holds while granted master keeps CYC=1.
 // Compatible with classic/burst (CTI carried through; no preemption mid-CYC).
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module wb_arb2
 #(
   parameter ADR_WIDTH = 13,

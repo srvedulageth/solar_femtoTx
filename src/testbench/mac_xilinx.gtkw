@@ -1,0 +1,68 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sun Dec 14 00:52:18 2025
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
+[dumpfile_mtime] "Sun Dec 14 00:49:09 2025"
+[dumpfile_size] 286720083
+[savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_2.gtkw"
+[timestart] 0
+[size] 1854 970
+[pos] -1 -1
+*-26.700211 8890000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] zap_test.
+[treeopen] zap_test.eth_phy.
+[treeopen] zap_test.u_chip_top.
+[treeopen] zap_test.u_chip_top.ethmac.wishbone.
+[treeopen] zap_test.u_chip_top.u_zap_top.
+[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.
+[sst_width] 436
+[signals_width] 294
+[sst_expanded] 1
+[sst_vpaned_height] 623
+@28
+zap_test.mrx_clk_pad_i
+zap_test.mrxdv_pad_i
+@22
+zap_test.mrxd_pad_i[3:0]
+@28
+zap_test.mrxerr_pad_i
+zap_test.u_chip_top.ethmac.rxethmac1.RxValid
+zap_test.u_chip_top.ethmac.rxethmac1.RxAbort
+@200
+-
+@28
+zap_test.mtx_clk_pad_i
+@22
+zap_test.mtxd_pad_o[3:0]
+@28
+zap_test.mtxen_pad_o
+zap_test.mtxerr_pad_o
+@200
+-
+@22
+zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
+@200
+-
+@28
+zap_test.u_chip_top.ethmac.wishbone.bd_ram.ce
+@22
+zap_test.u_chip_top.ram_wb_ethmac.dat_o[31:0]
+zap_test.u_chip_top.ram_wb_ethmac.dat_i[31:0]
+zap_test.u_chip_top.ram_wb_ethmac.adr_i[12:0]
+zap_test.u_chip_top.ram_wb_ethmac.wr_data[31:0]
+@28
+zap_test.u_chip_top.ram_wb_ethmac.cyc_i
+@22
+zap_test.u_chip_top.ethmac.ethreg1.HASH0Out[31:0]
+zap_test.u_chip_top.ethmac.ethreg1.HASH1Out[31:0]
+zap_test.u_chip_top.ram_wb_ethmac.dat_out[31:0]
+@28
+zap_test.u_chip_top.ram_wb_ethmac.we_i
+zap_test.u_chip_top.ethmac_m_wb_cyc_o
+zap_test.u_chip_top.data_wb_cyc_ethmac_ram
+@200
+-
+-
+[pattern_trace] 1
+[pattern_trace] 0

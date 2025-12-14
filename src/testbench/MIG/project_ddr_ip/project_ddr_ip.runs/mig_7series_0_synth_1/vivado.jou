@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Wed Dec 10 16:25:22 2025
+# Process ID         : 3350097
+# Current directory  : /home/vedulas/solar_femtoTX/src/testbench/MIG/project_ddr_ip/project_ddr_ip.runs/mig_7series_0_synth_1
+# Command line       : vivado -log mig_7series_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source mig_7series_0.tcl
+# Log file           : /home/vedulas/solar_femtoTX/src/testbench/MIG/project_ddr_ip/project_ddr_ip.runs/mig_7series_0_synth_1/mig_7series_0.vds
+# Journal file       : /home/vedulas/solar_femtoTX/src/testbench/MIG/project_ddr_ip/project_ddr_ip.runs/mig_7series_0_synth_1/vivado.jou
+# Running On         : vedulas-Latitude-7400
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.3 LTS
+# Processor Detail   : Intel(R) Core(TM) i7-8665U CPU @ 1.90GHz
+# CPU Frequency      : 1999.998 MHz
+# CPU Physical cores : 4
+# CPU Logical cores  : 8
+# Host memory        : 33460 MB
+# Swap memory        : 8589 MB
+# Total Virtual      : 42050 MB
+# Available Virtual  : 34113 MB
+#-----------------------------------------------------------
+source mig_7series_0.tcl -notrace
