@@ -248,9 +248,10 @@ module mig_7series_v4_2_arb_row_col #
   
   genvar i;
   generate
-    for(i = 1; i < RNK2RNK_DLY_CLKS; i = i + 1)
+    for(i = 1; i < RNK2RNK_DLY_CLKS; i = i + 1) begin
       always @(posedge clk)
         rnk_config_strobe_r[i] <= #TCQ rnk_config_strobe_r[i-1];
+    end
   endgenerate
 
   output wire rnk_config_strobe;

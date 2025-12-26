@@ -33,7 +33,7 @@ parameter BE_32_ENABLE                  = 0,
 parameter ONLY_CORE                     = 0
 
 )(
-        // Clk and rst
+        //Clk and rst
         input wire          SYS_CLK,
         input wire          SYS_RST,
 
@@ -43,6 +43,28 @@ parameter ONLY_CORE                     = 0
         output wire         led_2,
         output wire         led_3,
 `endif
+
+        //DDR3 SDRAM interface (Arty A7 style, adjust names if needed)
+        inout  wire [15:0]  ddr3_dq,
+        inout  wire [1:0]   ddr3_dqs_n,
+        inout  wire [1:0]   ddr3_dqs_p,
+
+        output wire [13:0]  ddr3_addr,
+        output wire [2:0]   ddr3_ba,
+        output wire         ddr3_ras_n,
+        output wire         ddr3_cas_n,
+        output wire         ddr3_we_n,
+        output wire [0:0]   ddr3_ck_p,
+        output wire [0:0]   ddr3_ck_n,
+        output wire [0:0]   ddr3_cke,
+        output wire [0:0]   ddr3_cs_n,
+        output wire [1:0]   ddr3_dm,
+        output wire [0:0]   ddr3_odt,
+        output wire         ddr3_reset_n,
+    
+        input               sys_clk_i,
+        input               clk_ref_i,
+        input               sys_rst,
 
         //EthMAC
         //Tx
@@ -507,6 +529,8 @@ wire [3:0] ethmac_ram_sel;
 wire ethmac_ram_cyc;
 wire ethmac_ram_stb;
 wire ethmac_ram_ack;
+wire ethmac_ram_ack_1;
+wire [31:0] ethmac_ram_dat_o_1;
 
 ram_wb
       #
@@ -522,10 +546,10 @@ ram_wb
               .dat_i(ethmac_ram_dat_i),
               .we_i(ethmac_ram_we),
               .sel_i(ethmac_ram_sel),
-              .dat_o(ethmac_ram_dat_o),
+              .dat_o(ethmac_ram_dat_o_1),
               .cyc_i(ethmac_ram_cyc),
               .stb_i(ethmac_ram_stb),
-              .ack_o(ethmac_ram_ack),
+              .ack_o(ethmac_ram_ack_1),
               .cti_i(3'b 000)
             );
 
@@ -581,4 +605,223 @@ wb_arb2 #(
    assign led_3 = ~uart_out[0:0];
    always @(posedge SYS_CLK) count <= count + 1;
 `endif
+
+//DDR3
+// ---------------------------------------------------------------------------
+// DDR3 MIG instance wires
+// ---------------------------------------------------------------------------
+wire        ui_clk;
+wire        ui_clk_sync_rst;
+wire        init_calib_complete;
+wire        [11:0] device_temp;
+
+// AXI4 slave interface from MIG (we'll connect later via WB<->AXI bridge)
+wire [3:0]  s_axi_awid;
+wire [27:0] s_axi_awaddr;
+wire [7:0]  s_axi_awlen;
+wire [2:0]  s_axi_awsize;
+wire [1:0]  s_axi_awburst;
+wire [0:0]  s_axi_awlock;
+wire [3:0]  s_axi_awcache;
+wire [2:0]  s_axi_awprot;
+wire [3:0]  s_axi_awqos;
+wire        s_axi_awvalid;
+wire        s_axi_awready;
+
+wire [31:0] s_axi_wdata;
+wire [3:0]  s_axi_wstrb;
+wire        s_axi_wlast;
+wire        s_axi_wvalid;
+wire        s_axi_wready;
+
+wire [3:0]  s_axi_bid;
+wire [1:0]  s_axi_bresp;
+wire        s_axi_bvalid;
+wire        s_axi_bready;
+
+wire [3:0]  s_axi_arid;
+wire [27:0] s_axi_araddr;
+wire [7:0]  s_axi_arlen;
+wire [2:0]  s_axi_arsize;
+wire [1:0]  s_axi_arburst;
+wire [0:0]  s_axi_arlock;
+wire [3:0]  s_axi_arcache;
+wire [2:0]  s_axi_arprot;
+wire [3:0]  s_axi_arqos;
+wire        s_axi_arvalid;
+wire        s_axi_arready;
+
+wire [3:0]  s_axi_rid;
+wire [31:0] s_axi_rdata;
+wire [1:0]  s_axi_rresp;
+wire        s_axi_rlast;
+wire        s_axi_rvalid;
+wire        s_axi_rready;
+
+reg         aresetn;
+always @(posedge i_clk) begin         
+  aresetn <= ~ui_clk_sync_rst;                  
+end 
+
+// ---------------------------------------------------------------------------
+// MIG 7-series DDR3 memory controller
+// ---------------------------------------------------------------------------
+mig_7series_0 u_mig_7series_0 (
+    // DDR3 physical interface
+    .ddr3_addr          (ddr3_addr),
+    .ddr3_ba            (ddr3_ba),
+    .ddr3_cas_n         (ddr3_cas_n),
+    .ddr3_ck_n          (ddr3_ck_n),
+    .ddr3_ck_p          (ddr3_ck_p),
+    .ddr3_cke           (ddr3_cke),
+    .ddr3_ras_n         (ddr3_ras_n),
+    .ddr3_we_n          (ddr3_we_n),
+    .ddr3_dq            (ddr3_dq),
+    .ddr3_dqs_n         (ddr3_dqs_n),
+    .ddr3_dqs_p         (ddr3_dqs_p),
+    .ddr3_reset_n       (ddr3_reset_n),
+
+    // Status
+    .init_calib_complete(init_calib_complete),
+    .device_temp(device_temp),
+
+    .ddr3_cs_n          (ddr3_cs_n),
+    .ddr3_dm            (ddr3_dm),
+    .ddr3_odt           (ddr3_odt),
+
+    // User interface clock / reset
+    .ui_clk             (ui_clk),
+    .ui_clk_sync_rst    (ui_clk_sync_rst),
+
+    // System / reference clocks & reset
+    .sys_clk_i          (sys_clk_i),
+    .clk_ref_i          (clk_ref_i),
+    .sys_rst            (sys_rst),              // MIG expects active-high reset
+
+    // Unused MIG test/debug ports
+    .mmcm_locked        (),
+    .aresetn            (),
+    .app_sr_req         (1'b0),
+    .app_ref_req        (1'b0),
+    .app_zq_req         (1'b0),
+    .app_sr_active      (),
+    .app_ref_ack        (),
+    .app_zq_ack         (),
+
+    // Slave Interface Write Address Ports
+    .s_axi_awid         (s_axi_awid),
+    .s_axi_awaddr       (s_axi_awaddr),
+    .s_axi_awlen        (s_axi_awlen),
+    .s_axi_awsize       (s_axi_awsize),
+    .s_axi_awburst      (s_axi_awburst),
+    .s_axi_awlock       (s_axi_awlock),
+    .s_axi_awcache      (s_axi_awcache),
+    .s_axi_awprot       (s_axi_awprot),
+    .s_axi_awqos        (s_axi_awqos),
+    .s_axi_awvalid      (s_axi_awvalid),
+    .s_axi_awready      (s_axi_awready),
+
+    // Slave Interface Write Data Ports
+    .s_axi_wdata        (s_axi_wdata),
+    .s_axi_wstrb        (s_axi_wstrb),
+    .s_axi_wlast        (s_axi_wlast),
+    .s_axi_wvalid       (s_axi_wvalid),
+    .s_axi_wready       (s_axi_wready),
+
+    // Slave Interface Write Response Ports
+    .s_axi_bid          (s_axi_bid),
+    .s_axi_bresp        (s_axi_bresp),
+    .s_axi_bvalid       (s_axi_bvalid),
+    .s_axi_bready       (s_axi_bready),
+
+    // Slave Interface Read Address Ports
+    .s_axi_arid         (s_axi_arid),
+    .s_axi_araddr       (s_axi_araddr),
+    .s_axi_arlen        (s_axi_arlen),
+    .s_axi_arsize       (s_axi_arsize),
+    .s_axi_arburst      (s_axi_arburst),
+    .s_axi_arlock       (s_axi_arlock),
+    .s_axi_arcache      (s_axi_arcache),
+    .s_axi_arprot       (s_axi_arprot),
+    .s_axi_arqos        (s_axi_arqos),
+    .s_axi_arvalid      (s_axi_arvalid),
+    .s_axi_arready      (s_axi_arready),
+
+    // Slave Interface Read Data Ports
+    .s_axi_rid          (s_axi_rid),
+    .s_axi_rdata        (s_axi_rdata),
+    .s_axi_rresp        (s_axi_rresp),
+    .s_axi_rlast        (s_axi_rlast),
+    .s_axi_rvalid       (s_axi_rvalid),
+    .s_axi_rready       (s_axi_rready)
+
+);
+//DDR3
+
+//wbm2axisp
+wbm2axisp u_wbm2axisp(
+    .i_clk(sys_clk_i),	// System clock
+    .i_reset(~sys_rst),	// Reset signal,drives AXI rst
+
+    // AXI write address channel signals
+    .o_axi_awvalid(s_axi_awvalid),	// Write address valid
+    .i_axi_awready(s_axi_awvalid),   // Slave is ready to accept
+    .o_axi_awid(s_axi_awid),	// Write ID
+    .o_axi_awaddr(s_axi_awaddr),	// Write address
+    .o_axi_awlen(s_axi_awlen),	// Write Burst Length
+    .o_axi_awsize(s_axi_awsize),	// Write Burst size
+    .o_axi_awburst(s_axi_awburst),	// Write Burst type
+    .o_axi_awlock(s_axi_awlock),	// Write lock type
+    .o_axi_awcache(s_axi_awcache),	// Write Cache type
+    .o_axi_awprot(s_axi_awprot),	// Write Protection type
+    .o_axi_awqos(s_axi_awqos),	// Write Quality of Svc
+
+    // AXI write data channel signals
+    .o_axi_wvalid(s_axi_wvalid),	// Write valid
+    .i_axi_wready(s_axi_wready),    // Write data ready
+    .o_axi_wdata(s_axi_wdata),	// Write data
+    .o_axi_wstrb(s_axi_wstrb),	// Write strobes
+    .o_axi_wlast(s_axi_wlast),	// Last write transaction
+
+    // AXI write response channel signals
+    .i_axi_bvalid(s_axi_bvalid),    // Write reponse valid
+    .o_axi_bready(s_axi_bready),    // Response ready
+    .i_axi_bid(s_axi_bid),	// Response ID
+    .i_axi_bresp(s_axi_bresp),	// Write response
+
+    // AXI read address channel signals
+    .o_axi_arvalid(s_axi_arvalid),	// Read address valid
+    .i_axi_arready(s_axi_arready),	// Read address ready
+    .o_axi_arid(s_axi_arid),     // Read ID
+    .o_axi_araddr(s_axi_araddr),	// Read address
+    .o_axi_arlen(s_axi_arlen),	// Read Burst Length
+    .o_axi_arsize(s_axi_arsize),	// Read Burst size
+    .o_axi_arburst(s_axi_arburst),	// Read Burst type
+    .o_axi_arlock(s_axi_arlock),	// Read lock type
+    .o_axi_arcache(s_axi_arcache),	// Read Cache type
+    .o_axi_arprot(s_axi_arprot),	// Read Protection type
+    .o_axi_arqos(s_axi_arqos),	// Read Protection type
+
+    // AXI read data channel signals
+    .i_axi_rvalid(s_axi_rvalid),  // Read reponse valid
+    .o_axi_rready(s_axi_rready),  // Read Response ready
+    .i_axi_rid(s_axi_rid),     // Response ID
+    .i_axi_rdata(s_axi_rdata),    // Read data
+    .i_axi_rresp(s_axi_rresp),   // Read response
+    .i_axi_rlast(s_axi_rlast),    // Read last
+
+    // We'll share the clock and the reset
+    .i_wb_cyc(ethmac_ram_cyc),
+    .i_wb_stb(ethmac_ram_stb),
+    .i_wb_we(ethmac_ram_we),
+    .i_wb_addr({13'h 0, ethmac_ram_adr}),
+    .i_wb_data(ethmac_ram_dat_i),
+    .o_wb_ack(ethmac_ram_ack),
+    .o_wb_data(ethmac_ram_dat_o),
+    .i_wb_sel(ethmac_ram_sel),
+    .o_wb_stall(),
+    .o_wb_err()
+);
+//wbm2axisp
+
 endmodule // zap_soc

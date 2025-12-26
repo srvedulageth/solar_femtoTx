@@ -1,0 +1,276 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Mon Dec 22 10:25:25 2025
+# Process ID         : 3750354
+# Current directory  : /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO
+# Command line       : vivado
+# Log file           : /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/vivado.log
+# Journal file       : /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/vivado.jou
+# Running On         : vedulas-Latitude-7400
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.3 LTS
+# Processor Detail   : Intel(R) Core(TM) i7-8665U CPU @ 1.90GHz
+# CPU Frequency      : 2600.054 MHz
+# CPU Physical cores : 4
+# CPU Logical cores  : 8
+# Host memory        : 33460 MB
+# Swap memory        : 8589 MB
+# Total Virtual      : 42050 MB
+# Available Virtual  : 32525 MB
+#-----------------------------------------------------------
+start_gui
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.0/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.1/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.2/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.3 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.3/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.0/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.1/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.2/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:2.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/2.2/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.0/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.1/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.2/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180_newl:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180_newl/production/1.0/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180_newl:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180_newl/production/1.1/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.0/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.1/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.2/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu208ld:part0:2.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu208ld/production/2.0/board.xml as part xczu58dr-fsvg1517-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu216ld:part0:2.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu216ld/production/2.0/board.xml as part xczu59dr-ffvf1760-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu670ld:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu670ld/1.0/board.xml as part xczu57dr-fsve1156-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.0/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.1/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.2/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.3 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.3/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.0/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.1/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.2/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:2.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/2.2/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.0/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.1/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.2/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180_newl:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180_newl/production/1.0/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180_newl:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180_newl/production/1.1/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.0/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.1/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.2/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu208ld:part0:2.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu208ld/production/2.0/board.xml as part xczu58dr-fsvg1517-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu216ld:part0:2.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu216ld/production/2.0/board.xml as part xczu59dr-ffvf1760-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu670ld:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu670ld/1.0/board.xml as part xczu57dr-fsve1156-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.0/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.1/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.2/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.3 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.3/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.0/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.1/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.2/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:2.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/2.2/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.0/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.1/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.2/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180_newl:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180_newl/production/1.0/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180_newl:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180_newl/production/1.1/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.0/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.1/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.2/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu208ld:part0:2.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu208ld/production/2.0/board.xml as part xczu58dr-fsvg1517-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu216ld:part0:2.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu216ld/production/2.0/board.xml as part xczu59dr-ffvf1760-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu670ld:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu670ld/1.0/board.xml as part xczu57dr-fsve1156-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190:part0:3.3 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190/production/3.3/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vck190_newl:part0:1.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vck190_newl/production/1.2/board.xml as part xcvc1902-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180:part0:3.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180/production/3.2/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vmk180_newl:part0:1.1 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vmk180_newl/production/1.1/board.xml as part xcvm1802-vsva2197-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk120:part0:1.2 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vpk120/production/1.2/board.xml as part xcvp1202-vsva2785-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu208ld:part0:2.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu208ld/production/2.0/board.xml as part xczu58dr-fsvg1517-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu216ld:part0:2.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu216ld/production/2.0/board.xml as part xczu59dr-ffvf1760-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu670ld:part0:1.0 available at /tools/Xilinx/Vivado/2024.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu670ld/1.0/board.xml as part xczu57dr-fsve1156-2-i specified in board_part file is either invalid or not available
+create_project project_ddr_ip_fifo /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo -part xc7a100tcsg324-1
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/tools/Xilinx/Vivado/2024.2/data/ip'.
+INFO: [Device 21-403] Loading part xc7a100tcsg324-1
+create_ip -name mig_7series -vendor xilinx.com -library ip -version 4.2 -module_name mig_7series_0
+set_property -dict [list \
+  CONFIG.ARESETN.INSERT_VIP {0} \
+  CONFIG.BOARD_MIG_PARAM {Custom} \
+  CONFIG.C0_ARESETN.INSERT_VIP {0} \
+  CONFIG.C0_CLOCK.INSERT_VIP {0} \
+  CONFIG.C0_DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C0_DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.C0_LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C0_MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.C0_MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.C0_MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.C0_MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.C0_MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.C0_QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.C0_RESET.INSERT_VIP {0} \
+  CONFIG.C0_RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.C0_RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.C0_SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.C1_ARESETN.INSERT_VIP {0} \
+  CONFIG.C1_CLOCK.INSERT_VIP {0} \
+  CONFIG.C1_DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C1_DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.C1_LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C1_MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.C1_MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.C1_MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.C1_MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.C1_MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.C1_QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.C1_RESET.INSERT_VIP {0} \
+  CONFIG.C1_RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.C1_RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.C1_SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.C2_ARESETN.INSERT_VIP {0} \
+  CONFIG.C2_CLOCK.INSERT_VIP {0} \
+  CONFIG.C2_DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C2_DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.C2_LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C2_MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.C2_MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.C2_MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.C2_MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.C2_MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.C2_QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.C2_RESET.INSERT_VIP {0} \
+  CONFIG.C2_RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.C2_RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.C2_SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.C3_ARESETN.INSERT_VIP {0} \
+  CONFIG.C3_CLOCK.INSERT_VIP {0} \
+  CONFIG.C3_DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C3_DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.C3_LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C3_MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.C3_MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.C3_MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.C3_MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.C3_MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.C3_QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.C3_RESET.INSERT_VIP {0} \
+  CONFIG.C3_RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.C3_RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.C3_SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.C4_ARESETN.INSERT_VIP {0} \
+  CONFIG.C4_CLOCK.INSERT_VIP {0} \
+  CONFIG.C4_DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C4_DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.C4_LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C4_MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.C4_MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.C4_MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.C4_MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.C4_MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.C4_QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.C4_RESET.INSERT_VIP {0} \
+  CONFIG.C4_RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.C4_RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.C4_SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.C5_ARESETN.INSERT_VIP {0} \
+  CONFIG.C5_CLOCK.INSERT_VIP {0} \
+  CONFIG.C5_DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C5_DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.C5_LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C5_MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.C5_MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.C5_MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.C5_MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.C5_MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.C5_QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.C5_RESET.INSERT_VIP {0} \
+  CONFIG.C5_RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.C5_RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.C5_SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.C6_ARESETN.INSERT_VIP {0} \
+  CONFIG.C6_CLOCK.INSERT_VIP {0} \
+  CONFIG.C6_DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C6_DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.C6_LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C6_MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.C6_MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.C6_MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.C6_MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.C6_MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.C6_QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.C6_RESET.INSERT_VIP {0} \
+  CONFIG.C6_RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.C6_RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.C6_SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.C7_ARESETN.INSERT_VIP {0} \
+  CONFIG.C7_CLOCK.INSERT_VIP {0} \
+  CONFIG.C7_DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C7_DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.C7_LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.C7_MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.C7_MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.C7_MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.C7_MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.C7_MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.C7_QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.C7_RESET.INSERT_VIP {0} \
+  CONFIG.C7_RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.C7_RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.C7_SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.CLK_REF_I.INSERT_VIP {0} \
+  CONFIG.CLOCK.INSERT_VIP {0} \
+  CONFIG.DDR2_RESET.INSERT_VIP {0} \
+  CONFIG.DDR3_RESET.INSERT_VIP {0} \
+  CONFIG.LPDDR2_RESET.INSERT_VIP {0} \
+  CONFIG.MIG_DONT_TOUCH_PARAM {Custom} \
+  CONFIG.MMCM_CLKOUT0.INSERT_VIP {0} \
+  CONFIG.MMCM_CLKOUT1.INSERT_VIP {0} \
+  CONFIG.MMCM_CLKOUT2.INSERT_VIP {0} \
+  CONFIG.MMCM_CLKOUT3.INSERT_VIP {0} \
+  CONFIG.MMCM_CLKOUT4.INSERT_VIP {0} \
+  CONFIG.QDRIIP_RESET.INSERT_VIP {0} \
+  CONFIG.RESET.INSERT_VIP {0} \
+  CONFIG.RESET_BOARD_INTERFACE {Custom} \
+  CONFIG.RLDIII_RESET.INSERT_VIP {0} \
+  CONFIG.RLDII_RESET.INSERT_VIP {0} \
+  CONFIG.S0_AXI.INSERT_VIP {0} \
+  CONFIG.S0_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.S1_AXI.INSERT_VIP {0} \
+  CONFIG.S1_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.S2_AXI.INSERT_VIP {0} \
+  CONFIG.S2_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.S3_AXI.INSERT_VIP {0} \
+  CONFIG.S3_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.S4_AXI.INSERT_VIP {0} \
+  CONFIG.S4_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.S5_AXI.INSERT_VIP {0} \
+  CONFIG.S5_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.S6_AXI.INSERT_VIP {0} \
+  CONFIG.S6_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.S7_AXI.INSERT_VIP {0} \
+  CONFIG.S7_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.SYSTEM_RESET.INSERT_VIP {0} \
+  CONFIG.SYS_CLK_I.INSERT_VIP {0} \
+  CONFIG.S_AXI.INSERT_VIP {0} \
+  CONFIG.S_AXI_CTRL.INSERT_VIP {0} \
+  CONFIG.XML_INPUT_FILE {mig_a.prj} \
+] [get_ips mig_7series_0]
+generate_target {instantiation_template} [get_files /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci]
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'mig_7series_0'...
+update_compile_order -fileset sources_1
+generate_target all [get_files  /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci]
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'mig_7series_0'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'mig_7series_0'...
+INFO: [IP_Flow 19-1686] Generating 'Implementation' target for IP 'mig_7series_0'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'mig_7series_0'...
+generate_target: Time (s): cpu = 00:00:39 ; elapsed = 00:00:37 . Memory (MB): peak = 8477.520 ; gain = 214.742 ; free physical = 9348 ; free virtual = 29606
+export_ip_user_files -of_objects [get_files /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci] -no_script -sync -force -quiet
+create_ip_run [get_files -of_objects [get_fileset sources_1] /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci]
+launch_runs mig_7series_0_synth_1 -jobs 4
+[Mon Dec 22 10:45:35 2025] Launched mig_7series_0_synth_1...
+Run output will be captured here: /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.runs/mig_7series_0_synth_1/runme.log
+export_simulation -lib_map_path [list {modelsim=/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.cache/compile_simlib/modelsim} {questa=/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.cache/compile_simlib/questa} {xcelium=/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.cache/compile_simlib/xcelium} {vcs=/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.cache/compile_simlib/vcs} {riviera=/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.cache/compile_simlib/riviera}] -of_objects [get_files /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci] -directory /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.ip_user_files/sim_scripts -ip_user_files_dir /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.ip_user_files -ipstatic_source_dir /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/project_ddr_ip_fifo/project_ddr_ip_fifo.ip_user_files/ipstatic -use_ip_compiled_libs -force -quiet
+open_example_project -force -dir /home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO [get_ips  mig_7series_0]
+INFO: [IP_Flow 19-1686] Generating 'Examples' target for IP 'mig_7series_0'...
+open_example_project: Time (s): cpu = 00:00:20 ; elapsed = 00:01:01 . Memory (MB): peak = 8713.688 ; gain = 0.000 ; free physical = 8250 ; free virtual = 28605
+exit
+INFO: [Common 17-206] Exiting Vivado at Mon Dec 22 11:07:45 2025...

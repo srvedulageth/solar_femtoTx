@@ -1,0 +1,121 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Fri Dec 26 17:21:44 2025
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
+[dumpfile_mtime] "Fri Dec 26 17:06:13 2025"
+[dumpfile_size] 379917643
+[savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_xilinx_ddr3.gtkw"
+[timestart] 132301000000
+[size] 1850 860
+[pos] -1 -1
+*-29.718996 134727466125 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] zap_test.
+[treeopen] zap_test.mem_rnk[0].
+[treeopen] zap_test.mem_rnk[0].mem.
+[treeopen] zap_test.mem_rnk[0].mem.gen_mem[0].
+[treeopen] zap_test.u_chip_top.
+[treeopen] zap_test.u_chip_top.ethmac.wishbone.
+[treeopen] zap_test.u_chip_top.u_mig_7series_0.u_mig_7series_0_mig.
+[treeopen] zap_test.u_chip_top.u_mig_7series_0.u_mig_7series_0_mig.u_memc_ui_top_axi.mem_intfc0.mc0.
+[treeopen] zap_test.u_chip_top.u_mig_7series_0.u_mig_7series_0_mig.u_memc_ui_top_axi.u_axi_mc.
+[treeopen] zap_test.u_chip_top.u_mig_7series_0.u_mig_7series_0_mig.u_memc_ui_top_axi.u_ui_top.
+[sst_width] 436
+[signals_width] 294
+[sst_expanded] 1
+[sst_vpaned_height] 540
+@28
+zap_test.mrx_clk_pad_i
+zap_test.mrxdv_pad_i
+@22
+zap_test.mrxd_pad_i[3:0]
+@28
+zap_test.mrxerr_pad_i
+zap_test.u_chip_top.ethmac.rxethmac1.RxValid
+zap_test.u_chip_top.ethmac.rxethmac1.RxAbort
+@200
+-
+@28
+zap_test.mtx_clk_pad_i
+@22
+zap_test.mtxd_pad_o[3:0]
+@28
+zap_test.mtxen_pad_o
+zap_test.mtxerr_pad_o
+@200
+-
+@22
+zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
+@200
+-
+@28
+zap_test.u_chip_top.ethmac.wishbone.bd_ram.ce
+@22
+zap_test.u_chip_top.ram_wb_ethmac.dat_o[31:0]
+zap_test.u_chip_top.ram_wb_ethmac.dat_i[31:0]
+zap_test.u_chip_top.ram_wb_ethmac.adr_i[12:0]
+zap_test.u_chip_top.ram_wb_ethmac.wr_data[31:0]
+@28
+zap_test.u_chip_top.ram_wb_ethmac.cyc_i
+@22
+zap_test.u_chip_top.ethmac.ethreg1.HASH0Out[31:0]
+zap_test.u_chip_top.ethmac.ethreg1.HASH1Out[31:0]
+zap_test.u_chip_top.ram_wb_ethmac.dat_out[31:0]
+@28
+zap_test.u_chip_top.ram_wb_ethmac.we_i
+zap_test.u_chip_top.ethmac_m_wb_cyc_o
+zap_test.u_chip_top.data_wb_cyc_ethmac_ram
+@200
+-
+@28
+zap_test.u_chip_top.u_mig_7series_0.sys_clk_i
+zap_test.u_chip_top.u_mig_7series_0.clk_ref_i
+zap_test.u_chip_top.u_mig_7series_0.aresetn
+zap_test.sys_rst_n
+@22
+zap_test.ddr3_addr_fpga[13:0]
+zap_test.ddr3_dq_fpga[15:0]
+@28
+zap_test.u_chip_top.u_mig_7series_0.sys_rst
+zap_test.u_chip_top.u_mig_7series_0.ui_clk
+zap_test.u_chip_top.u_mig_7series_0.ui_clk_sync_rst
+@200
+-
+@28
+zap_test.u_chip_top.ddr3_reset_n
+@22
+zap_test.u_chip_top.u_mig_7series_0.u_mig_7series_0_mig.u_memc_ui_top_axi.mem_intfc0.mc0.mc_address[55:0]
+@28
+zap_test.u_chip_top.u_mig_7series_0.init_calib_complete
+zap_test.u_chip_top.u_wbm2axisp.i_wb_cyc
+zap_test.u_chip_top.u_wbm2axisp.i_wb_we
+@22
+zap_test.u_chip_top.u_wbm2axisp.i_wb_addr[25:0]
+zap_test.u_chip_top.u_wbm2axisp.i_wb_data[31:0]
+@28
+zap_test.u_chip_top.u_wbm2axisp.o_wb_ack
+@22
+zap_test.u_chip_top.u_wbm2axisp.o_wb_data[31:0]
+@200
+-
+@28
+zap_test.u_chip_top.u_wbm2axisp.i_reset
+@22
+zap_test.u_chip_top.u_mig_7series_0.u_mig_7series_0_mig.u_memc_ui_top_axi.ddr_addr[13:0]
+@28
+zap_test.u_chip_top.u_wbm2axisp.o_axi_awvalid
+zap_test.u_chip_top.u_wbm2axisp.i_axi_awready
+zap_test.u_chip_top.u_wbm2axisp.o_axi_wvalid
+@22
+zap_test.u_chip_top.u_wbm2axisp.o_axi_wstrb[3:0]
+zap_test.u_chip_top.u_wbm2axisp.o_axi_wdata[31:0]
+@28
+zap_test.u_chip_top.u_wbm2axisp.i_axi_wready
+@23
+zap_test.u_chip_top.u_wbm2axisp.o_axi_awaddr[27:0]
+@200
+-
+-
+-
+[pattern_trace] 1
+[pattern_trace] 0
