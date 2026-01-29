@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Thu Jan 29 01:17:47 2026
+[*] Thu Jan 29 16:24:06 2026
 [*]
 [dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
-[dumpfile_mtime] "Sat Jan 24 20:58:28 2026"
-[dumpfile_size] 334184063
+[dumpfile_mtime] "Thu Jan 29 16:23:29 2026"
+[dumpfile_size] 352849015
 [savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_xilinx.gtkw"
-[timestart] 166401700
-[size] 1781 933
+[timestart] 0
+[size] 1707 884
 [pos] -1 -1
-*-14.699228 166550600 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-26.794075 111525000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] zap_test.
 [treeopen] zap_test.eth_phy.
 [treeopen] zap_test.u_chip_top.
@@ -19,7 +19,7 @@
 [sst_width] 298
 [signals_width] 294
 [sst_expanded] 1
-[sst_vpaned_height] 593
+[sst_vpaned_height] 546
 @28
 zap_test.mrx_clk_pad_i
 zap_test.mrxdv_pad_i
@@ -93,6 +93,10 @@ zap_test.u_chip_top.u_arb.m0_we_i
 zap_test.u_chip_top.u_arb.m1_cyc_i
 zap_test.u_chip_top.u_arb.m1_we_i
 zap_test.u_chip_top.u_arb.s_cyc_o
+@22
+zap_test.u_chip_top.u_arb.m0_adr_i[31:0]
+zap_test.u_chip_top.u_arb.m0_dat_o[31:0]
+@28
 zap_test.u_chip_top.u_arb.s_we_o
 @22
 zap_test.u_chip_top.u_zap_top.wb_dat[31:0]
@@ -113,14 +117,36 @@ zap_test.u_chip_top.ethmac_ram_ack
 @22
 zap_test.u_chip_top.u_arb.m0_dat_o[31:0]
 zap_test.u_chip_top.u_phy.dq_out_en_n_w[15:0]
+@c00022
 zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+@28
+(0)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(1)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(2)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(3)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(4)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(5)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(6)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(7)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(8)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(9)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(10)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(11)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(12)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(13)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(14)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+(15)zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+@1401200
+-group_end
+@22
+zap_test.u_chip_top.u_arb.m0_adr_i[31:0]
 zap_test.u_chip_top.u_phy.ddr3_dq_io[15:0]
 zap_test.u_chip_top.u_phy.dq_delayed_w[15:0]
 @200
 -
 @28
 zap_test.u_chip_top.u_phy.clk_i
-@c00023
+@c00022
 zap_test.u_chip_top.u_phy.dq_in_w[15:0]
 @28
 (0)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
@@ -139,7 +165,7 @@ zap_test.u_chip_top.u_phy.dq_in_w[15:0]
 (13)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
 (14)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
 (15)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
-@1401201
+@1401200
 -group_end
 @22
 zap_test.u_chip_top.u_phy.rd_sel_q[3:0]
