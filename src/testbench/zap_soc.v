@@ -44,7 +44,7 @@ parameter ONLY_CORE                     = 0
         output wire         led_3,
 `endif
 
-        //DDR3 SDRAM interface (Arty A7 style, adjust names if needed)
+`ifdef DDR3_CONTROLLER
         inout  wire [15:0]  ddr3_dq,
         inout  wire [1:0]   ddr3_dqs_n,
         inout  wire [1:0]   ddr3_dqs_p,
@@ -61,10 +61,7 @@ parameter ONLY_CORE                     = 0
         output wire [1:0]   ddr3_dm,
         output wire [0:0]   ddr3_odt,
         output wire         ddr3_reset_n,
-    
-        input               sys_clk_i,
-        input               clk_ref_i,
-        input               sys_rst,
+`endif //`ifdef DDR3_CONTROLLER
 
         //EthMAC
         //Tx
@@ -130,16 +127,23 @@ localparam VIC_HI                       = 32'hFFFFFFBF;
 localparam ETHMAC_LO                    = 32'hFFFFE000; //Internal Slave Ram of EthMAC total 2K bytes
 localparam ETHMAC_HI                    = 32'hFFFFEFFF;
 
-localparam ETHMAC_BUF_RAM_LO            = 32'h0A000000;
-localparam ETHMAC_BUF_RAM_HI            = 32'h0A001FFF; //Total 8K, accessed both by processor and ethmac...
+localparam ETHMAC_BUF_RAM_LO            = 32'h10000000;
+localparam ETHMAC_BUF_RAM_HI            = 32'h1FFFFFFF; //Total 256MB, accessed both by processor and ethmac...
 
 // Internal signals.
+wire            clk_ref;
+wire            clk2ddr3;
+
 wire            i_clk    = SYS_CLK;
 wire            i_reset  = SYS_RST;
 
+wire            ddr3_init_done;
+wire            dfi_wrdata_en;
+wire            dfi_rddata_valid;
+
 reg             eth_ref_clk_r1, eth_ref_clk_r2;
 
-always @(posedge SYS_CLK) begin
+always @(posedge i_clk) begin
   if (SYS_RST) begin
     eth_ref_clk_r1 <= 'b 0;
   end else begin
@@ -498,18 +502,22 @@ ethmac ethmac(
 // ===============================
 
 //Processor RAM ...
+localparam RAM_ADDR_WIDTH        = 14;
+localparam RAM_DATA_WIDTH        = 32;
+localparam RAM_MEM_SIZE          = 16384;
+
 ram_wb
       #
         (
-          .adr_width(13),
-          .dat_width(32),
-          .mem_size(8192),
+          .adr_width(RAM_ADDR_WIDTH),
+          .dat_width(RAM_DATA_WIDTH),
+          .mem_size(RAM_MEM_SIZE),
           .MEMFILE("ethmac_zap.dump")
         )
       ram_wb (
               .clk_i(i_clk),
               .rst_i(i_reset),
-              .adr_i(data_wb_adr[12:0]),
+              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:0]),
               .dat_i(data_wb_dout),
               .we_i(data_wb_we),
               .sel_i(data_wb_sel),
@@ -521,7 +529,7 @@ ram_wb
             );
 
 //EthMAC TX/RX/BDS RAM ...
-wire [12:0] ethmac_ram_adr;
+wire [31:0] ethmac_ram_adr;
 wire [31:0] ethmac_ram_dat_i;
 wire [31:0] ethmac_ram_dat_o;
 wire ethmac_ram_we;
@@ -529,33 +537,11 @@ wire [3:0] ethmac_ram_sel;
 wire ethmac_ram_cyc;
 wire ethmac_ram_stb;
 wire ethmac_ram_ack;
-wire ethmac_ram_ack_1;
-wire [31:0] ethmac_ram_dat_o_1;
-
-ram_wb
-      #
-        (
-          .adr_width(13),
-          .dat_width(32),
-          .mem_size(8192)
-        )
-      ram_wb_ethmac (
-              .clk_i(i_clk),
-              .rst_i(i_reset),
-              .adr_i(ethmac_ram_adr),
-              .dat_i(ethmac_ram_dat_i),
-              .we_i(ethmac_ram_we),
-              .sel_i(ethmac_ram_sel),
-              .dat_o(ethmac_ram_dat_o_1),
-              .cyc_i(ethmac_ram_cyc),
-              .stb_i(ethmac_ram_stb),
-              .ack_o(ethmac_ram_ack_1),
-              .cti_i(3'b 000)
-            );
+wire ethmac_rd_o;
 
 //Wishbone Arbiter ...
 wb_arb2 #(
-  .ADR_WIDTH(13),
+  .ADR_WIDTH(32),
   .DAT_WIDTH(32),
   .PARK_ON_M0(1)      // park on CPU
 ) u_arb (
@@ -563,7 +549,7 @@ wb_arb2 #(
   .rst     (i_reset),
 
   // M0: CPU
-  .m0_adr_i(data_wb_adr[12:0]),
+  .m0_adr_i(data_wb_adr),
   .m0_dat_i(data_wb_dout),
   .m0_dat_o(data_wb_din_ethmac_ram),
   .m0_we_i (data_wb_we),
@@ -574,7 +560,7 @@ wb_arb2 #(
   .m0_ack_o(data_wb_ack_ethmac_ram),
 
   // M1: EthMAC master
-  .m1_adr_i(ethmac_m_wb_adr_o[12:0]),
+  .m1_adr_i(ethmac_m_wb_adr_o),
   .m1_dat_i(ethmac_m_wb_dat_o),
   .m1_dat_o(ethmac_m_wb_dat_i),
   .m1_we_i (ethmac_m_wb_we_o),
@@ -584,8 +570,10 @@ wb_arb2 #(
   .m1_cti_i(3'b 000),
   .m1_ack_o(ethmac_m_wb_ack_i),
 
+  .ethmac_rd_o(ethmac_rd_o),
+
   // Slave: 8K RAM
-  .s_adr_o (ethmac_ram_adr[12:0]),
+  .s_adr_o (ethmac_ram_adr),
   .s_dat_o (ethmac_ram_dat_i),
   .s_dat_i (ethmac_ram_dat_o),
   .s_we_o  (ethmac_ram_we),
@@ -600,228 +588,219 @@ wb_arb2 #(
    reg [23:0] count = 0;
    assign led_0 = count[23];
    assign led_1 = count[22];
-   assign led_2 = count[21];
+   //assign led_2 = count[21];
    //assign led_3 = count[20];
    assign led_3 = ~uart_out[0:0];
-   always @(posedge SYS_CLK) count <= count + 1;
+   always @(posedge i_clk) count <= count + 1;
+
+   reg [23:0] count_1 = 0;
+   assign led_2 = count_1[23];
+   always @(posedge clk25) count_1 <= count_1 + 1;
 `endif
 
-//DDR3
-// ---------------------------------------------------------------------------
-// DDR3 MIG instance wires
-// ---------------------------------------------------------------------------
-wire        ui_clk;
-wire        ui_clk_sync_rst;
-wire        init_calib_complete;
-wire        [11:0] device_temp;
+`ifdef DDR3_CONTROLLER
+//-----------------------------------------------------------------
+// PLL
+//-----------------------------------------------------------------
+wire clk;
+wire clk_ddr;
+wire clk_ddr_dqs;
+//wire clk_ref;
+//wire clk2ddr3;
 
-// AXI4 slave interface from MIG (we'll connect later via WB<->AXI bridge)
-wire [3:0]  s_axi_awid;
-wire [27:0] s_axi_awaddr;
-wire [7:0]  s_axi_awlen;
-wire [2:0]  s_axi_awsize;
-wire [1:0]  s_axi_awburst;
-wire [0:0]  s_axi_awlock;
-wire [3:0]  s_axi_awcache;
-wire [2:0]  s_axi_awprot;
-wire [3:0]  s_axi_awqos;
-wire        s_axi_awvalid;
-wire        s_axi_awready;
+artix7_pll u_pll
+(
+    //.clkref_i(osc)
+    .clkref_i(i_clk) //100MHz ...
 
-wire [31:0] s_axi_wdata;
-wire [3:0]  s_axi_wstrb;
-wire        s_axi_wlast;
-wire        s_axi_wvalid;
-wire        s_axi_wready;
-
-wire [3:0]  s_axi_bid;
-wire [1:0]  s_axi_bresp;
-wire        s_axi_bvalid;
-wire        s_axi_bready;
-
-wire [3:0]  s_axi_arid;
-wire [27:0] s_axi_araddr;
-wire [7:0]  s_axi_arlen;
-wire [2:0]  s_axi_arsize;
-wire [1:0]  s_axi_arburst;
-wire [0:0]  s_axi_arlock;
-wire [3:0]  s_axi_arcache;
-wire [2:0]  s_axi_arprot;
-wire [3:0]  s_axi_arqos;
-wire        s_axi_arvalid;
-wire        s_axi_arready;
-
-wire [3:0]  s_axi_rid;
-wire [31:0] s_axi_rdata;
-wire [1:0]  s_axi_rresp;
-wire        s_axi_rlast;
-wire        s_axi_rvalid;
-wire        s_axi_rready;
-
-reg         aresetn;
-always @(posedge i_clk) begin         
-  aresetn <= ~ui_clk_sync_rst;                  
-end 
-
-// ---------------------------------------------------------------------------
-// MIG 7-series DDR3 memory controller
-// ---------------------------------------------------------------------------
-mig_7series_0 u_mig_7series_0 (
-    // DDR3 physical interface
-    .ddr3_addr          (ddr3_addr),
-    .ddr3_ba            (ddr3_ba),
-    .ddr3_cas_n         (ddr3_cas_n),
-    .ddr3_ck_n          (ddr3_ck_n),
-    .ddr3_ck_p          (ddr3_ck_p),
-    .ddr3_cke           (ddr3_cke),
-    .ddr3_ras_n         (ddr3_ras_n),
-    .ddr3_we_n          (ddr3_we_n),
-    .ddr3_dq            (ddr3_dq),
-    .ddr3_dqs_n         (ddr3_dqs_n),
-    .ddr3_dqs_p         (ddr3_dqs_p),
-    .ddr3_reset_n       (ddr3_reset_n),
-
-    // Status
-    .init_calib_complete(init_calib_complete),
-    .device_temp(device_temp),
-
-    .ddr3_cs_n          (ddr3_cs_n),
-    .ddr3_dm            (ddr3_dm),
-    .ddr3_odt           (ddr3_odt),
-
-    // User interface clock / reset
-    .ui_clk             (ui_clk),
-    .ui_clk_sync_rst    (ui_clk_sync_rst),
-
-    // System / reference clocks & reset
-    .sys_clk_i          (sys_clk_i),
-    .clk_ref_i          (clk_ref_i),
-    .sys_rst            (sys_rst),              // MIG expects active-high reset
-
-    // Unused MIG test/debug ports
-    .mmcm_locked        (),
-    .aresetn            (),
-    .app_sr_req         (1'b0),
-    .app_ref_req        (1'b0),
-    .app_zq_req         (1'b0),
-    .app_sr_active      (),
-    .app_ref_ack        (),
-    .app_zq_ack         (),
-
-    // Slave Interface Write Address Ports
-    .s_axi_awid         (s_axi_awid),
-    .s_axi_awaddr       (s_axi_awaddr),
-    .s_axi_awlen        (s_axi_awlen),
-    .s_axi_awsize       (s_axi_awsize),
-    .s_axi_awburst      (s_axi_awburst),
-    .s_axi_awlock       (s_axi_awlock),
-    .s_axi_awcache      (s_axi_awcache),
-    .s_axi_awprot       (s_axi_awprot),
-    .s_axi_awqos        (s_axi_awqos),
-    .s_axi_awvalid      (s_axi_awvalid),
-    .s_axi_awready      (s_axi_awready),
-
-    // Slave Interface Write Data Ports
-    .s_axi_wdata        (s_axi_wdata),
-    .s_axi_wstrb        (s_axi_wstrb),
-    .s_axi_wlast        (s_axi_wlast),
-    .s_axi_wvalid       (s_axi_wvalid),
-    .s_axi_wready       (s_axi_wready),
-
-    // Slave Interface Write Response Ports
-    .s_axi_bid          (s_axi_bid),
-    .s_axi_bresp        (s_axi_bresp),
-    .s_axi_bvalid       (s_axi_bvalid),
-    .s_axi_bready       (s_axi_bready),
-
-    // Slave Interface Read Address Ports
-    .s_axi_arid         (s_axi_arid),
-    .s_axi_araddr       (s_axi_araddr),
-    .s_axi_arlen        (s_axi_arlen),
-    .s_axi_arsize       (s_axi_arsize),
-    .s_axi_arburst      (s_axi_arburst),
-    .s_axi_arlock       (s_axi_arlock),
-    .s_axi_arcache      (s_axi_arcache),
-    .s_axi_arprot       (s_axi_arprot),
-    .s_axi_arqos        (s_axi_arqos),
-    .s_axi_arvalid      (s_axi_arvalid),
-    .s_axi_arready      (s_axi_arready),
-
-    // Slave Interface Read Data Ports
-    .s_axi_rid          (s_axi_rid),
-    .s_axi_rdata        (s_axi_rdata),
-    .s_axi_rresp        (s_axi_rresp),
-    .s_axi_rlast        (s_axi_rlast),
-    .s_axi_rvalid       (s_axi_rvalid),
-    .s_axi_rready       (s_axi_rready)
-
+    // Outputs
+    //,.clkout0_o(clk)         // 100
+    ,.clkout0_o(clk2ddr3)         // 100
+    ,.clkout1_o(clk_ddr)     // 400
+    ,.clkout2_o(clk_ref)     // 200
+    ,.clkout3_o(clk_ddr_dqs) // 400 (phase 90)
 );
-//DDR3
 
-//wbm2axisp
-wbm2axisp u_wbm2axisp(
-    .i_clk(sys_clk_i),	// System clock
-    .i_reset(~sys_rst),	// Reset signal,drives AXI rst
+//-----------------------------------------------------------------
+// Registers / Wires
+//-----------------------------------------------------------------
+wire  [ 14:0] dfi_address;
+wire  [  2:0] dfi_bank;
+wire          dfi_cas_n;
+wire          dfi_cke;
+wire          dfi_cs_n;
+wire          dfi_odt;
+wire          dfi_ras_n;
+wire          dfi_reset_n;
+wire          dfi_we_n;
+wire  [ 31:0] dfi_wrdata;
+//wire          dfi_wrdata_en;
+wire  [  3:0] dfi_wrdata_mask;
+wire          dfi_rddata_en;
+wire [ 31:0]  dfi_rddata;
+//wire          dfi_rddata_valid;
+wire [   1:0] dfi_rddata_dnv;
 
-    // AXI write address channel signals
-    .o_axi_awvalid(s_axi_awvalid),	// Write address valid
-    .i_axi_awready(s_axi_awvalid),   // Slave is ready to accept
-    .o_axi_awid(s_axi_awid),	// Write ID
-    .o_axi_awaddr(s_axi_awaddr),	// Write address
-    .o_axi_awlen(s_axi_awlen),	// Write Burst Length
-    .o_axi_awsize(s_axi_awsize),	// Write Burst size
-    .o_axi_awburst(s_axi_awburst),	// Write Burst type
-    .o_axi_awlock(s_axi_awlock),	// Write lock type
-    .o_axi_awcache(s_axi_awcache),	// Write Cache type
-    .o_axi_awprot(s_axi_awprot),	// Write Protection type
-    .o_axi_awqos(s_axi_awqos),	// Write Quality of Svc
+//-----------------------------------------------------------------
+// DDR PHY
+//-----------------------------------------------------------------
+ddr3_dfi_phy
+#(
+     .DQS_TAP_DELAY_INIT(27)
+    ,.DQ_TAP_DELAY_INIT(0)
+    ,.TPHY_RDLAT(5)
+)
+u_phy
+(
+     .clk_i(clk2ddr3)
+    ,.clk_ddr_i(clk_ddr)
+    ,.clk_ddr90_i(clk_ddr_dqs)
+    ,.clk_ref_i(clk_ref)
+    ,.rst_i(i_reset)
 
-    // AXI write data channel signals
-    .o_axi_wvalid(s_axi_wvalid),	// Write valid
-    .i_axi_wready(s_axi_wready),    // Write data ready
-    .o_axi_wdata(s_axi_wdata),	// Write data
-    .o_axi_wstrb(s_axi_wstrb),	// Write strobes
-    .o_axi_wlast(s_axi_wlast),	// Last write transaction
+    ,.cfg_valid_i(1'b 0)
+    ,.cfg_i(32'h 0)
 
-    // AXI write response channel signals
-    .i_axi_bvalid(s_axi_bvalid),    // Write reponse valid
-    .o_axi_bready(s_axi_bready),    // Response ready
-    .i_axi_bid(s_axi_bid),	// Response ID
-    .i_axi_bresp(s_axi_bresp),	// Write response
+    ,.dfi_address_i(dfi_address)
+    ,.dfi_bank_i(dfi_bank)
+    ,.dfi_cas_n_i(dfi_cas_n)
+    ,.dfi_cke_i(dfi_cke)
+    ,.dfi_cs_n_i(dfi_cs_n)
+    ,.dfi_odt_i(dfi_odt)
+    ,.dfi_ras_n_i(dfi_ras_n)
+    ,.dfi_reset_n_i(dfi_reset_n)
+    ,.dfi_we_n_i(dfi_we_n)
 
-    // AXI read address channel signals
-    .o_axi_arvalid(s_axi_arvalid),	// Read address valid
-    .i_axi_arready(s_axi_arready),	// Read address ready
-    .o_axi_arid(s_axi_arid),     // Read ID
-    .o_axi_araddr(s_axi_araddr),	// Read address
-    .o_axi_arlen(s_axi_arlen),	// Read Burst Length
-    .o_axi_arsize(s_axi_arsize),	// Read Burst size
-    .o_axi_arburst(s_axi_arburst),	// Read Burst type
-    .o_axi_arlock(s_axi_arlock),	// Read lock type
-    .o_axi_arcache(s_axi_arcache),	// Read Cache type
-    .o_axi_arprot(s_axi_arprot),	// Read Protection type
-    .o_axi_arqos(s_axi_arqos),	// Read Protection type
+    ,.dfi_wrdata_i(dfi_wrdata)
+    ,.dfi_wrdata_en_i(dfi_wrdata_en)
+    ,.dfi_wrdata_mask_i(dfi_wrdata_mask)
+    ,.dfi_rddata_en_i(dfi_rddata_en)
 
-    // AXI read data channel signals
-    .i_axi_rvalid(s_axi_rvalid),  // Read reponse valid
-    .o_axi_rready(s_axi_rready),  // Read Response ready
-    .i_axi_rid(s_axi_rid),     // Response ID
-    .i_axi_rdata(s_axi_rdata),    // Read data
-    .i_axi_rresp(s_axi_rresp),   // Read response
-    .i_axi_rlast(s_axi_rlast),    // Read last
+    ,.dfi_rddata_o(dfi_rddata)
+    ,.dfi_rddata_valid_o(dfi_rddata_valid)
+    ,.dfi_rddata_dnv_o(dfi_rddata_dnv)
 
-    // We'll share the clock and the reset
-    .i_wb_cyc(ethmac_ram_cyc),
-    .i_wb_stb(ethmac_ram_stb),
-    .i_wb_we(ethmac_ram_we),
-    .i_wb_addr({13'h 0, ethmac_ram_adr}),
-    .i_wb_data(ethmac_ram_dat_i),
-    .o_wb_ack(ethmac_ram_ack),
-    .o_wb_data(ethmac_ram_dat_o),
-    .i_wb_sel(ethmac_ram_sel),
-    .o_wb_stall(),
-    .o_wb_err()
+    ,.ddr3_ck_p_o(ddr3_ck_p)
+    ,.ddr3_ck_n_o(ddr3_ck_n)
+    ,.ddr3_cke_o(ddr3_cke)
+    ,.ddr3_reset_n_o(ddr3_reset_n)
+    ,.ddr3_ras_n_o(ddr3_ras_n)
+    ,.ddr3_cas_n_o(ddr3_cas_n)
+    ,.ddr3_we_n_o(ddr3_we_n)
+    ,.ddr3_cs_n_o(ddr3_cs_n)
+    ,.ddr3_ba_o(ddr3_ba)
+    ,.ddr3_addr_o(ddr3_addr)
+    ,.ddr3_odt_o(ddr3_odt)
+    ,.ddr3_dm_o(ddr3_dm)
+    ,.ddr3_dqs_p_io(ddr3_dqs_p)
+    ,.ddr3_dqs_n_io(ddr3_dqs_n)
+    ,.ddr3_dq_io(ddr3_dq)
 );
-//wbm2axisp
+
+//-----------------------------------------------------------------
+// DDR Core
+//-----------------------------------------------------------------
+wire  [ 15:0]  ddr3_ram_wr;
+wire           ddr3_ram_rd;
+wire  [ 31:0]  ddr3_ram_addr;
+wire  [127:0]  ddr3_ram_write_data;
+wire  [ 15:0]  ddr3_ram_req_id;
+wire           ddr3_ram_accept;
+wire           ddr3_ram_ack;
+wire           ddr3_ram_error;
+wire [ 15:0]   ddr3_ram_resp_id;
+wire [127:0]   ddr3_ram_read_data;
+
+wire [2:0]     wb_ddr3_br_state;
+
+ddr3_core
+#(
+     .DDR_WRITE_LATENCY(4)
+    ,.DDR_READ_LATENCY(4)
+    ,.DDR_MHZ(100)
+)
+u_ddr_core
+(
+     .clk_i(clk2ddr3)
+    ,.rst_i(i_reset)
+
+    // Configuration (unused)
+    ,.cfg_enable_i(1'b1)
+    ,.cfg_stb_i(1'b0)
+    ,.cfg_data_i(32'b0)
+    ,.cfg_stall_o()
+
+    ,.init_done_o(ddr3_init_done)
+
+    ,.inport_wr_i(ddr3_ram_wr)
+    ,.inport_rd_i(ddr3_ram_rd)
+    ,.inport_addr_i(ddr3_ram_addr)
+    ,.inport_write_data_i(ddr3_ram_write_data)
+    ,.inport_req_id_i(ddr3_ram_req_id)
+    ,.inport_accept_o(ddr3_ram_accept)
+    ,.inport_ack_o(ddr3_ram_ack)
+    ,.inport_error_o(ddr3_ram_error)
+    ,.inport_resp_id_o(ddr3_ram_resp_id)
+    ,.inport_read_data_o(ddr3_ram_read_data)
+
+    ,.dfi_address_o(dfi_address)
+    ,.dfi_bank_o(dfi_bank)
+    ,.dfi_cas_n_o(dfi_cas_n)
+    ,.dfi_cke_o(dfi_cke)
+    ,.dfi_cs_n_o(dfi_cs_n)
+    ,.dfi_odt_o(dfi_odt)
+    ,.dfi_ras_n_o(dfi_ras_n)
+    ,.dfi_reset_n_o(dfi_reset_n)
+    ,.dfi_we_n_o(dfi_we_n)
+    ,.dfi_wrdata_o(dfi_wrdata)
+    ,.dfi_wrdata_en_o(dfi_wrdata_en)
+    ,.dfi_wrdata_mask_o(dfi_wrdata_mask)
+    ,.dfi_rddata_en_o(dfi_rddata_en)
+    ,.dfi_rddata_i(dfi_rddata)
+    ,.dfi_rddata_valid_i(dfi_rddata_valid)
+    ,.dfi_rddata_dnv_i(dfi_rddata_dnv)
+);
+
+wb_ddr3_bridge #(
+    .ADR_WIDTH(32),          // Wishbone address width
+    .DAT_WIDTH(32),          // Must be 32 for this bridge
+    .WB_ADDR_IS_WORD(0),     // 0: adr_i is byte address (common WB)
+                           // 1: adr_i is word address (adr<<2)
+    .ID_INIT(16'h0000)       // starting request id
+)
+u_wb_ddr3_bridge(
+    .clk_i(i_clk),
+    .rst_i(i_reset),      // synchronous active-high
+
+    // ---------------- Wishbone Slave ----------------
+    .dat_i(ethmac_ram_dat_i),
+    .dat_o(ethmac_ram_dat_o), //HERE 1111
+    .adr_i(ethmac_ram_adr),
+    .we_i(ethmac_ram_we),
+    .sel_i(ethmac_ram_sel),
+    .cyc_i(ethmac_ram_cyc),
+    .stb_i(ethmac_ram_stb),
+    .cti_i(3'd 0), //NOT USED
+    .ack_o(ethmac_ram_ack), //HERE 1111
+
+    .ethmac_rd_i(ethmac_rd_o),
+
+    // ---------------- DDR3 core "inport" interface ----------------
+    .inport_wr_o(ddr3_ram_wr),        // byte strobes (16 bytes)
+    .inport_rd_o(ddr3_ram_rd),
+    .inport_addr_o(ddr3_ram_addr),      // byte address
+    .inport_write_data_o(ddr3_ram_write_data),
+    .inport_req_id_o(ddr3_ram_req_id),
+    .inport_accept_i(ddr3_ram_accept),    // 1-cycle pulse when accepted
+    .inport_ack_i(ddr3_ram_ack),       // 1-cycle pulse when completed
+    .inport_error_i(ddr3_ram_error),
+    .inport_resp_id_i(ddr3_ram_resp_id),
+    .inport_read_data_i(ddr3_ram_read_data),
+
+    .init_done_i(ddr3_init_done),         // optional: tie to 1 if not used
+
+    .state(wb_ddr3_br_state)
+);
+`endif //`ifdef DDR3_CONTROLLER
 
 endmodule // zap_soc

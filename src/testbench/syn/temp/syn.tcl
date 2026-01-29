@@ -179,17 +179,17 @@ set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0 ]
 set_property ALL_PROBE_SAME_MU_CNT 2 [get_debug_cores u_ila_0 ]
 endgroup
 
-#connect_debug_port u_ila_0/clk [get_nets [list SYS_CLK_IBUF_BUFG ]]
-connect_debug_port u_ila_0/clk [get_nets [list clk_ref ]]
+connect_debug_port u_ila_0/clk [get_nets [list SYS_CLK_IBUF_BUFG ]]
 
+create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe0]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
 connect_debug_port u_ila_0/probe0 [get_nets [list ddr3_init_done_dbg ]]
 
 create_debug_port u_ila_0 probe
-set_property port_width 32 [get_debug_ports u_ila_0/probe1]
+set_property port_width 1 [get_debug_ports u_ila_0/probe1]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-connect_debug_port u_ila_0/probe1 [get_nets {data_wb_din_ethmac_ram_dbg[*]}]
+connect_debug_port u_ila_0/probe1 [get_nets [list dfi_wrdata_en_dbg ]]
 
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe2]
@@ -210,16 +210,6 @@ create_debug_port u_ila_0 probe
 set_property port_width 3 [get_debug_ports u_ila_0/probe5]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
 connect_debug_port u_ila_0/probe5 [get_nets {wb_ddr3_br_state_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe6]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
-connect_debug_port u_ila_0/probe6 [get_nets [list clk2ddr3 ]]
-
-create_debug_port u_ila_0 probe
-set_property port_width 32 [get_debug_ports u_ila_0/probe7]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
-connect_debug_port u_ila_0/probe7 [get_nets {dfi_rddata_dbg[*]}]
 
 #Debug
 #link_design -debug

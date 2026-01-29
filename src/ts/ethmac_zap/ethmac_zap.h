@@ -15,15 +15,21 @@
 
 // RX ring: BD 64..(64+RX_BD_COUNT-1) are RX
 #define RX_BD_FIRST    64u
-#define RX_BD_COUNT     4u           // 8 is a good start
-#define RX_BUF_SIZE  1024u           // per-BD capacity (>= 1536)
+#define RX_BD_COUNT    64u           // 8 is a good start
+#define RX_BUF_SIZE  2048u           // per-BD capacity (>= 1536)
 
 #define TX_BD_FIRST   0u
-#define TX_BD_COUNT   4u
-#define TX_BUF_SIZE   1024u     // ARP(42B) OK, ICMP(74B) OK
+#define TX_BD_COUNT   64u
+#define TX_BUF_SIZE   2048u     // ARP(42B) OK, ICMP(74B) OK
 
 static volatile unsigned tx_head = TX_BD_FIRST;
 static volatile unsigned rx_tail = RX_BD_FIRST;   // next BD to consume
+
+// System RAM (packet buffers) accessible by EthMAC Wishbone master
+#define ETHMAC_BUF_RAM_BASE   0x10000000UL
+#define ETHMAC_RX_BUF_RAM_BASE   (ETHMAC_BUF_RAM_BASE + 0x20000u)
+
+#define ETH_TX_BD_NUM       64u    // first N are TX, remaining are RX
 
 /* ================= Platform glue (EDIT THESE) ================= */
 
@@ -32,20 +38,10 @@ static volatile unsigned rx_tail = RX_BD_FIRST;   // next BD to consume
 
 // BD RAM base inside the same window. Two common options:
 #define ETH_BD_BASE         (ETH_BASE + 0x0400u)   // common wrapper (BDs inside 4KB)
-/* Alternatively, if your wrapper uses OC's historical word-index 0x400:
-   #define ETH_BD_BASE     (ETH_BASE + 0x1000u)    // 0x400 << 2
-*/
 
-// Descriptor counts (2 KB BD RAM / 8 B per BD ⇒ up to 256 BDs)
-#define ETH_BD_COUNT        8u
-#define ETH_TX_BD_NUM       64u    // first N are TX, remaining are RX
 
-// System RAM (packet buffers) accessible by EthMAC Wishbone master
-#define ETH_DMA_MEM_BASE    0x0A000000u   // TODO: set to a valid uncached/phys region
-#define ETH_DMA_MEM_SIZE    0x2000u    // 1 MiB example
 
-#define ETHMAC_BUF_RAM_BASE   0x0A000000UL
-#define ETHMAC_RX_BUF_RAM_BASE   (ETHMAC_BUF_RAM_BASE + 0x1000u)
+
 
 // CPU clock (for MDIO divisor)
 #define SYS_CLK_HZ          100000000u    // 100 MHz

@@ -1,0 +1,299 @@
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
+module wb_ddr3_bridge #(
+    parameter ADR_WIDTH = 32,          // Wishbone address width
+    parameter DAT_WIDTH = 32,          // Must be 32 for this bridge
+    parameter WB_ADDR_IS_WORD = 0,     // 0: adr_i is byte address (common WB)
+                                     // 1: adr_i is word address (adr<<2)
+    parameter ID_INIT = 16'h0000       // starting request id
+)(
+    input                   clk_i,
+    input                   rst_i,      // synchronous active-high
+
+    // ---------------- Wishbone Slave ----------------
+    input   [DAT_WIDTH-1:0] dat_i,
+    output  [DAT_WIDTH-1:0] dat_o,
+    input   [ADR_WIDTH-1:0] adr_i,
+    input                   we_i,
+    input   [3:0]           sel_i,
+    input                   cyc_i,
+    input                   stb_i,
+    input   [2:0]           cti_i,
+    output  reg             ack_o,
+    input                   ethmac_rd_i,
+
+    // ---------------- DDR3 core "inport" interface ----------------
+    output  reg  [15:0]     inport_wr_o,        // byte strobes (16 bytes)
+    output  reg             inport_rd_o,
+    output  reg  [31:0]     inport_addr_o,      // byte address
+    output  reg  [127:0]    inport_write_data_o,
+    output  reg  [15:0]     inport_req_id_o,
+    input                   inport_accept_i,    // 1-cycle pulse when accepted
+    input                   inport_ack_i,       // 1-cycle pulse when completed
+    input                   inport_error_i,
+    input   [15:0]          inport_resp_id_i,
+    input   [127:0]         inport_read_data_i,
+
+    input                   init_done_i,         // optional: tie to 1 if not used
+
+    output  reg [2:0]       state
+);
+
+    // ------------------------------------------------------------
+    // Address normalization
+    // ------------------------------------------------------------
+    wire [31:0] wb_byte_addr;
+    //assign wb_byte_addr = (WB_ADDR_IS_WORD) ? { (32-ADR_WIDTH){1'b0}, adr_i } << 2 : { (32-ADR_WIDTH){1'b0}, adr_i };
+    assign wb_byte_addr = (WB_ADDR_IS_WORD) ? (adr_i << 2) : adr_i;
+
+    // 16-byte aligned line address for the DDR3 core
+    wire [31:0] line_addr;
+    assign line_addr    = { wb_byte_addr[31:4], 4'b0000 };
+
+    // Which 32-bit word inside the 16-byte line (0..3)
+    wire [1:0]  word_sel     = wb_byte_addr[3:2];
+
+    // Byte lane base inside the 16-byte line
+    wire [3:0]  byte_base    = { word_sel, 2'b00 }; // 0,4,8,12
+
+    // ------------------------------------------------------------
+    // Wishbone request detect
+    // ------------------------------------------------------------
+    wire wb_req = cyc_i & stb_i;
+
+    // ------------------------------------------------------------
+    // State machine
+    // ------------------------------------------------------------
+    localparam S_IDLE   = 3'd0;
+    localparam S_SEND   = 3'd1;
+    localparam S_WAIT   = 3'd2;
+    localparam S_WAIT_DROP = 3'd3;
+    localparam S_RD_AGAIN = 3'd4;
+
+    //reg [2:0] state;
+
+    // Latched WB fields for an in-flight transaction
+    reg [31:0] lat_line_addr;
+    reg [31:0] lat_wb_byte_addr;
+    reg [31:0] lat_dat_i;
+    reg [3:0]  lat_sel_i;
+    reg        lat_we_i;
+
+    // Output data register
+    reg [31:0] dat_o_r;
+    assign dat_o = dat_o_r;
+
+    // Simple req-id counter
+    reg [15:0] req_id;
+
+    wire [1:0] ws = lat_wb_byte_addr[3:2];
+    wire [3:0] bb = { (2'd3 - ws), 2'b00 };
+
+    // ------------------------------------------------------------
+    // Helpers: build 128b write_data and 16b byte strobes
+    // ------------------------------------------------------------
+    function [127:0] place_word32_into_line;
+      input [127:0] line;
+      input [31:0]  w;
+      input [1:0]   ws;
+      reg   [127:0] tmp;
+      begin
+        tmp = line;
+        case (ws)
+          2'd0: tmp[127:96]  = w;
+          2'd1: tmp[95:64]   = w;
+          2'd2: tmp[63:32]   = w;
+          2'd3: tmp[31:0]    = w;
+        endcase
+        place_word32_into_line = tmp;
+      end
+    endfunction
+
+    function [15:0] make_byte_strobes_16;
+        input [3:0] sel;
+        input [3:0] bb;   // byte_base 0/4/8/12
+        reg   [15:0] m;
+        begin
+            m = 16'h0000;
+            // sel[0] -> lowest byte of 32b word
+            m[bb + 0] = sel[0];
+            m[bb + 1] = sel[1];
+            m[bb + 2] = sel[2];
+            m[bb + 3] = sel[3];
+            make_byte_strobes_16 = m;
+        end
+    endfunction
+
+    // ------------------------------------------------------------
+    // Sequential
+    // ------------------------------------------------------------
+    always @(posedge clk_i) begin
+        if (rst_i) begin
+            state               <= S_IDLE;
+            ack_o               <= 1'b0;
+            dat_o_r             <= 32'h0;
+
+            inport_wr_o         <= 16'h0000;
+            inport_rd_o         <= 1'b0;
+            inport_addr_o       <= 32'h0;
+            inport_write_data_o <= 128'h0;
+            inport_req_id_o     <= ID_INIT;
+
+            req_id              <= ID_INIT;
+
+            lat_line_addr       <= 32'h0;
+            lat_wb_byte_addr    <= 32'h0;
+            lat_dat_i           <= 32'h0;
+            lat_sel_i           <= 4'h0;
+            lat_we_i            <= 1'b0;
+
+        end else begin
+            // default pulses
+            ack_o       <= 1'b0;
+
+            // default: hold request lines unless we explicitly drive them
+            // We keep wr/rd asserted in S_SEND until accept arrives.
+            if (state != S_SEND) begin
+                inport_wr_o <= 16'h0000;
+                inport_rd_o <= 1'b0;
+            end
+
+            // If you want to stall all WB accesses until DDR init done:
+            if (!init_done_i) begin
+                // Hard drop/ignore. Alternative: hold off ack forever.
+                // Here we simply do nothing; master will keep requesting.
+                state <= S_IDLE;
+                inport_wr_o <= 16'h0000;
+                inport_rd_o <= 1'b0;
+                ack_o <= 1'b0;
+            end else begin
+                case (state)
+
+                    // ----------------------------------------------------
+                    // IDLE: latch a WB beat when present
+                    // ----------------------------------------------------
+                    S_IDLE: begin
+                        if (wb_req) begin
+                            lat_line_addr    <= line_addr;
+                            lat_wb_byte_addr <= wb_byte_addr;
+                            lat_dat_i        <= dat_i;
+                            lat_sel_i        <= sel_i;
+                            lat_we_i         <= we_i;
+
+                            // Prepare DDR request fields
+                            inport_addr_o       <= line_addr;
+                            inport_req_id_o     <= req_id;
+
+                            if (we_i) begin
+                                // build 128b write payload with only the selected word filled
+                                // other bytes don't matter because byte strobes will mask them
+                                inport_write_data_o <= place_word32_into_line(128'h0, lat_dat_i, ws);
+                                inport_wr_o         <= make_byte_strobes_16(lat_sel_i, bb);
+
+                                inport_rd_o         <= 1'b0;
+                            end else begin
+                                inport_write_data_o <= 128'h0;
+                                inport_wr_o         <= 16'h0000;
+                                inport_rd_o         <= 1'b1;
+                            end
+
+                            state <= S_SEND;
+                        end
+                    end
+
+                    // ----------------------------------------------------
+                    // SEND: keep rd/wr asserted until DDR core accepts
+                    // ----------------------------------------------------
+                    S_SEND: begin
+                        // Keep addr/id stable
+                        inport_addr_o   <= lat_line_addr;
+                        inport_req_id_o <= req_id;
+
+                        if (lat_we_i) begin
+                            inport_write_data_o <= place_word32_into_line(128'h0, lat_dat_i, lat_wb_byte_addr[3:2]);
+                            inport_wr_o         <= make_byte_strobes_16(lat_sel_i, {lat_wb_byte_addr[3:2],2'b00});
+                            inport_rd_o         <= 1'b0;
+                        end else begin
+                            inport_wr_o         <= 16'h0000;
+                            inport_rd_o         <= 1'b1;
+                        end
+
+                        if (inport_accept_i) begin
+                            // accepted; bump req_id and wait for completion
+                            req_id <= req_id + 1;
+                            state  <= S_WAIT;
+
+                            // deassert rd/wr next cycle via default logic
+                        end
+                    end
+
+                    // ----------------------------------------------------
+                    // WAIT: wait for DDR ack, then produce WB ack + data
+                    // ----------------------------------------------------
+                    S_WAIT: begin
+                        if (inport_ack_i) begin
+                            if (!lat_we_i) begin
+                                // Extract 32b word from 128b read line
+                                case (lat_wb_byte_addr[3:2])
+                                  2'd0: dat_o_r <= inport_read_data_i[127:96];
+                                  2'd1: dat_o_r <= inport_read_data_i[95:64];
+                                  2'd2: dat_o_r <= inport_read_data_i[63:32];
+                                  2'd3: dat_o_r <= inport_read_data_i[31:0];
+                                endcase
+                            end
+
+                            // Wishbone acknowledge (1 cycle pulse)
+                            ack_o  <= 1'b1;
+
+                            // Go idle; if master keeps cyc/stb high, we’ll latch next beat next cycle.
+                            //state  <= S_IDLE;
+                            state  <= S_WAIT_DROP;
+                        end
+                    end
+
+                    S_WAIT_DROP: begin
+                    // Don't accept a new request until the master drops CYC/STB.
+                    // Prevents re-latching the same beat when master deasserts one cycle late.
+                        ack_o  <= 1'b0;
+                        if(ethmac_rd_i == 'b 1) begin
+                            state <= S_RD_AGAIN;
+                        end
+                        else begin
+                          if (!wb_req) begin
+                              state <= S_IDLE;
+                          end
+                        end
+                    end
+
+                    S_RD_AGAIN: begin
+                        if (wb_req) begin
+                            lat_line_addr    <= line_addr;
+                            lat_wb_byte_addr <= wb_byte_addr;
+                            lat_dat_i        <= dat_i;
+                            lat_sel_i        <= sel_i;
+                            lat_we_i         <= we_i;
+
+                            // Prepare DDR request fields
+                            inport_addr_o       <= line_addr;
+                            inport_req_id_o     <= req_id;
+
+                            inport_write_data_o <= 128'h0;
+                            inport_wr_o         <= 16'h0000;
+                            inport_rd_o         <= 1'b1;
+
+                            state <= S_SEND;
+                        end
+                        else begin
+                            state <= S_IDLE;
+                        end
+                    end
+
+                    default: state <= S_IDLE;
+                endcase
+            end
+        end
+    end
+
+endmodule

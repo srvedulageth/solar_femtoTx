@@ -131,7 +131,12 @@ localparam ETHMAC_BUF_RAM_LO            = 32'h10000000;
 localparam ETHMAC_BUF_RAM_HI            = 32'h1FFFFFFF; //Total 256MB, accessed both by processor and ethmac...
 
 // Internal signals.
-wire            i_clk    = SYS_CLK;
+wire sys_clk_ibuf;
+wire sys_clk;        // the real fabric clock
+
+//wire            i_clk    = SYS_CLK;
+wire            i_clk    = sys_clk;
+
 //wire            i_reset  = ~SYS_RST;
 wire            stable_rst_sync;
 wire            ddr3_init_done;
@@ -212,7 +217,6 @@ OBUF u_refclk_obuf (
   .O (eth_ref_clk)
 );
 
-/*
 IBUF u_ibuf_sysclk (
   .I(SYS_CLK),
   .O(sys_clk_ibuf)
@@ -222,7 +226,6 @@ BUFG u_bufg_sysclk (
   .I(sys_clk_ibuf),
   .O(sys_clk)
 );
-*/
 
 /*
 wire clk25;
@@ -894,16 +897,11 @@ u_wb_ddr3_bridge(
 );
 `endif //`ifdef DDR3_CONTROLLER
 
-//(* MARK_DEBUG = "true" *) wire sys_clk_dbg = sys_clk;
+(* MARK_DEBUG = "true" *) wire sys_clk_dbg = sys_clk;
 (* MARK_DEBUG = "true" *) wire ddr3_init_done_dbg = ddr3_init_done;
+(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+(* MARK_DEBUG = "true" *) wire dfi_rddata_valid_dbg = dfi_rddata_valid;
 (* MARK_DEBUG = "true" *) wire ethmac_ram_cyc_dbg = ethmac_ram_cyc;
 (* MARK_DEBUG = "true" *) wire ethmac_ram_ack_dbg = ethmac_ram_ack;
-(* MARK_DEBUG = "true" *) wire [2:0] wb_ddr3_br_state_dbg = wb_ddr3_br_state;
-
-(* MARK_DEBUG = "true" *) wire dfi_rddata_valid_dbg = dfi_rddata_valid;
-(* MARK_DEBUG = "true" *) wire [31:0] dfi_rddata_dbg = dfi_rddata;
-
-(* MARK_DEBUG = "true" *) wire [31:0] data_wb_din_ethmac_ram_dbg = data_wb_din_ethmac_ram;
-//(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
-//(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+(* MARK_DEBUG = "true" *) wire wb_ddr3_br_state_dbg = wb_ddr3_br_state;
 endmodule // zap_soc

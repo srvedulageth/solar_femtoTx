@@ -172,7 +172,6 @@ end
 wire i_reset = rst_sync;
 //wire i_reset = stable_rst_sync;
 
-/*
 (* MARK_DEBUG = "true" *) wire mtx_clk_pad_dbg  = mtx_clk_pad_i;   // EthMAC MDC out
 (* MARK_DEBUG = "true" *) wire [3:0] mtxd_pad_dbg = mtxd_pad_o; // MDIO bidir
 (* MARK_DEBUG = "true" *) wire mtxen_pad_dbg = mtxen_pad_o; // MDIO bidir
@@ -183,7 +182,6 @@ wire i_reset = rst_sync;
 (* MARK_DEBUG = "true" *) wire ddr3_1_dbg = ddr3_init_done;
 (* MARK_DEBUG = "true" *) wire ddr3_2_dbg = dfi_wrdata_en;
 (* MARK_DEBUG = "true" *) wire ddr3_3_dbg = dfi_rddata_valid;
-*/
 
 //EthPHY Reference clock, 25MHz ...
 wire clk25;
@@ -894,16 +892,13 @@ u_wb_ddr3_bridge(
 );
 `endif //`ifdef DDR3_CONTROLLER
 
+/*
 //(* MARK_DEBUG = "true" *) wire sys_clk_dbg = sys_clk;
 (* MARK_DEBUG = "true" *) wire ddr3_init_done_dbg = ddr3_init_done;
+(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+(* MARK_DEBUG = "true" *) wire dfi_rddata_valid_dbg = dfi_rddata_valid;
 (* MARK_DEBUG = "true" *) wire ethmac_ram_cyc_dbg = ethmac_ram_cyc;
 (* MARK_DEBUG = "true" *) wire ethmac_ram_ack_dbg = ethmac_ram_ack;
 (* MARK_DEBUG = "true" *) wire [2:0] wb_ddr3_br_state_dbg = wb_ddr3_br_state;
-
-(* MARK_DEBUG = "true" *) wire dfi_rddata_valid_dbg = dfi_rddata_valid;
-(* MARK_DEBUG = "true" *) wire [31:0] dfi_rddata_dbg = dfi_rddata;
-
-(* MARK_DEBUG = "true" *) wire [31:0] data_wb_din_ethmac_ram_dbg = data_wb_din_ethmac_ram;
-//(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
-//(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+*/
 endmodule // zap_soc

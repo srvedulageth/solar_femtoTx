@@ -402,6 +402,9 @@ void net_poll_drain(void) {
 
         uint16_t len  = (uint16_t)((st >> 16) & 0xFFFF);   // actual frame length
         uint32_t ptr  = bd[1];
+#ifdef DEBUG_1
+        uart_puts("net_mini len=0x"); uart_puthex16(len); uart_puts("\r\n");
+#endif
 
         // Re-arm BD (capacity back in [31:16]) *before* we start decoding.
         uint16_t wrap = (uint16_t)(st & BD_WRAP);
@@ -435,7 +438,7 @@ void net_poll_drain(void) {
                     struct arp_pkt_t info;
                     load_arp_info(pkt + sizeof(struct eth_hdr_t), &info);
 
-#ifdef DEBUG_1
+#ifdef DEBUG2
                     uart_puts("ARP oper=0x"); uart_puthex16(info.oper);
                     uart_puts(" tpa=0x"); uart_puthex32(info.tpa);
                     uart_puts("\r\n");

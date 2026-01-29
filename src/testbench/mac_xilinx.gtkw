@@ -1,25 +1,25 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Sun Dec 14 00:52:18 2025
+[*] Thu Jan 29 01:17:47 2026
 [*]
 [dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
-[dumpfile_mtime] "Sun Dec 14 00:49:09 2025"
-[dumpfile_size] 286720083
-[savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_2.gtkw"
-[timestart] 0
-[size] 1854 970
+[dumpfile_mtime] "Sat Jan 24 20:58:28 2026"
+[dumpfile_size] 334184063
+[savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_xilinx.gtkw"
+[timestart] 166401700
+[size] 1781 933
 [pos] -1 -1
-*-26.700211 8890000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-14.699228 166550600 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] zap_test.
 [treeopen] zap_test.eth_phy.
 [treeopen] zap_test.u_chip_top.
 [treeopen] zap_test.u_chip_top.ethmac.wishbone.
-[treeopen] zap_test.u_chip_top.u_zap_top.
-[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.
-[sst_width] 436
+[treeopen] zap_test.u_chip_top.u_ddr_core.
+[treeopen] zap_test.u_chip_top.u_phy.
+[sst_width] 298
 [signals_width] 294
 [sst_expanded] 1
-[sst_vpaned_height] 623
+[sst_vpaned_height] 593
 @28
 zap_test.mrx_clk_pad_i
 zap_test.mrxdv_pad_i
@@ -45,23 +45,122 @@ zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
 @200
 -
 @28
+zap_test.u_chip_top.SYS_CLK
 zap_test.u_chip_top.ethmac.wishbone.bd_ram.ce
-@22
-zap_test.u_chip_top.ram_wb_ethmac.dat_o[31:0]
-zap_test.u_chip_top.ram_wb_ethmac.dat_i[31:0]
-zap_test.u_chip_top.ram_wb_ethmac.adr_i[12:0]
-zap_test.u_chip_top.ram_wb_ethmac.wr_data[31:0]
-@28
-zap_test.u_chip_top.ram_wb_ethmac.cyc_i
 @22
 zap_test.u_chip_top.ethmac.ethreg1.HASH0Out[31:0]
 zap_test.u_chip_top.ethmac.ethreg1.HASH1Out[31:0]
-zap_test.u_chip_top.ram_wb_ethmac.dat_out[31:0]
 @28
-zap_test.u_chip_top.ram_wb_ethmac.we_i
+zap_test.u_chip_top.ethmac.wb_clk_i
+@22
+zap_test.u_chip_top.ethmac.m_wb_adr_o[31:0]
+@28
 zap_test.u_chip_top.ethmac_m_wb_cyc_o
+zap_test.u_chip_top.ethmac.m_wb_ack_i
+@22
+zap_test.u_chip_top.ethmac.m_wb_dat_i[31:0]
+@28
+zap_test.u_chip_top.ethmac.m_wb_we_o
 zap_test.u_chip_top.data_wb_cyc_ethmac_ram
 @200
+-
+@28
+zap_test.u_chip_top.u_wb_ddr3_bridge.cyc_i
+zap_test.u_chip_top.u_wb_ddr3_bridge.clk_i
+zap_test.u_chip_top.ethmac_m_wb_ack_i
+zap_test.u_chip_top.u_wb_ddr3_bridge.stb_i
+zap_test.u_chip_top.u_wb_ddr3_bridge.wb_req
+zap_test.u_chip_top.u_wb_ddr3_bridge.we_i
+@22
+zap_test.u_chip_top.u_wb_ddr3_bridge.sel_i[3:0]
+@28
+zap_test.u_chip_top.u_wb_ddr3_bridge.ack_o
+@22
+zap_test.u_chip_top.u_wb_ddr3_bridge.dat_i[31:0]
+zap_test.u_chip_top.u_wb_ddr3_bridge.dat_o[31:0]
+@28
+zap_test.u_chip_top.u_wb_ddr3_bridge.init_done_i
+@200
+-
+@22
+zap_test.u_chip_top.ethmac.m_wb_dat_i[31:0]
+zap_test.u_chip_top.ethmac.m_wb_dat_o[31:0]
+@200
+-
+@28
+zap_test.u_chip_top.u_arb.m0_cyc_i
+zap_test.u_chip_top.u_arb.m0_we_i
+zap_test.u_chip_top.u_arb.m1_cyc_i
+zap_test.u_chip_top.u_arb.m1_we_i
+zap_test.u_chip_top.u_arb.s_cyc_o
+zap_test.u_chip_top.u_arb.s_we_o
+@22
+zap_test.u_chip_top.u_zap_top.wb_dat[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.wb_ack
+zap_test.u_chip_top.u_arb.m0_ack_o
+@200
+-
+-
+@28
+zap_test.u_chip_top.ddr3_init_done
+zap_test.u_chip_top.dfi_wrdata_en
+zap_test.u_chip_top.ethmac_ram_cyc
+zap_test.u_chip_top.dfi_rddata_valid
+zap_test.u_chip_top.u_wb_ddr3_bridge.state[2:0]
+zap_test.u_chip_top.u_arb.clk
+zap_test.u_chip_top.ethmac_ram_ack
+@22
+zap_test.u_chip_top.u_arb.m0_dat_o[31:0]
+zap_test.u_chip_top.u_phy.dq_out_en_n_w[15:0]
+zap_test.u_chip_top.u_phy.dq_out_w[15:0]
+zap_test.u_chip_top.u_phy.ddr3_dq_io[15:0]
+zap_test.u_chip_top.u_phy.dq_delayed_w[15:0]
+@200
+-
+@28
+zap_test.u_chip_top.u_phy.clk_i
+@c00023
+zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+@28
+(0)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(1)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(2)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(3)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(4)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(5)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(6)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(7)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(8)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(9)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(10)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(11)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(12)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(13)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(14)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+(15)zap_test.u_chip_top.u_phy.dq_in_w[15:0]
+@1401201
+-group_end
+@22
+zap_test.u_chip_top.u_phy.rd_sel_q[3:0]
+zap_test.u_chip_top.u_phy.rd_data0_w[15:0]
+zap_test.u_chip_top.u_phy.rd_data3_w[15:0]
+@28
+zap_test.u_chip_top.dfi_rddata_valid
+zap_test.u_chip_top.u_phy.clk_ref_i
+@22
+zap_test.u_chip_top.u_phy.rd_capture_q[31:0]
+zap_test.u_chip_top.u_phy.dfi_rddata_o[31:0]
+@200
+-
+@28
+zap_test.u_chip_top.u_phy.dfi_rddata_en_i
+zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rd_idx_q[1:0]
+zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rddata_valid_i
+@200
+-
+-
+-
 -
 -
 [pattern_trace] 1

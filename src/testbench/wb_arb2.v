@@ -38,6 +38,9 @@ module wb_arb2
   input  [2:0]               m1_cti_i,
   output                     m1_ack_o,
 
+  // ----------------
+  output wire                ethmac_rd_o,
+
   // ---------------- Single Slave (RAM) ----------------
   output [ADR_WIDTH-1:0]     s_adr_o,
   output [DAT_WIDTH-1:0]     s_dat_o,
@@ -107,4 +110,6 @@ module wb_arb2
   assign m0_dat_o = (g_is_m0) ? s_dat_i : {DAT_WIDTH{1'b0}};
   assign m1_dat_o = (g_is_m0) ? {DAT_WIDTH{1'b0}} : s_dat_i;
 
+  //EthMAC Rds are pipelined i.e. cyc_o is NOT deasserted by the EthMAC controller in between transfers ...
+  assign ethmac_rd_o = g_is_m0 ? 1'b 0: ~m1_we_i;
 endmodule
