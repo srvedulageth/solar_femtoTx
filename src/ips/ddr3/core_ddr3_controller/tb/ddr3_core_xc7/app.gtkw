@@ -1,0 +1,49 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Tue Jan 13 16:20:04 2026
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX/src/ips/ddr3/core_ddr3_controller/tb/ddr3_core_xc7/waveform.vcd"
+[dumpfile_mtime] "Thu Jan  8 18:04:39 2026"
+[dumpfile_size] 4139471
+[savefile] "/home/vedulas/solar_femtoTX/src/ips/ddr3/core_ddr3_controller/tb/ddr3_core_xc7/app.gtkw"
+[timestart] 0
+[size] 1694 773
+[pos] -1 -1
+*-23.334785 61564583 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] testbench.
+[sst_width] 278
+[signals_width] 198
+[sst_expanded] 1
+[sst_vpaned_height] 217
+@28
+testbench.u_ddr_core.clk_i
+testbench.ddr3_dqs_w[1:0]
+@23
+testbench.ddr3_dq_w[15:0]
+@28
+testbench.ram_rd
+@22
+testbench.ram_wr[15:0]
+@28
+testbench.ram_accept
+testbench.ram_ack
+@22
+testbench.ram_addr[31:0]
+@28
+testbench.ram_error
+@22
+testbench.ram_read_data[127:0]
+testbench.ram_req_id[15:0]
+testbench.ram_resp_id[15:0]
+testbench.ram_write_data[127:0]
+@200
+-
+@28
+testbench.u_ddr_core.ram_req_w
+testbench.u_ddr_core.id_fifo_space_w
+testbench.u_ddr_core.cfg_enable_i
+testbench.u_ddr_core.refresh_q
+@22
+testbench.u_ddr_core.next_state_r[3:0]
+[pattern_trace] 1
+[pattern_trace] 0
