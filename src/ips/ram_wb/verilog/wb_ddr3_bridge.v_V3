@@ -81,6 +81,8 @@ module wb_ddr3_bridge #(
     reg [3:0]  lat_sel_i;
     reg        lat_we_i;
 
+    reg        sent_q, accept_q;
+
     // Output data register
     reg [31:0] dat_o_r;
     assign dat_o = dat_o_r;
@@ -146,6 +148,8 @@ module wb_ddr3_bridge #(
             lat_sel_i           <= 4'h0;
             lat_we_i            <= 1'b0;
 
+            sent_q              <= 1'b0;
+
         end else begin
             // default pulses
             ack_o       <= 1'b0;
@@ -195,6 +199,7 @@ module wb_ddr3_bridge #(
                                 inport_rd_o         <= 1'b1;
                             end
 
+                            sent_q <= 1'b0;
                             state <= S_SEND;
                         end
                     end
@@ -207,6 +212,7 @@ module wb_ddr3_bridge #(
                         inport_addr_o   <= lat_line_addr;
                         inport_req_id_o <= req_id;
 
+                        if (!sent_q) begin
                         if (lat_we_i) begin
                             inport_write_data_o <= place_word32_into_line(128'h0, lat_dat_i, lat_wb_byte_addr[3:2]);
                             inport_wr_o         <= make_byte_strobes_16(lat_sel_i, {lat_wb_byte_addr[3:2],2'b00});
@@ -215,12 +221,20 @@ module wb_ddr3_bridge #(
                             inport_wr_o         <= 16'h0000;
                             inport_rd_o         <= 1'b1;
                         end
+                        end
+                        else begin
+                            // already accepted: hold request deasserted
+                            inport_wr_o <= 16'h0000;
+                            inport_rd_o <= 1'b0;
+                        end
 
-                        if (inport_accept_i) begin
-                            inport_rd_o         <= 1'b0;
-`ifdef SYNTHESIS
-                            inport_wr_o         <= 1'b0;
-`endif
+                        // Use registered accept (accept_q), not raw inport_accept_i
+                        //if (!sent_q && accept_q) begin
+                        if (!sent_q && inport_accept_i) begin
+                            sent_q <= 1'b1;        // <--- latch that we sent it
+
+                            //inport_wr_o <= 16'h0000;
+                            inport_rd_o <= 1'b0;
 
                             // accepted; bump req_id and wait for completion
                             req_id <= req_id + 1;
@@ -284,6 +298,7 @@ module wb_ddr3_bridge #(
                             inport_wr_o         <= 16'h0000;
                             inport_rd_o         <= 1'b1;
 
+                            sent_q <= 1'b0;
                             state <= S_SEND;
                         end
                         else begin
@@ -295,6 +310,11 @@ module wb_ddr3_bridge #(
                 endcase
             end
         end
+    end
+
+    always @(posedge clk_i) begin
+      if (rst_i) accept_q <= 1'b0;
+      else       accept_q <= inport_accept_i;
     end
 
 endmodule

@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Thu Jan 29 16:24:06 2026
+[*] Mon Feb  2 23:52:37 2026
 [*]
 [dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
-[dumpfile_mtime] "Thu Jan 29 16:23:29 2026"
-[dumpfile_size] 352849015
+[dumpfile_mtime] "Sun Feb  1 18:06:25 2026"
+[dumpfile_size] 352348042
 [savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_xilinx.gtkw"
-[timestart] 0
-[size] 1707 884
+[timestart] 165096900
+[size] 1684 923
 [pos] -1 -1
-*-26.794075 111525000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-14.808722 165164583 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] zap_test.
 [treeopen] zap_test.eth_phy.
 [treeopen] zap_test.u_chip_top.
@@ -17,9 +17,9 @@
 [treeopen] zap_test.u_chip_top.u_ddr_core.
 [treeopen] zap_test.u_chip_top.u_phy.
 [sst_width] 298
-[signals_width] 294
+[signals_width] 282
 [sst_expanded] 1
-[sst_vpaned_height] 546
+[sst_vpaned_height] 582
 @28
 zap_test.mrx_clk_pad_i
 zap_test.mrxdv_pad_i
@@ -144,8 +144,6 @@ zap_test.u_chip_top.u_phy.ddr3_dq_io[15:0]
 zap_test.u_chip_top.u_phy.dq_delayed_w[15:0]
 @200
 -
-@28
-zap_test.u_chip_top.u_phy.clk_i
 @c00022
 zap_test.u_chip_top.u_phy.dq_in_w[15:0]
 @28
@@ -169,22 +167,111 @@ zap_test.u_chip_top.u_phy.dq_in_w[15:0]
 -group_end
 @22
 zap_test.u_chip_top.u_phy.rd_sel_q[3:0]
-zap_test.u_chip_top.u_phy.rd_data0_w[15:0]
-zap_test.u_chip_top.u_phy.rd_data3_w[15:0]
 @28
 zap_test.u_chip_top.dfi_rddata_valid
 zap_test.u_chip_top.u_phy.clk_ref_i
 @22
 zap_test.u_chip_top.u_phy.rd_capture_q[31:0]
 zap_test.u_chip_top.u_phy.dfi_rddata_o[31:0]
+@28
+zap_test.u_chip_top.u_phy.dfi_rddata_en_i
 @200
 -
 @28
+zap_test.u_chip_top.u_phy.clk_i
 zap_test.u_chip_top.u_phy.dfi_rddata_en_i
-zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rd_idx_q[1:0]
 zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rddata_valid_i
+zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rd_idx_q[1:0]
+@22
+zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rddata_i[31:0]
+@24
+zap_test.u_chip_top.u_phy.rd_lat_q[2:0]
+@22
+zap_test.u_chip_top.ddr3_ram_read_data[127:0]
+zap_test.u_chip_top.u_phy.rd_sel_q[3:0]
 @200
 -
+-
+@28
+zap_test.u_chip_top.u_phy.clk_i
+zap_test.u_chip_top.u_phy.dfi_rddata_en_i
+zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rddata_valid_i
+@22
+zap_test.u_chip_top.u_ddr_core.dfi_rddata_i[31:0]
+@200
+-
+@22
++{zap_test.u_chip_top.u_phy.rd_data0_w[15:0]} zap_test.u_chip_top.u_phy.rd_data0_w[15:0]
+zap_test.u_chip_top.u_phy.rd_data1_w[15:0]
+zap_test.u_chip_top.u_phy.rd_data2_w[15:0]
+zap_test.u_chip_top.u_phy.rd_data3_w[15:0]
+@23
++{zap_test.u_chip_top.u_phy.rd_data0_w[15:0]} zap_test.u_chip_top.u_phy.rd_data0_w[15:0]
+zap_test.u_chip_top.u_phy.rd_data3_w[15:0]
+@200
+-
+@24
+zap_test.u_chip_top.u_phy.rd_lat_q[2:0]
+@22
+zap_test.u_chip_top.u_phy.rd_en_r[7:0]
+zap_test.u_chip_top.u_phy.rd_en_q[7:0]
+zap_test.u_chip_top.u_ddr_core.u_seq.rd_en_q[6:0]
+@28
+zap_test.u_chip_top.u_ddr_core.u_seq.rd_en_w
+zap_test.u_chip_top.u_ddr_core.u_seq.accept_o
+zap_test.u_chip_top.u_wb_ddr3_bridge.wb_req
+zap_test.u_chip_top.u_ddr_core.u_seq.read_early_accept_w
+@22
+zap_test.u_chip_top.u_ddr_core.u_seq.delay_q[5:0]
+zap_test.u_chip_top.u_ddr_core.u_seq.command_i[3:0]
+@28
+zap_test.u_chip_top.u_wb_ddr3_bridge.clk_i
++{zap_test.u_chip_top.u_ddr_core.u_seq.wr_en_w} zap_test.u_chip_top.u_ddr_core.u_seq.wr_en_w
+@22
+zap_test.u_chip_top.dfi_wrdata[31:0]
+@200
+-
+@22
+zap_test.u_chip_top.u_ddr_core.u_seq.wrdata_i[127:0]
+zap_test.u_chip_top.u_ddr_core.u_seq.wrdata_mask_i[15:0]
+zap_test.u_chip_top.u_wb_ddr3_bridge.inport_wr_o[15:0]
+@28
+zap_test.u_chip_top.u_phy.dfi_wrdata_en_i
+@22
+zap_test.u_chip_top.u_phy.dfi_wrdata_i[31:0]
+@28
+zap_test.u_chip_top.u_phy.wr_valid_q0
+@22
+zap_test.u_chip_top.u_phy.dfi_wrdata_q[31:0]
+@200
+-
+-
+@28
+zap_test.u_chip_top.u_pll.clkout0_o
+zap_test.u_chip_top.u_pll.clkout1_o
+zap_test.u_chip_top.u_pll.clkout2_o
+zap_test.u_chip_top.u_pll.clkout3_o
+@200
+-
+-
+@28
+zap_test.u_chip_top.u_ddr_core.clk_i
+zap_test.u_chip_top.clk2ddr3
+zap_test.u_chip_top.u_wb_ddr3_bridge.inport_rd_o
+zap_test.u_chip_top.u_ddr_core.ram_req_w
++{zap_test.u_chip_top.u_ddr_core.inport_accept_o} zap_test.u_chip_top.u_ddr_core.inport_accept_o
+@22
++{zap_test.u_chip_top.u_ddr_core.state_q[3:0]} zap_test.u_chip_top.u_ddr_core.state_q[3:0]
+@24
+zap_test.u_chip_top.u_wb_ddr3_bridge.state[2:0]
+@28
+zap_test.u_chip_top.u_wb_ddr3_bridge.inport_accept_i
+@200
+-
+-
+@22
+zap_test.u_chip_top.ddr3_ram_read_data[127:0]
+@200
 -
 -
 -

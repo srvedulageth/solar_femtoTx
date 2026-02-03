@@ -131,6 +131,10 @@ localparam ETHMAC_BUF_RAM_LO            = 32'h10000000;
 localparam ETHMAC_BUF_RAM_HI            = 32'h1FFFFFFF; //Total 256MB, accessed both by processor and ethmac...
 
 // Internal signals.
+wire            clk_ddr;
+wire            clk_ref;
+wire            clk2ddr3;
+
 wire            i_clk    = SYS_CLK;
 //wire            i_reset  = ~SYS_RST;
 wire            stable_rst_sync;
@@ -694,10 +698,10 @@ reset_sync_debounce reset_sync_debounce (
 // PLL
 //-----------------------------------------------------------------
 wire clk;
-wire clk_ddr;
+//wire clk_ddr;
 wire clk_ddr_dqs;
-wire clk_ref;
-wire clk2ddr3;
+//wire clk_ref;
+//wire clk2ddr3;
 
 artix7_pll u_pll
 (
@@ -732,6 +736,9 @@ wire [ 31:0]  dfi_rddata;
 //wire          dfi_rddata_valid;
 wire [   1:0] dfi_rddata_dnv;
 
+wire  [  3:0] ddr3_command;
+wire  [  3:0] ddr3_state_q;
+
 //-----------------------------------------------------------------
 // DDR PHY
 //-----------------------------------------------------------------
@@ -765,8 +772,8 @@ u_phy
     ,.dfi_wrdata_i(dfi_wrdata)
     ,.dfi_wrdata_en_i(dfi_wrdata_en)
     ,.dfi_wrdata_mask_i(dfi_wrdata_mask)
-    ,.dfi_rddata_en_i(dfi_rddata_en)
 
+    ,.dfi_rddata_en_i(dfi_rddata_en)
     ,.dfi_rddata_o(dfi_rddata)
     ,.dfi_rddata_valid_o(dfi_rddata_valid)
     ,.dfi_rddata_dnv_o(dfi_rddata_dnv)
@@ -822,6 +829,8 @@ u_ddr_core
     ,.cfg_stall_o()
 
     ,.init_done_o(ddr3_init_done)
+    ,.command_o(ddr3_command)
+    ,.state_q_o(ddr3_state_q)
 
     ,.inport_wr_i(ddr3_ram_wr)
     ,.inport_rd_i(ddr3_ram_rd)
@@ -894,7 +903,7 @@ u_wb_ddr3_bridge(
 );
 `endif //`ifdef DDR3_CONTROLLER
 
-//(* MARK_DEBUG = "true" *) wire sys_clk_dbg = sys_clk;
+/*
 (* MARK_DEBUG = "true" *) wire ddr3_init_done_dbg = ddr3_init_done;
 (* MARK_DEBUG = "true" *) wire ethmac_ram_cyc_dbg = ethmac_ram_cyc;
 (* MARK_DEBUG = "true" *) wire ethmac_ram_ack_dbg = ethmac_ram_ack;
@@ -904,6 +913,35 @@ u_wb_ddr3_bridge(
 (* MARK_DEBUG = "true" *) wire [31:0] dfi_rddata_dbg = dfi_rddata;
 
 (* MARK_DEBUG = "true" *) wire [31:0] data_wb_din_ethmac_ram_dbg = data_wb_din_ethmac_ram;
-//(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
-//(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+
+(* MARK_DEBUG = "true" *) wire ddr3_ram_accept_dbg = ddr3_ram_accept;
+(* MARK_DEBUG = "true" *) wire [3:0] ddr3_command_dbg = ddr3_command;
+(* MARK_DEBUG = "true" *) wire [3:0] ddr3_state_q_dbg = ddr3_state_q;
+(* MARK_DEBUG = "true" *) wire [127:0] ddr3_ram_read_data_dbg = ddr3_ram_read_data;
+
+//wb_ddr3_bridge.v debug signals ...
+(* MARK_DEBUG = "true" *) wire wb_ddr3_ram_rd_dbg = ddr3_ram_rd;
+(* MARK_DEBUG = "true" *) wire ddr3_ram_accept_dbg = ddr3_ram_accept;
+(* MARK_DEBUG = "true" *) wire wb_ddr3_ram_ack_dbg = ddr3_ram_ack;
+(* MARK_DEBUG = "true" *) wire [2:0] wb_ddr3_br_state_dbg = wb_ddr3_br_state;
+*/
+
+(* MARK_DEBUG = "true" *) wire ethmac_ram_cyc_dbg = ethmac_ram_cyc;
+(* MARK_DEBUG = "true" *) wire ethmac_ram_ack_dbg = ethmac_ram_ack;
+(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+(* MARK_DEBUG = "true" *) wire [31:0] dfi_wrdata_dbg = dfi_wrdata;
+(* MARK_DEBUG = "true" *) wire dfi_rddata_valid_dbg = dfi_rddata_valid;
+(* MARK_DEBUG = "true" *) wire [31:0] dfi_rddata_dbg = dfi_rddata;
+
+(* MARK_DEBUG = "true" *) wire [15:0] ddr3_ram_wr_dbg = ddr3_ram_wr;
+(* MARK_DEBUG = "true" *) wire ddr3_ram_accept_dbg = ddr3_ram_accept;
+(* MARK_DEBUG = "true" *) wire [2:0] wb_ddr3_br_state_dbg = wb_ddr3_br_state;
+(* MARK_DEBUG = "true" *) wire [3:0] ddr3_state_q_dbg = ddr3_state_q;
+
+(* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data0_w_dbg = zap_soc.u_phy.rd_data0_w;
+(* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data1_w_dbg = zap_soc.u_phy.rd_data1_w;
+(* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data2_w_dbg = zap_soc.u_phy.rd_data2_w;
+(* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data3_w_dbg = zap_soc.u_phy.rd_data3_w;
+
 endmodule // zap_soc

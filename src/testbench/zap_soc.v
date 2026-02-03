@@ -131,6 +131,7 @@ localparam ETHMAC_BUF_RAM_LO            = 32'h10000000;
 localparam ETHMAC_BUF_RAM_HI            = 32'h1FFFFFFF; //Total 256MB, accessed both by processor and ethmac...
 
 // Internal signals.
+wire            clk_ddr;
 wire            clk_ref;
 wire            clk2ddr3;
 
@@ -603,7 +604,7 @@ wb_arb2 #(
 // PLL
 //-----------------------------------------------------------------
 wire clk;
-wire clk_ddr;
+//wire clk_ddr;
 wire clk_ddr_dqs;
 //wire clk_ref;
 //wire clk2ddr3;
@@ -641,6 +642,9 @@ wire [ 31:0]  dfi_rddata;
 //wire          dfi_rddata_valid;
 wire [   1:0] dfi_rddata_dnv;
 
+wire  [  3:0] ddr3_command;
+wire  [  3:0] ddr3_state_q;
+
 //-----------------------------------------------------------------
 // DDR PHY
 //-----------------------------------------------------------------
@@ -674,8 +678,8 @@ u_phy
     ,.dfi_wrdata_i(dfi_wrdata)
     ,.dfi_wrdata_en_i(dfi_wrdata_en)
     ,.dfi_wrdata_mask_i(dfi_wrdata_mask)
-    ,.dfi_rddata_en_i(dfi_rddata_en)
 
+    ,.dfi_rddata_en_i(dfi_rddata_en)
     ,.dfi_rddata_o(dfi_rddata)
     ,.dfi_rddata_valid_o(dfi_rddata_valid)
     ,.dfi_rddata_dnv_o(dfi_rddata_dnv)
@@ -731,6 +735,8 @@ u_ddr_core
     ,.cfg_stall_o()
 
     ,.init_done_o(ddr3_init_done)
+    ,.command_o(ddr3_command)
+    ,.state_q_o(ddr3_state_q)
 
     ,.inport_wr_i(ddr3_ram_wr)
     ,.inport_rd_i(ddr3_ram_rd)

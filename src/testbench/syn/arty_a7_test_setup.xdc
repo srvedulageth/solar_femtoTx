@@ -336,5 +336,5 @@ set_property IOSTANDARD DIFF_SSTL135 [get_ports {ddr3_ck_n[0]}]
 set_property PACKAGE_PIN V9 [get_ports {ddr3_ck_n[0]}]
 
 set_property INTERNAL_VREF  0.675 [get_iobanks 34]
-set_property INTERNAL_VREF  0.675 [get_iobanks 35]
+#set_property INTERNAL_VREF  0.675 [get_iobanks 35]
 ##DDR3
