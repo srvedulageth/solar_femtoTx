@@ -80,7 +80,9 @@
 //
 //
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_miim

@@ -18,6 +18,9 @@
 //
 // This is a classic synchronous FIFO.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_sync_fifo #(
         parameter logic [31:0] WIDTH = 32'd32,

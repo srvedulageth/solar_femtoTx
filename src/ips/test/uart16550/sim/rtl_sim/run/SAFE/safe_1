@@ -1,0 +1,4 @@
+xvlog -work work.testbench_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+xvlog -work work.uart_wb_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+xvlog -work work.uart_device_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+xvlog -work work.testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v

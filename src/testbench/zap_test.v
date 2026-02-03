@@ -16,93 +16,102 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 // 02110-1301, USA.
 //
+//`timescale 1ps/1ps
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
-
-module zap_test (
-        input  wire            i_clk,
-        input  wire            i_reset,
-        input  wire            i_int_sel,
-
-        output reg             o_sim_ok = 1'd0,
-        output reg             o_sim_err = 1'd0,
-
-        output reg             o_wb_stb,
-        output reg             o_wb_cyc,
-        output reg     [31:0]  o_wb_adr,
-        output reg     [3:0]   o_wb_sel,
-        output reg             o_wb_we,
-        output reg     [31:0]  o_wb_dat,
-        output reg      [2:0]  o_wb_cti,
-        input  wire            i_wb_ack,
-        input  wire    [31:0]  i_wb_dat,
-
-        input  wire    [7:0]   i_mem [65536-1:0],
-
-        output wire            UART_SR_DAV_0,
-        output wire            UART_SR_DAV_1,
-        output wire    [7:0]   UART_SR_0,
-        output wire    [7:0]   UART_SR_1
-);
-
-initial
-begin
-        $dumpfile("zap.vcd");
-        $dumpvars;
-end
-
-parameter DATA_SECTION_TLB_ENTRIES      = 4;
-parameter DATA_LPAGE_TLB_ENTRIES        = 8;
-parameter DATA_SPAGE_TLB_ENTRIES        = 16;
-parameter DATA_FPAGE_TLB_ENTRIES        = 32;
-parameter DATA_CACHE_SIZE               = 1024;
-parameter CODE_SECTION_TLB_ENTRIES      = 4;
-parameter CODE_LPAGE_TLB_ENTRIES        = 8;
-parameter CODE_SPAGE_TLB_ENTRIES        = 16;
-parameter CODE_FPAGE_TLB_ENTRIES        = 32;
-parameter CODE_CACHE_SIZE               = 1024;
-parameter FIFO_DEPTH                    = 4;
-parameter BP_ENTRIES                    = 1024;
-parameter ONLY_CORE                     = 0;
-parameter BE_32_ENABLE                  = 0;
-
+module zap_test;
 
 localparam STRING_LENGTH                = 12;
 
+reg i_clk = 0;
+initial begin
+   forever #5ns i_clk = ~i_clk; //100MHz
+end
+
+reg clk_baud_19200 = 0;
+initial begin
+  //forever #2605 clk_baud_19200 = ~clk_baud_19200;
+  forever #26040 clk_baud_19200 = ~clk_baud_19200;
+end
+
+reg i_reset;
+initial begin
+  i_reset = 'b 1;
+  repeat(50) @(posedge i_clk);
+  #1;
+  i_reset = 'b 0;
+end
+
+`ifdef DUAL_UART
 reg [1:0]                  i_uart = 2'b11;
 reg [1:0]                  o_uart;
-reg [31:0]                 i;
+`else
+reg [0:0]                  i_uart = 'b1;
+reg [0:0]                  o_uart;
+`endif
+
 reg [3:0]                  clk_ctr = 4'd0;
-reg [STRING_LENGTH*8-1:0]  uart_string = "DLROW OLLEH ";
-reg [6:0]                  uart_ctr    = 6'd10;
+//reg [STRING_LENGTH*8-1:0]  uart_string = "DLROW OLLEH ";
+reg [STRING_LENGTH*8-1:0]  uart_string = "H";
+reg [6:0]                  uart_ctr    = 7'd10;
 reg [31:0]                 btrace      = 32'd0;
-reg [31:0]                 mem [65536/4-1:0]; // 16K words.
 reg                        uart_done = 1'd0;
-reg [8:0]                  uart_init_done = 8'd0;
+//reg [8:0]                  uart_init_done = 9'd0;
+reg [3:0]                  uart_init_done = 4'd0;
+
+wire            UART_SR_DAV_0;
+wire    [7:0]   UART_SR_0;
+`ifdef DUAL_UART
+wire            UART_SR_DAV_1;
+wire    [7:0]   UART_SR_1;
+`endif
+
+//EthMAC
+//Tx
+wire              mtx_clk_pad_i; // Transmit clock (from PHY)
+wire [3:0]        mtxd_pad_o;    // Transmit nibble (to PHY)
+wire              mtxen_pad_o;   // Transmit enable (to PHY)
+wire              mtxerr_pad_o;  // Transmit error (to PHY)
+
+//Rx
+wire              mrx_clk_pad_i; // Receive clock (from PHY)
+wire [3:0]        mrxd_pad_i;    // Receive nibble (from PHY)
+wire              mrxdv_pad_i;   // Receive data valid (from PHY)
+wire              mrxerr_pad_i;  // Receive data error (from PHY)
+
+//Common Tx and Rx
+wire              mcoll_pad_i;   // Collision (from PHY)
+wire              mcrs_pad_i;    // Carrier sense (from PHY)
+
+//Phy Reference Clock and Reset ...
+wire              eth_ref_clk;
+wire              eth_rstn;
+
+// MIIM MII Management interface
+wire              mdc_pad_o;     // MII Management data clock (to PHY)
+wire              mdio_pad_io;
 
 // Divided clocks.
 reg clk_2 = 1'd0, clk_4 = 1'd0, clk_8 = 1'd0, clk_16 = 1'd0;
 
 // Digital clock dividers.
-always @ ( posedge i_clk )
-        clk_2 = clk_2 + 1;
+always @ ( posedge i_clk ) clk_2 = clk_2 + 1;
+always @ ( posedge clk_2 ) clk_4 = clk_4 + 1;
+always @ ( posedge clk_4 ) clk_8 = clk_8 + 1;
+always @ ( posedge clk_8 ) clk_16 = clk_16 + 1;
 
-always @ ( posedge clk_2 )
-        clk_4 = clk_4 + 1;
-
-always @ ( posedge clk_4 )
-        clk_8 = clk_8 + 1;
-
-always @ ( posedge clk_8 )
-        clk_16 = clk_16 + 1;
-
-always @ ( posedge clk_16 )
+//always @ ( posedge clk_16 )
+always @ ( posedge clk_baud_19200 )
 begin
         if ( !(&uart_init_done) )
                 uart_init_done <= uart_init_done + 1;
 end
 
 // UART data into the core.
-always @ ( posedge clk_16 ) if ( !uart_done && (&uart_init_done) )
+//always @ ( posedge clk_16 ) if ( !uart_done && (&uart_init_done) )
+always @ ( posedge clk_baud_19200 ) if ( !uart_done && (&uart_init_done) )
 begin
         if ( uart_ctr <= 8 )
         begin
@@ -129,41 +138,51 @@ begin
         end
 end
 
-// Create memory for easy analysis.
-always @ (*)
-begin
-        for(int i=0;i<65536;i=i+4)
-                mem[i/4] = {i_mem[i+3], i_mem[i+2], i_mem[i+1], i_mem[i]};
-end
-
 // UART TX related. Data out of core.
-uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(i_clk), .i_line(o_uart[0]),
+//uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(i_clk), .i_line(o_uart[0]),
+uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(clk_baud_19200), .i_line(o_uart[0]),
                                         .UART_SR_DAV(UART_SR_DAV_0), .UART_SR(UART_SR_0) );
+`ifdef DUAL_UART
 uart_tx_dumper u_uart_tx_dumper_dev1 (  .i_clk(i_clk), .i_line(o_uart[1]),
                                         .UART_SR_DAV(UART_SR_DAV_1), .UART_SR(UART_SR_1) );
+`endif
 
-wire          mtx_clk;  // This goes to PHY
-wire          mrx_clk;  // This goes to PHY
+`ifdef DDR3_CONTROLLER
+wire [15:0]  ddr3_dq_fpga;
+wire [1:0]   ddr3_dqs_n_fpga;
+wire [1:0]   ddr3_dqs_p_fpga;
 
-wire   [3:0]  MTxD;
-wire          MTxEn;
-wire          MTxErr;
+wire [13:0]  ddr3_addr_fpga;
+wire [2:0]   ddr3_ba_fpga;
+wire         ddr3_ras_n_fpga;
+wire         ddr3_cas_n_fpga;
+wire         ddr3_we_n_fpga;
+wire [0:0]   ddr3_ck_p_fpga;
+wire [0:0]   ddr3_ck_n_fpga;
+wire [0:0]   ddr3_cke_fpga;
+wire [0:0]   ddr3_cs_n_fpga;
+wire [1:0]   ddr3_dm_fpga;
+wire [0:0]   ddr3_odt_fpga;
 
-wire   [3:0]  MRxD;     // This goes to PHY
-wire          MRxDV;    // This goes to PHY
-wire          MRxErr;   // This goes to PHY
-wire          MColl;    // This goes to PHY
-wire          MCrs;     // This goes to PHY
-
-wire          Mdi_I;
-wire          Mdo_O;
-wire          Mdo_OE;
-tri           Mdio_IO;
-wire          Mdc_O;
-
-wire wb_rst = i_reset;
+wire         ddr3_reset_n;
+`endif //`ifdef DDR3_CONTROLLER
 
 // DUT
+parameter DATA_SECTION_TLB_ENTRIES      = 4;
+parameter DATA_LPAGE_TLB_ENTRIES        = 8;
+parameter DATA_SPAGE_TLB_ENTRIES        = 16;
+parameter DATA_FPAGE_TLB_ENTRIES        = 32;
+parameter DATA_CACHE_SIZE               = 1024;
+parameter CODE_SECTION_TLB_ENTRIES      = 4;
+parameter CODE_LPAGE_TLB_ENTRIES        = 8;
+parameter CODE_SPAGE_TLB_ENTRIES        = 16;
+parameter CODE_FPAGE_TLB_ENTRIES        = 32;
+parameter CODE_CACHE_SIZE               = 1024;
+parameter FIFO_DEPTH                    = 4;
+parameter BP_ENTRIES                    = 1024;
+parameter ONLY_CORE                     = 0;
+parameter BE_32_ENABLE                  = 0;
+
 zap_soc #(
         .FIFO_DEPTH(FIFO_DEPTH),
         .BP_ENTRIES(BP_ENTRIES),
@@ -181,116 +200,600 @@ zap_soc #(
         .ONLY_CORE(ONLY_CORE)
 ) u_chip_top (
         // Clk and rst
+`ifdef DDR3_CONTROLLER //DDR3 controller from github
         .SYS_CLK  (i_clk),
         .SYS_RST  (i_reset),
 
-        // UART 0
-        .UART0_RXD(i_uart[0]),
-        .UART0_TXD(o_uart[0]),
+        .ddr3_dq(ddr3_dq_fpga),
+        .ddr3_dqs_n(ddr3_dqs_n_fpga),
+        .ddr3_dqs_p(ddr3_dqs_p_fpga),
 
-        // UART 1
-        .UART1_RXD(i_uart[1]),
-        .UART1_TXD(o_uart[1]),
+        .ddr3_addr(ddr3_addr_fpga),
+        .ddr3_ba(ddr3_ba_fpga),
+        .ddr3_ras_n(ddr3_ras_n_fpga),
+        .ddr3_cas_n(ddr3_cas_n_fpga),
+        .ddr3_we_n(ddr3_we_n_fpga),
+        .ddr3_ck_p(ddr3_ck_p_fpga),
+        .ddr3_ck_n(ddr3_ck_n_fpga),
+        .ddr3_cke(ddr3_cke_fpga),
+        .ddr3_cs_n(ddr3_cs_n_fpga),
+        .ddr3_dm(ddr3_dm_fpga),
+        .ddr3_odt(ddr3_odt_fpga),
 
+        .ddr3_reset_n(ddr3_reset_n),
+`else //FPGA RAM
+        .SYS_CLK  (i_clk),
+        .SYS_RST  (i_reset),
+`endif // `ifdef DDR3_CONTROLLER //DDR3 controller from github
+
+        //EthMAC
         //TX
-        .mtx_clk_pad_i(mtx_clk), .mtxd_pad_o(MTxD), .mtxen_pad_o(MTxEn), .mtxerr_pad_o(MTxErr),
+        .mtx_clk_pad_i(mtx_clk_pad_i),
+        .mtxd_pad_o(mtxd_pad_o),
+        .mtxen_pad_o(mtxen_pad_o),
+        .mtxerr_pad_o(mtxerr_pad_o),
 
         //RX
-        .mrx_clk_pad_i(mrx_clk), .mrxd_pad_i(MRxD), .mrxdv_pad_i(MRxDV), .mrxerr_pad_i(MRxErr),
-        .mcoll_pad_i(MColl),    .mcrs_pad_i(MCrs),
+        .mrx_clk_pad_i(mrx_clk_pad_i),
+        .mrxd_pad_i(mrxd_pad_i),
+        .mrxdv_pad_i(mrxdv_pad_i),
+        .mrxerr_pad_i(mrxerr_pad_i),
+
+        //Common Tx and Rx
+        .mcoll_pad_i(mcoll_pad_i),
+        .mcrs_pad_i(mcrs_pad_i),
+  
+        //Phy Reference Clock and Reset ...
+        .eth_ref_clk(eth_ref_clk),
+        .eth_rstn(eth_rstn),
 
         // MIIM
-        .mdc_pad_o(Mdc_O), .md_pad_i(Mdi_I), .md_pad_o(Mdo_O), .md_padoe_o(Mdo_OE),
+        .mdc_pad_o(mdc_pad_o),
+        .mdio_pad_io(mdio_pad_io),
+
+        // UART 0
+        .UART0_RXD(i_uart[0]),
+        .UART0_TXD(o_uart[0])
+
+`ifdef DUAL_UART
+        ,
+        // UART 1
+        .UART1_RXD(i_uart[1]),
+        .UART1_TXD(o_uart[1])
+`endif
 
         //Wishbone External Master Interface
-        .int_sel  (i_int_sel),
-        .I_IRQ    (28'd0),
-        .I_FIQ    (1'd0),
-        .O_WB_STB (o_wb_stb),
-        .O_WB_CYC (o_wb_cyc),
-        .O_WB_DAT (o_wb_dat),
-        .O_WB_ADR (o_wb_adr),
-        .O_WB_SEL (o_wb_sel),
-        .O_WB_WE  (o_wb_we),
-        .I_WB_ACK (i_wb_ack),
-        .I_WB_DAT (i_wb_dat),
-        .O_WB_CTI(o_wb_cti)
-
+        //.int_sel  ('b 1)
 );
 
-integer sim_ctr = 0;
-
-always @ ( posedge i_clk )
-begin
-        sim_ctr <= sim_ctr + 1;
-
-        if ( sim_ctr == `MAX_CLOCK_CYCLES )
-        begin
-                o_sim_ok <= 1'd1;
-
-                `include "zap_check.vh"
-        end
+integer phy_log_file_desc;
+initial begin
+  phy_log_file_desc = $fopen("./eth_tb_phy.log");
 end
 
-// Expose the CPU registers.
-wire [31:0] r0   =  `REG_HIER.mem[0];
-wire [31:0] r1   =  `REG_HIER.mem[1];
-wire [31:0] r2   =  `REG_HIER.mem[2];
-wire [31:0] r3   =  `REG_HIER.mem[3];
-wire [31:0] r4   =  `REG_HIER.mem[4];
-wire [31:0] r5   =  `REG_HIER.mem[5];
-wire [31:0] r6   =  `REG_HIER.mem[6];
-wire [31:0] r7   =  `REG_HIER.mem[7];
-wire [31:0] r8   =  `REG_HIER.mem[8];
-wire [31:0] r9   =  `REG_HIER.mem[9];
-wire [31:0] r10  =  `REG_HIER.mem[10];
-wire [31:0] r11  =  `REG_HIER.mem[11];
-wire [31:0] r12  =  `REG_HIER.mem[12];
-wire [31:0] r13  =  `REG_HIER.mem[13];
-wire [31:0] r14  =  `REG_HIER.mem[14];
-wire [31:0] r15  =  `REG_HIER.mem[15];
-wire [31:0] r16  =  `REG_HIER.mem[16];
-wire [31:0] r17  =  `REG_HIER.mem[17];
-wire [31:0] r18  =  `REG_HIER.mem[18];
-wire [31:0] r19  =  `REG_HIER.mem[19];
-wire [31:0] r20  =  `REG_HIER.mem[20];
-wire [31:0] r21  =  `REG_HIER.mem[21];
-wire [31:0] r22  =  `REG_HIER.mem[22];
-wire [31:0] r23  =  `REG_HIER.mem[23];
-wire [31:0] r24  =  `REG_HIER.mem[24];
-wire [31:0] r25  =  `REG_HIER.mem[25];
-wire [31:0] r26  =  `REG_HIER.mem[26];
-wire [31:0] r27  =  `REG_HIER.mem[27];
-wire [31:0] r28  =  `REG_HIER.mem[28];
-wire [31:0] r29  =  `REG_HIER.mem[29];
-wire [31:0] r30  =  `REG_HIER.mem[30];
-wire [31:0] r31  =  `REG_HIER.mem[31];
-wire [31:0] r32  =  `REG_HIER.mem[32];
-wire [31:0] r33  =  `REG_HIER.mem[33];
-wire [31:0] r34  =  `REG_HIER.mem[34];
-wire [31:0] r35  =  `REG_HIER.mem[35];
-wire [31:0] r36  =  `REG_HIER.mem[36];
-wire [31:0] r37  =  `REG_HIER.mem[37];
-wire [31:0] r38  =  `REG_HIER.mem[38];
-wire [31:0] r39  =  `REG_HIER.mem[39];
-
-eth_phy eth_phy
-(
+eth_phy eth_phy (
   // WISHBONE reset
-  .m_rst_n_i(!wb_rst),
+  .m_rst_n_i(!i_reset),
 
   // MAC TX
-  .mtx_clk_o(mtx_clk),    .mtxd_i(MTxD),    .mtxen_i(MTxEn),    .mtxerr_i(MTxErr),
+  .mtx_clk_o(mtx_clk_pad_i),    .mtxd_i(mtxd_pad_o),    .mtxen_i(mtxen_pad_o),    .mtxerr_i(mtxerr_pad_o),
 
   // MAC RX
-  .mrx_clk_o(mrx_clk),    .mrxd_o(MRxD),    .mrxdv_o(MRxDV),    .mrxerr_o(MRxErr),
-  .mcoll_o(MColl),        .mcrs_o(MCrs),
+  .mrx_clk_o(mrx_clk_pad_i),    .mrxd_o(mrxd_pad_i),    .mrxdv_o(mrxdv_pad_i),    .mrxerr_o(mrxerr_pad_i),
+  .mcoll_o(mcoll_pad_i),        .mcrs_o(mcrs_pad_i),
 
   // MIIM
-  .mdc_i(Mdc_O),          .md_io(Mdio_IO),
+  .mdc_i(mdc_pad_o),          .md_io(mdio_pad_io),
 
   // SYSTEM
   .phy_log(phy_log_file_desc)
+  //.phy_log() //Not connected
 );
+initial begin
+  $dumpfile("zap.vcd");
+  $dumpvars(0);
+end
+
+initial begin
+  #100;
+  wait(uart_done);
+  //repeat(1000)  @(posedge clk_16);
+  repeat(10)  @(posedge clk_baud_19200);
+  $display("Simulation OK");
+  $finish;
+end
+
+initial begin
+  #50000ns;
+  eth_phy.link_up_down(1);
+end
+
+task set_rx_packet;
+  input  [31:0] rxpnt;
+  input  [15:0] len;
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input  [47:0] eth_dest_addr;
+  input  [47:0] eth_source_addr;
+  input  [15:0] eth_type_len;
+  input  [7:0]  eth_start_data;
+  integer       i, sd;
+  reg    [47:0] dest_addr;
+  reg    [47:0] source_addr;
+  reg    [15:0] type_len;
+  reg    [21:0] buffer;
+  reg           delta_t;
+begin
+  buffer = rxpnt[21:0];
+  dest_addr = eth_dest_addr;
+  source_addr = eth_source_addr;
+  type_len = eth_type_len;
+  sd = eth_start_data;
+  delta_t = 0;
+  for(i = 0; i < len; i = i + 1) 
+  begin
+    if (i < 6)
+    begin
+      eth_phy.rx_mem[buffer] = dest_addr[47:40];
+      dest_addr = dest_addr << 8;
+    end
+    else if (i < 12)
+    begin
+      eth_phy.rx_mem[buffer] = source_addr[47:40];
+      source_addr = source_addr << 8;
+    end
+    else if (i < 14)
+    begin
+      eth_phy.rx_mem[buffer] = type_len[15:8];
+      type_len = type_len << 8;
+    end
+    else
+    begin
+      eth_phy.rx_mem[buffer] = sd[7:0];
+      sd = sd + 1;
+    end
+    buffer = buffer + 1;
+  end
+  delta_t = !delta_t;
+  if (plus_dribble_nibble)
+    eth_phy.rx_mem[buffer] = {4'h0, 4'hD /*sd[3:0]*/};
+  delta_t = !delta_t;
+end
+endtask // set_rx_packet
+
+`ifdef XILINX
+byte arp_payload [0:27] = {
+    8'h00, 8'h01, 8'h08, 8'h00, 8'h06, 8'h04, 8'h00, 8'h01,
+    8'h64, 8'h00, 8'h6A, 8'h8B, 8'hCB, 8'hA6,
+    8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'hC0, 8'hA8, 8'h01, 8'h14
+};
+
+byte ip_icmp_payload [0:59] = {
+    8'h45, 8'h00, 8'h00, 8'h3C, 8'hD7, 8'h06, 8'h00, 8'h00,
+    8'h80, 8'h01, 8'h00, 8'h00, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    // ICMP (type 8 echo request + data)
+    8'h08, 8'h00, 8'h4A, 8'h07, 8'h00, 8'h01, 8'h03, 8'h54,
+    8'h61, 8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68,
+    8'h69, 8'h6A, 8'h6B, 8'h6C, 8'h6D, 8'h6E, 8'h6F, 8'h70,
+    8'h71, 8'h72, 8'h73, 8'h74, 8'h75, 8'h76, 8'h77, 8'h61,
+    8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68, 8'h69
+};
+byte ip_udp_payload_1 [0:55] = {
+    8'h45, 8'h00, 8'h00, 8'h38, 8'h18, 8'h8b, 8'h00, 8'h00,
+    8'h80, 8'h11, 8'h60, 8'h78, 8'hc0, 8'ha8, 8'h01, 8'h0A,
+    8'hff, 8'hff, 8'hff, 8'hff, 8'hc0, 8'h69, 8'h56, 8'hce,
+    8'h00, 8'h24, 8'h61, 8'h76, 8'h53, 8'h54, 8'h52, 8'h5f,
+    8'h42, 8'h43, 8'h41, 8'h53, 8'h54, 8'h00, 8'h00, 8'h00,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h52, 8'h51, 8'h31, 8'h2e,
+    8'h30, 8'he2, 8'h30, 8'h00, 8'h00, 8'h1c, 8'h64, 8'h31
+};
+`else
+reg [7:0] arp_payload [0:27] = {
+    8'h00,8'h01,8'h08,8'h00,8'h06,8'h04,8'h00,8'h01,
+    8'hA4,8'hBB,8'h6D,8'h52,8'hE4,8'h53,
+    8'hC0,8'hA8,8'h01,8'h0A,
+    8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,
+    8'hC0,8'hA8,8'h01,8'h14
+};
+
+reg [7:0] ip_icmp_payload [0:59] = {
+    8'h45, 8'h00, 8'h00, 8'h3C, 8'hD7, 8'h06, 8'h00, 8'h00,
+    8'h80, 8'h01, 8'h00, 8'h00, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    // ICMP (type 8 echo request + data)
+    8'h08, 8'h00, 8'h4A, 8'h07, 8'h00, 8'h01, 8'h03, 8'h54,
+    8'h61, 8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68,
+    8'h69, 8'h6A, 8'h6B, 8'h6C, 8'h6D, 8'h6E, 8'h6F, 8'h70,
+    8'h71, 8'h72, 8'h73, 8'h74, 8'h75, 8'h76, 8'h77, 8'h61,
+    8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68, 8'h69
+};
+
+reg [7:0] ip_icmp_payload_1 [0:115] = {
+    //IP ...
+    8'h45, 8'h00, 8'h00, 8'h74, 8'hf4, 8'hf1, 8'h00, 8'h00,
+    8'h80, 8'h01, 8'h00, 8'h00, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    // ICMP (type 3 echo request + data)
+    8'h03, 8'h02, 8'hfc, 8'hfd, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'h45, 8'h00, 8'h00, 8'h58, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'h40, 8'h01, 8'hF7, 8'h36, 8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    8'hC0, 8'hA8, 8'h01, 8'h0A, 8'h00, 8'h00, 8'h80, 8'h76,
+
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h45, 8'h00, 8'h00, 8'h3C,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h40, 8'h01, 8'hF7, 8'h52,
+
+    8'hC0, 8'hA8, 8'h01, 8'h14, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+
+    8'h00, 8'h00, 8'h1B, 8'hEC, 8'h00, 8'h01, 8'h39, 8'h6F,
+
+    8'h61, 8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h00, 8'h00,
+
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00
+};
+
+reg [7:0] ip_udp_payload_1 [0:55] = {
+    8'h45, 8'h00, 8'h00, 8'h38, 8'h18, 8'h8b, 8'h00, 8'h00,
+    8'h80, 8'h11, 8'h60, 8'h78, 8'hc0, 8'ha8, 8'h01, 8'h0A,
+    8'hff, 8'hff, 8'hff, 8'hff, 8'hc0, 8'h69, 8'h56, 8'hce,
+    8'h00, 8'h24, 8'h61, 8'h76, 8'h53, 8'h54, 8'h52, 8'h5f,
+    8'h42, 8'h43, 8'h41, 8'h53, 8'h54, 8'h00, 8'h00, 8'h00,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h52, 8'h51, 8'h31, 8'h2e,
+    8'h30, 8'he2, 8'h30, 8'h00, 8'h00, 8'h1c, 8'h64, 8'h31
+};
+`endif
+
+task set_rx_packet_1;
+  input  [31:0] rxpnt;
+  input  [15:0] len;
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input  [47:0] eth_dest_addr;
+  input  [47:0] eth_source_addr;
+  input  [15:0] eth_type_len;
+  input  [7:0]  eth_start_data;
+  integer       i, sd;
+  reg    [47:0] dest_addr;
+  reg    [47:0] source_addr;
+  reg    [15:0] type_len;
+  reg    [21:0] buffer;
+  reg           delta_t;
+begin
+  buffer = rxpnt[21:0];
+  dest_addr = eth_dest_addr;
+  source_addr = eth_source_addr;
+  type_len = eth_type_len;
+  sd = eth_start_data;
+  delta_t = 0;
+  for(i = 0; i < len; i = i + 1) 
+  begin
+    if (i < 6)
+    begin
+      eth_phy.rx_mem[buffer] = dest_addr[47:40];
+      dest_addr = dest_addr << 8;
+    end
+    else if (i < 12)
+    begin
+      eth_phy.rx_mem[buffer] = source_addr[47:40];
+      source_addr = source_addr << 8;
+    end
+    else if (i < 14)
+    begin
+      eth_phy.rx_mem[buffer] = type_len[15:8];
+      type_len = type_len << 8;
+    end
+
+    else if(eth_type_len == 'h 0806) begin //ARP Pkt ...
+      if (i < 42) begin //28 bytes from arp payload
+        eth_phy.rx_mem[buffer] = arp_payload[i-14];
+      end
+      else if((i >=42) && (i < 60)) begin
+        eth_phy.rx_mem[buffer] = 8'h 00;
+      end
+    end
+
+    else if(eth_type_len == 'h 0800) begin //ICMP Pkt ...
+      if (i < 74) begin //60 bytes from icmp payload
+        eth_phy.rx_mem[buffer] = ip_icmp_payload[i-14];
+      end
+    end
+
+    else
+    begin
+      eth_phy.rx_mem[buffer] = sd[7:0];
+      sd = sd + 1;
+    end
+    buffer = buffer + 1;
+  end
+  delta_t = !delta_t;
+  if (plus_dribble_nibble)
+    eth_phy.rx_mem[buffer] = {4'h0, 4'hD /*sd[3:0]*/};
+  delta_t = !delta_t;
+end
+endtask // set_rx_packet_1
+
+task set_rx_packet_udp;
+  input  [31:0] rxpnt;
+  input  [15:0] len;
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input  [47:0] eth_dest_addr;
+  input  [47:0] eth_source_addr;
+  input  [15:0] eth_type_len;
+  input  [7:0]  eth_start_data;
+  input  [15:0] pkt_len;
+
+  integer       i, sd;
+  reg    [47:0] dest_addr;
+  reg    [47:0] source_addr;
+  reg    [15:0] type_len;
+  reg    [21:0] buffer;
+  reg           delta_t;
+begin
+  buffer = rxpnt[21:0];
+  dest_addr = eth_dest_addr;
+  source_addr = eth_source_addr;
+  type_len = eth_type_len;
+  sd = eth_start_data;
+  delta_t = 0;
+  for(i = 0; i < len; i = i + 1) 
+  begin
+    if (i < 6)
+    begin
+      eth_phy.rx_mem[buffer] = dest_addr[47:40];
+      dest_addr = dest_addr << 8;
+    end
+    else if (i < 12)
+    begin
+      eth_phy.rx_mem[buffer] = source_addr[47:40];
+      source_addr = source_addr << 8;
+    end
+    else if (i < 14)
+    begin
+      eth_phy.rx_mem[buffer] = type_len[15:8];
+      type_len = type_len << 8;
+    end
+
+    else if(type_len == 'h0800) begin //ICMP+IP packet ...
+      if (i < pkt_len) begin
+        eth_phy.rx_mem[buffer] = ip_udp_payload_1[i-14];
+      end
+    end
+
+    else
+    begin
+      eth_phy.rx_mem[buffer] = sd[7:0];
+      sd = sd + 1;
+    end
+    buffer = buffer + 1;
+  end
+  delta_t = !delta_t;
+  if (plus_dribble_nibble)
+    eth_phy.rx_mem[buffer] = {4'h0, 4'hD /*sd[3:0]*/};
+  delta_t = !delta_t;
+end
+endtask // set_rx_packet_udp
+
+task append_rx_crc;
+  input  [31:0] rxpnt_phy; // source
+  input  [15:0] len; // length in bytes without CRC
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input         negated_crc; // if appended CRC is correct or not
+  reg    [31:0] crc;
+  reg    [7:0]  tmp;
+  reg    [31:0] addr_phy;
+  reg           delta_t;
+begin
+  addr_phy = rxpnt_phy + len;
+  delta_t = 0;
+  // calculate CRC from prepared packet
+  paralel_crc_phy_rx(rxpnt_phy, {16'h0, len}, plus_dribble_nibble, crc);
+  if (negated_crc)
+    crc = ~crc;
+  delta_t = !delta_t;
+
+  if (plus_dribble_nibble)
+  begin
+    tmp = eth_phy.rx_mem[addr_phy];
+    eth_phy.rx_mem[addr_phy]     = {crc[27:24], tmp[3:0]};
+    eth_phy.rx_mem[addr_phy + 1] = {crc[19:16], crc[31:28]};
+    eth_phy.rx_mem[addr_phy + 2] = {crc[11:8], crc[23:20]};
+    eth_phy.rx_mem[addr_phy + 3] = {crc[3:0], crc[15:12]};
+    eth_phy.rx_mem[addr_phy + 4] = {4'h0, crc[7:4]};
+  end
+  else
+  begin
+    eth_phy.rx_mem[addr_phy]     = crc[31:24];
+    eth_phy.rx_mem[addr_phy + 1] = crc[23:16];
+    eth_phy.rx_mem[addr_phy + 2] = crc[15:8];
+    eth_phy.rx_mem[addr_phy + 3] = crc[7:0];
+  end
+end
+endtask // append_rx_crc
+
+// paralel CRC calculating for PHY RX
+task paralel_crc_phy_rx;
+  input  [31:0] start_addr; // start address
+  input  [31:0] len; // length of frame in Bytes without CRC length
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  output [31:0] crc_out;
+  reg    [21:0] addr_cnt; // only 22 address lines
+  integer       word_cnt;
+  integer       nibble_cnt;
+  reg    [31:0] load_reg;
+  reg           delta_t;
+  reg    [31:0] crc_next;
+  reg    [31:0] crc;
+  reg           crc_error;
+  reg     [3:0] data_in;
+  integer       i;
+begin
+  #1 addr_cnt = start_addr[21:0];
+  word_cnt = 24; // 27; // start of the frame - nibble granularity (MSbit first)
+  crc = 32'hFFFF_FFFF; // INITIAL value
+  delta_t = 0;
+  // length must include 4 bytes of ZEROs, to generate CRC
+  // get number of nibbles from Byte length (2^1 = 2)
+  if (plus_dribble_nibble)
+    nibble_cnt = ((len + 4) << 1) + 1'b1; // one nibble longer
+  else
+    nibble_cnt = ((len + 4) << 1);
+  // because of MAGIC NUMBER nibbles are swapped [3:0] -> [0:3]
+  load_reg[31:24] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[23:16] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[15: 8] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[ 7: 0] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  while (nibble_cnt > 0)
+  begin
+    // wait for delta time
+    delta_t = !delta_t;
+    // shift data in
+
+    if(nibble_cnt <= 8) // for additional 8 nibbles shift ZEROs in!
+      data_in[3:0] = 4'h0;
+    else
+
+      data_in[3:0] = {load_reg[word_cnt], load_reg[word_cnt+1], load_reg[word_cnt+2], load_reg[word_cnt+3]};
+    crc_next[0]  = (data_in[0] ^ crc[28]);
+    crc_next[1]  = (data_in[1] ^ data_in[0] ^ crc[28]    ^ crc[29]);
+    crc_next[2]  = (data_in[2] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[30]);
+    crc_next[3]  = (data_in[3] ^ data_in[2] ^ data_in[1] ^ crc[29]  ^ crc[30] ^ crc[31]);
+    crc_next[4]  = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[0];
+    crc_next[5]  = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[1];
+    crc_next[6]  = (data_in[2] ^ data_in[1] ^ crc[29]    ^ crc[30]) ^ crc[ 2];
+    crc_next[7]  = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[3];
+    crc_next[8]  = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[4];
+    crc_next[9]  = (data_in[2] ^ data_in[1] ^ crc[29]    ^ crc[30]) ^ crc[5];
+    crc_next[10] = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[6];
+    crc_next[11] = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[7];
+    crc_next[12] = (data_in[2] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[30]) ^ crc[8];
+    crc_next[13] = (data_in[3] ^ data_in[2] ^ data_in[1] ^ crc[29]  ^ crc[30] ^ crc[31]) ^ crc[9];
+    crc_next[14] = (data_in[3] ^ data_in[2] ^ crc[30]    ^ crc[31]) ^ crc[10];
+    crc_next[15] = (data_in[3] ^ crc[31])   ^ crc[11];
+    crc_next[16] = (data_in[0] ^ crc[28])   ^ crc[12];
+    crc_next[17] = (data_in[1] ^ crc[29])   ^ crc[13];
+    crc_next[18] = (data_in[2] ^ crc[30])   ^ crc[14];
+    crc_next[19] = (data_in[3] ^ crc[31])   ^ crc[15];
+    crc_next[20] =  crc[16];
+    crc_next[21] =  crc[17];
+    crc_next[22] = (data_in[0] ^ crc[28])   ^ crc[18];
+    crc_next[23] = (data_in[1] ^ data_in[0] ^ crc[29]    ^ crc[28]) ^ crc[19];
+    crc_next[24] = (data_in[2] ^ data_in[1] ^ crc[30]    ^ crc[29]) ^ crc[20];
+    crc_next[25] = (data_in[3] ^ data_in[2] ^ crc[31]    ^ crc[30]) ^ crc[21];
+    crc_next[26] = (data_in[3] ^ data_in[0] ^ crc[31]    ^ crc[28]) ^ crc[22];
+    crc_next[27] = (data_in[1] ^ crc[29])   ^ crc[23];
+    crc_next[28] = (data_in[2] ^ crc[30])   ^ crc[24];
+    crc_next[29] = (data_in[3] ^ crc[31])   ^ crc[25];
+    crc_next[30] =  crc[26];
+    crc_next[31] =  crc[27];
+
+    crc = crc_next;
+    crc_error = crc[31:0] != 32'hc704dd7b;  // CRC not equal to magic number
+    case (nibble_cnt)
+    9: crc_out = {!crc[24], !crc[25], !crc[26], !crc[27], !crc[28], !crc[29], !crc[30], !crc[31],
+                  !crc[16], !crc[17], !crc[18], !crc[19], !crc[20], !crc[21], !crc[22], !crc[23],
+                  !crc[ 8], !crc[ 9], !crc[10], !crc[11], !crc[12], !crc[13], !crc[14], !crc[15],
+                  !crc[ 0], !crc[ 1], !crc[ 2], !crc[ 3], !crc[ 4], !crc[ 5], !crc[ 6], !crc[ 7]};
+    default: crc_out = crc_out;
+    endcase
+    // wait for delta time
+    delta_t = !delta_t;
+    // increment address and load new data
+    if ((word_cnt+3) == 7)//4)
+    begin
+      // because of MAGIC NUMBER nibbles are swapped [3:0] -> [0:3]
+      load_reg[31:24] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[23:16] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[15: 8] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[ 7: 0] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+    end
+    // set new load bit position
+    if((word_cnt+3) == 31)
+      word_cnt = 16;
+    else if ((word_cnt+3) == 23)
+      word_cnt = 8;
+    else if ((word_cnt+3) == 15)
+      word_cnt = 0;
+    else if ((word_cnt+3) == 7)
+      word_cnt = 24;
+    else
+      word_cnt = word_cnt + 4;// - 4;
+    // decrement nibble counter
+    nibble_cnt = nibble_cnt - 1;
+    // wait for delta time
+    delta_t = !delta_t;
+  end // while
+  #1;
+end
+endtask // paralel_crc_phy_rx
+
+initial begin
+  #100000ns;
+
+  repeat(1) begin
+    //Start Rx ...
+    $display("Rx Begin");
+
+    //For ARP, uncomment below 3 and comment ICMP below...
+    //set_rx_packet_1(0, 'h 5FC, 1'b0, 48'hff_ff_ff_ff_ff_ff, 48'hA4_BB_6D_52_E4_53, 16'h0806, 'h 0F);
+    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'hff_ff_ff_ff_ff_ff, 48'h64_00_6A_8B_CB_A6, 16'h0806, 'h 0F);
+    append_rx_crc (0, 'd 60, 1'b0, 1'b0); //ARP packet length 42 bytes + 18 bytes padding...
+    #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 64, 1'b0); //Length = 42(ARP Packet Length) + 18 bytes padding + 4 bytes CRC ...
+
+    repeat(20000) @(posedge i_clk);
+
+    //For ICMP, uncomment below 3 and comment above ARP ...
+    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'hA4_BB_6D_52_E4_53, 16'h0800, 'h 0F);
+    append_rx_crc (0, 'd 74, 1'b0, 1'b0); //ICMP packet length 74 bytes... without CRC
+    #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 78, 1'b0); //Length = 74(ICMP Packet Length) + 4 bytes CRC ...
+
+    repeat(20000) @(posedge i_clk);
+
+    $display("Rx Done");
+  end
+  #5000ns;
+  $finish;
+end
+
+always @(posedge UART_SR_DAV_0) begin
+  $display("Transmitted UART Data = %h", UART_SR_0);
+end
+
+`ifdef DDR3_CONTROLLER
+    ddr3 u_ram (
+        .dq(ddr3_dq_fpga),
+        .dqs(ddr3_dqs_p_fpga),
+        .dqs_n(ddr3_dqs_n_fpga),
+
+        .addr(ddr3_addr_fpga),
+        .ba(ddr3_ba_fpga),
+        .ras_n(ddr3_ras_n_fpga),
+        .cas_n(ddr3_cas_n_fpga),
+        .we_n(ddr3_we_n_fpga),
+        .ck(ddr3_ck_p_fpga),
+        .ck_n(ddr3_ck_n_fpga),
+        .cke(ddr3_cke_fpga),
+        .cs_n(ddr3_cs_n_fpga),
+        .dm_tdqs(ddr3_dm_fpga),
+        .odt(ddr3_odt_fpga),
+
+        .rst_n(ddr3_reset_n),
+
+        .tdqs_n()
+    );
+`endif //`ifdef DDR3_CONTROLLER
 
 endmodule //zap_test

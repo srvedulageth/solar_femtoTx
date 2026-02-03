@@ -1,0 +1,8 @@
+
+verilog work "/home/vedulas/solar_femtoTX/src/ips/ddr3/core_ddr3_controller/examples/arty_a7/artix7_pll.v"
+verilog work "/home/vedulas/solar_femtoTX/src/ips/ddr3/core_ddr3_controller/tb/ddr3_core_xc7/ddr3.v"
+verilog work "/home/vedulas/solar_femtoTX/src/ips/ddr3/core_ddr3_controller/tb/ddr3_core_xc7/testbench.v"
+verilog work "/home/vedulas/solar_femtoTX/src/ips/ddr3/core_ddr3_controller/src_v/ddr3_dfi_seq.v"
+verilog work "/home/vedulas/solar_femtoTX/src/ips/ddr3/core_ddr3_controller/src_v/ddr3_core.v"
+verilog work "/home/vedulas/solar_femtoTX/src/ips/ddr3/core_ddr3_controller/src_v/phy/xc7/ddr3_dfi_phy.v"
+verilog work "/tools/Xilinx/Vivado/2024.2/data/verilog/src/glbl.v"

@@ -18,6 +18,9 @@
 //
 // This RTL describe a classic direct mapped branch target buffer.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_btb #(
         //

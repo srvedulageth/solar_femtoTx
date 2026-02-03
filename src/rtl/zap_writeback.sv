@@ -16,6 +16,9 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 // 02110-1301, USA.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_writeback #(
         parameter logic [31:0] BP_ENTRIES   = 32'd1024,  // BP entries.

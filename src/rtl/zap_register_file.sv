@@ -20,6 +20,9 @@
 // Flip flop based register files. Good for FPGA where flip-flops are
 // plentiful.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_register_file
 (

@@ -1,0 +1,1 @@
+"work.sim_tb_top" "work.glbl" -prj "xsim_files.prj" -L "unisims_ver" -L "secureip" -s "xsim_test" -debug "typical" 

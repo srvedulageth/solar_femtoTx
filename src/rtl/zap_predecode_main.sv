@@ -19,6 +19,9 @@
 // The pre-decode block. Does partial instruction decoding and sequencing
 // before passing the instruction onto the next stage.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_predecode_main #(
         parameter logic [31:0] PHY_REGS  = 32'd64,

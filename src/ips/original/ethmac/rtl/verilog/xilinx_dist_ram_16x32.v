@@ -1,3 +1,8 @@
+
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module xilinx_dist_ram_16x32
 (
     data_out,

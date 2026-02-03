@@ -18,6 +18,9 @@
 //
 // This is the barrel shifter in the ZAP processor.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_shifter_shift
 #(

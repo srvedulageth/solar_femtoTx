@@ -61,7 +61,9 @@
 //
 //
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 module eth_cop
 (

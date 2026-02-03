@@ -1,0 +1,3 @@
+xelab -top temp
+xelab -top temp -snapshot my_ss
+xsim my_ss -R

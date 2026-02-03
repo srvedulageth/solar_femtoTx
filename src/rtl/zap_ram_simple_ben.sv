@@ -31,6 +31,9 @@
 // to merge multiple rows of such memories into a single column, we choose
 // to have a separate memory system with byte enables not present.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_ram_simple_ben #(
         parameter logic [31:0] WIDTH = 32'd32,

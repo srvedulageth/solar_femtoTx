@@ -1,0 +1,139 @@
+1. This is the FPGA Synthesis and Implementation Directory.
+2. Steps
+   -- Install Vivado and ensure that 'vivado' is in the path. (vivado -help)
+   -- Run the command: vivado -mode batch -source ./syn.tcl
+      -- This will do FPGA synthesis, P&R and generates bit stream.
+   -- Open Vivado GUI
+      vivado &
+      Create a post-synthesis project; Tick the box "Do not specify sources at this time";
+      Select part 'xc7a100tcsg324-1' 
+
+      Open hadware manager and open taregt(xc7a100tcsg324-1). Program the device with .bit file generated above (vivado -mode ...)
+      << you should see that 3 leds toggelling.
+      
+   -- gtkterm &; configure (19200 baud, 8bit, 1 stop bit, no parity and no flow control, USB1 port)
+      << what ever key you type gets printed on the terminal and also 4th led toggles
+   -- To remove synthesis generated not needed file etc: \rm -rf work/ *.rpt *.dcp vivado* clockInfo.txt tight_setup_hold_pins.txt .Xil
+3. Expected Warnings
+  
+WARNING: [Common 17-576] 'retiming' is deprecated. Please use -global_retiming option
+WARNING: [Synth 8-693] zero replication count - replication ignored [/home/vedulas/solar_femtoTX/src/rtl/zap_cache_tag_ram.sv:509]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/home/vedulas/solar_femtoTX/src/rtl/zap_fetch_main.sv:178]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/home/vedulas/solar_femtoTX/src/rtl/zap_mode16_decoder_main.sv:169]
+WARNING: [Synth 8-6014] Unused sequential element UNUSED_reg was removed.  [/home/vedulas/solar_femtoTX/src/testbench/syn/timer.v:167]
+WARNING: [Synth 8-6014] Unused sequential element dummy_reg was removed.  [/home/vedulas/solar_femtoTX/src/rtl/zap_tlb_check.sv:78]
+WARNING: [Synth 8-6014] Unused sequential element UNUSED_reg was removed.  [/home/vedulas/solar_femtoTX/src/testbench/syn/vic.v:134]
+WARNING: [Synth 8-7129] Port RxByteCntGreat2 in module eth_macstatus is either unconnected or has no load
+WARNING: [Synth 8-7129] Port TxUsedData in module eth_macstatus is either unconnected or has no load
+WARNING: [Synth 8-7129] Port rst in module eth_spram_256x32 is either unconnected or has no load
+WARNING: [Synth 8-7129] Port r_TxBDNum[7] in module eth_wishbone is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ByteCntEq0 in module eth_rxstatem is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ByteCntGreat2 in module eth_rxstatem is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[15] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[14] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[13] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[12] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[11] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[10] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[9] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[8] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[7] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[27] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[26] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[25] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[24] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[23] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[22] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[21] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[20] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[19] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[18] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[17] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[16] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[15] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[14] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[13] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[12] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[11] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[10] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[9] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[8] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[7] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[6] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[5] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_icache_clean_done in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_fb_branch_src_address[offset] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][20] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][19] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][18] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][17] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][16] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][15] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][14] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][13] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][12] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][11] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][10] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][9] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][8] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][7] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][6] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][5] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][4] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][3] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][2] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][1] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][0] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[offset] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][9] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][8] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][7] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][6] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][5] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][4] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][3] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][2] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][1] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[index][0] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr_del[offset] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_decompile_valid in module zap_writeback is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_uop_last in module zap_writeback is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[63] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[62] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[61] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[60] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[59] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[58] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[57] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[56] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[55] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[54] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[53] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[52] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[51] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[50] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[49] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[48] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[47] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[46] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[45] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[44] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[43] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[42] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[41] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_dc_reg_idx[40] in module zap_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_baddr[13] in module zap_tlb_fsm is either unconnected or has no load
+Resolution: To avoid this warning, move constraints listed in [.Xil/zap_soc_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+WARNING: [Synth 8-3936] Found unconnected internal register 'xprod_ab_reg' and it is trimmed from '34' to '32' bits. [/home/vedulas/solar_femtoTX/src/rtl/zap_shifter_multiply.sv:125]
+Synthesis finished with 0 errors, 0 critical warnings and 173 warnings.
+451 Infos, 108 Warnings, 0 Critical Warnings and 0 Errors encountered.
+25 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors, 21 Warnings
+44 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+199 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+WARNING: [Route 35-328] Router estimated timing not met.
+14 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
+11 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+
+
+4.

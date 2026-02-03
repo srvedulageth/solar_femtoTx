@@ -20,7 +20,7 @@
 void main (void)
 {
         float value = 0;
-        float *z = (float*) 0xffff0000; //EthMAC Base Address. Just want to check basic access to EthMac.
+        float *z = (float*) 0xffffe000; //EthMAC Base Address. Just want to check basic access to EthMac.
         *z = 0xDEADBEEF; //Writing to base register of EthMAC
         value = *z; //Reading from EthMAC Base address ...
 }

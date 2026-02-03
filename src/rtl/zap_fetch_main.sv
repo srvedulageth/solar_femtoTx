@@ -22,6 +22,10 @@
 //  AND R0, R0, R0.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_fetch_main
 (
 

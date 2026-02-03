@@ -22,6 +22,10 @@
 // Otherwise, this stage is simply a buffer.
 //
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module zap_memory_main
 #(
         // Width of CPSR.

@@ -19,6 +19,9 @@
 //
 // This is the post ALU stage for RAM reads
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_postalu_main #(
         parameter logic [31:0] PHY_REGS  = 32'd46, // Number of physical registers.

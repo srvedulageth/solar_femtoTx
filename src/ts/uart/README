@@ -1,0 +1,5 @@
+arm-none-eabi-as -march=armv5te -g src/ts/uart/uart.s -o obj/ts/uart/uart_start.o
+arm-none-eabi-gcc -c -msoft-float -mfloat-abi=soft -march=armv5te -g  src/ts/uart/uart.c -o obj/ts/uart/uart.o
+arm-none-eabi-ld -T src/ts/common.ld obj/ts/uart/uart_start.o obj/ts/uart/uart.o -o obj/ts/uart/uart.elf
+arm-none-eabi-objcopy -O binary obj/ts/uart/uart.elf obj/ts/uart/uart.bin
+hexdump -ve '1/4 "%08x\n"' obj/ts/uart/uart.bin > obj/ts/uart/uart.dump

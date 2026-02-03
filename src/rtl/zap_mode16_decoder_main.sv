@@ -21,7 +21,9 @@
 // seem a bit complex.
 //
 
-
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_mode16_decoder_main (
         // Clock and reset.

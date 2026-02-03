@@ -20,7 +20,9 @@
 // processor and the TLB controller. Cache uploads and downloads are done
 // using an incrementing burst on the Wishbone bus for maximum efficiency
 //
-
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 `include "zap_defines.svh"
 
 module zap_dcache_fsm   #(

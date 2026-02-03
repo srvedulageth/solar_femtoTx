@@ -29,6 +29,9 @@
 // - Write data in Rm to [Rn]        - STR Rm, [Rn]
 // - Copy data from DUMMY to Rd.     - MOV Rd, DUMMY0
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_predecode_uop_sequencer
 (

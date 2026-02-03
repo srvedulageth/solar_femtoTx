@@ -21,6 +21,9 @@
 // perform large data exchanges. Note that the translate function must be
 // present in the coprocessor to account for CPU modes.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_predecode_coproc #(
         parameter [31:0] PHY_REGS = 32'd46

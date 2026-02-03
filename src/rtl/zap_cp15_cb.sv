@@ -22,6 +22,9 @@
 // versa. This is integrated within the processor. The MMU unit can easily
 // interface with this block.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_cp15_cb
 
@@ -647,8 +650,7 @@ assign r6 = r[6];
 
 logic unused;
 
-assign unused = |{r0, r1, r2, r3, r4, r5, r6, i_cpsr[27:5],
-                  i_icache_clean_done};
+assign unused = |{r0, r1, r2, r3, r4, r5, r6, i_cpsr[27:5], i_icache_clean_done};
 
 endmodule : zap_cp15_cb
 

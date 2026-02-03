@@ -28,6 +28,9 @@
 //
 // If using direct constant without rotation, make it LSL #0.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_decode #(
 parameter [31:0] ARCH_REGS  = 32,

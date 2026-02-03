@@ -19,6 +19,9 @@
 // A slightly modified ones counter. It will count the number of ones
 // and multiply the result by 4.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_ones_counter (
     output logic [11:0] o_ones_counter,

@@ -1,0 +1,80 @@
+ 2327  \rm -rf xelab.* xvlog.* xsim.dir
+ 2333  \rm -rf xelab.* xvlog.* xsim.dir
+ 2336  xvlog -f compile.args | tee t1
+ 2344  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2345  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2348  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2349  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2352  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2353  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2357  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2358  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2365  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2366  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2367  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2368  xvlog -f compile.args | tee t1
+ 2378  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2380  xvlog -f compile.args | tee t1
+ 2383  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2384  xvlog -f compile.args | tee t1
+ 2386  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2387  xvlog -f compile.args | tee t1
+ 2389  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2390  xvlog -f compile.args | tee t1
+ 2392  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2394  xvlog -f compile.args | tee t1
+ 2397  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2398  xvlog -f compile.args | tee t1
+ 2402  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2403  xvlog -f compile.args | tee t1
+ 2406  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2407  xvlog -f compile.args | tee t1
+ 2410  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2411  xvlog -f compile.args | tee t1
+ 2417  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2419  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2420  xvlog -f compile.args | tee t1
+ 2423  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2425  xvlog -f compile.args | tee t1
+ 2436  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2439  xvlog -work testbench_utilities ../../../bench/verilog/uart_testbench_utilities.v 
+ 2448  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2450  xvlog -work testbench_utilities ../../../rtl/verilog/uart_defines.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2452  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2453  xvlog -work testbench_utilities ./uart_defines.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2455  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2456  xvlog -work testbench_utilities ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2458  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2460  xvlog -work work.testbench_utilities ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2464  xvlog -work work.uart_wb_utilities ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2467  xvlog -work work.uart_device_utilities ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2472  xvlog -work work.testcase ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2475  xvlog -work work.testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2484  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2488  xvlog -work work.testbench_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2490  xvlog -work work.uart_wb_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2492  xvlog -work work.uart_device_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2494  xvlog -work work.testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2512  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2515  xvlog -work testbench_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2517  xvlog -work uart_wb_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2519  xvlog -work uart_device_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2521  xvlog -work testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2526  xvlog -f compile.args
+ 2529  xvlog -f compile.args | tee t1
+ 2540  xvlog --list
+ 2555  \rm -rv xvlog.*
+ 2556  \rm -rf xvlog.*
+ 2559  xvlog -work work.testbench_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2561  xvlog -work work.uart_wb_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2563  xvlog -work work.uart_device_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2565  xvlog -work work.testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2567  xvlog -f compile.args
+ 2582  xvlog -f compile.args
+ 2584  xvlog -f compile.args
+ 2596  xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2597  xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2599  xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2601  <pre>xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2604  xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2637  \rm -rf xvlog.* xsim.* xelab.*

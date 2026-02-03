@@ -1,0 +1,1000 @@
+ 1653  vi zap_test.v
+ 1654  grep -r -i REG_HEIR *
+ 1655  grep -r -i REG_H *
+ 1656  grep -r -i REG_HIER *
+ 1657  cd ..
+ 1658  grep -r -i REG_HIER *
+ 1659  pwd
+ 1660  cd ..
+ 1661  ls
+ 1662  ls -al
+ 1663  vi Makefile 
+ 1664  cd ../..
+ 1665  ls -al
+ 1666  ls
+ 1667  cd OpenCores/
+ 1668  ls
+ 1669  cd ..
+ 1670  ls
+ 1671  cd solar_femtoTX/
+ 1672  ls
+ 1673  ls -al
+ 1674  ls -al obj/
+ 1675  mv ts ts_1
+ 1676  cd obj/
+ 1677  mv ts ts_1
+ 1678  cd ..
+ 1679  make runsim ts=uart
+ 1680  pwd
+ 1681  which vivado
+ 1682  which verilator
+ 1683  vi Makefile 
+ 1684  make runsim TC=uart
+ 1685  \rm -rf obj/ts
+ 1686  make runsim TC=uart | tee uart.log
+ 1687  vi uart.log 
+ 1688  cd ../
+ 1689  ls
+ 1690  cd Xilinx_Test/
+ 1691  ls
+ 1692  cd ZAP/
+ 1693  ls
+ 1694  \rm -rf obj
+ 1695  sudo -i
+ 1696  pwd
+ 1697  make runsim TC=uart | grep uart.log
+ 1698  pwd
+ 1699  cd ..
+ 1700  ls -al
+ 1701  cd ..
+ 1702  ls -al
+ 1703  cd sudo -i
+ 1704  sudo -i
+ 1705  pwd
+ 1706  cd Xilinx_Test/ZAP/
+ 1707  make runsim TC=uart | grep uart.log
+ 1708  \rm -rf obj/ts
+ 1709  make runsim TC=uart | tee uart.log
+ 1710  vi uart.log 
+ 1711  git status
+ 1712  git diff src/syn/syn.tcl
+ 1713  clear
+ 1714  git status
+ 1715  \rm uart.log 
+ 1716  \rm -rf obj/ts
+ 1717  make runnsim TC=uart | tee uart.log
+ 1718  make runsim TC=uart | tee uart.log
+ 1719  vi uart.log 
+ 1720  gtkwave obj/ts/uart/zap.vcd &
+ 1721  cd obj/ts/uart/
+ 1722  ls
+ 1723  vi uart.dump 
+ 1724  clear
+ 1725  cd
+ 1726  ls
+ 1727  pwd
+ 1728  cd SAFE_CORES/
+ 1729  ls
+ 1730  cd neorv32
+ 1731  cd ..
+ 1732  cd neorv32
+ 1733  ls
+ 1734  cd rtl/
+ 1735  ls
+ 1736  cd test_setups/
+ 1737  ls
+ 1738  vi neorv32_test_setup_on_chip_debugger.vhd 
+ 1739  pwd
+ 1740  cd 
+ 1741  ls
+ 1742  ls -al
+ 1743  cd riscv-gnu-toolchain/
+ 1744  ls -al
+ 1745  cd ..
+ 1746  exit
+ 1747  pwd
+ 1748  ./configure --prefix=/root/riscv --with-arch=rv32i --with-abi=ilp32
+ 1749  make
+ 1750  whoami
+ 1751  sudo -i
+ 1752  whoami
+ 1753  exit
+ 1754  pwd
+ 1755  ls
+ 1756  vi ./configure
+ 1757  ./configure --prefix=/opt/riscv --with-arch=rv32i --with-abi=ilp32
+ 1758  make
+ 1759  whoami
+ 1760  exit
+ 1761  cd 
+ 1762  pwd
+ 1763  ls
+ 1764  cd SAFE_CORES/
+ 1765  ls
+ 1766  cd neorv32-setups/
+ 1767  ls
+ 1768  cd vivado/
+ 1769  ls
+ 1770  cd nexys-a7-test-setup/
+ 1771  ls
+ 1772  cd ../
+ 1773  ls
+ 1774  cd ..
+ 1775  ls
+ 1776  cd neorv32/
+ 1777  ls
+ 1778  cd sim/
+ 1779  ls
+ 1780  vi xbus_memory.vhd 
+ 1781  vi neorv32_tb.vhd 
+ 1782  pwd
+ 1783  ls
+ 1784  cd ..
+ 1785  ls -al
+ 1786  cd ..
+ 1787  ls
+ 1788  cd ..
+ 1789  ls -al
+ 1790  cd neorv32
+ 1791  ls
+ 1792  cd sw/
+ 1793  ls -al
+ 1794  cd ..
+ 1795  ls -al
+ 1796  cd pwd
+ 1797  pwd
+ 1798  ls -al
+ 1799  cd neorv32
+ 1800  ls
+ 1801  cd rtl/
+ 1802  ls
+ 1803  cd core/
+ 1804  ls
+ 1805  grep -r -i bus_req_t *
+ 1806  grep ack *
+ 1807  grep -r -i wishbone *
+ 1808  vi neorv32_xbus.vhd 
+ 1809  grep -r -i bus_req_t *
+ 1810  cd ..
+ 1811  grep -r -i bus_req_t *
+ 1812  grep -r -i xbus_req_t *
+ 1813  vi core/neorv32_package.vhd 
+ 1814  clear
+ 1815  pwd
+ 1816  cd ..
+ 1817  ls
+ 1818  cd ../
+ 1819  ls
+ 1820  cd neorv32
+ 1821  git status
+ 1822  cd ../neorv32-setups/
+ 1823  ls
+ 1824  ls -al
+ 1825  git status
+ 1826  cd vivado/
+ 1827  ls -al
+ 1828  \rm -rf v-arty-a7-test-setup
+ 1829  cd nexys-a7-test-setup/
+ 1830  ls -al
+ 1831  git status
+ 1832  vi nexys_a7_test_setup.xdc 
+ 1833  vi create_project.tcl 
+ 1834  git status
+ 1835  vi ../arty-a7-test-setup/create_project.tcl 
+ 1836  vi create_project.tcl 
+ 1837  pwd
+ 1838  clear
+ 1839  git status
+ 1840  vivado -mode batch -source create_project.tcl 
+ 1841  vi ./../../neorv32/sim/neorv32_tb.vhd
+ 1842  pwd
+ 1843  ls -al
+ 1844  vi vivado.log 
+ 1845  cd work/
+ 1846  ls
+ 1847  ls -al
+ 1848  cd ..
+ 1849  find . -name "*.bit"
+ 1850  cd work/nexys-a7-100-test-setup.runs/impl_1/
+ 1851  ls -al
+ 1852  ls
+ 1853  vi runme.sh 
+ 1854  cd ../..
+ 1855  ls
+ 1856  cd ..
+ 1857  ls
+ 1858  vi vivado.log 
+ 1859  find . -name neorv32_test_setup_bootloader.tcl
+ 1860  clear
+ 1861  ls -al
+ 1862  vi README.md 
+ 1863  pwd
+ 1864  ls -al
+ 1865  vi nexys_a7_test_setup.xdc 
+ 1866  pwd
+ 1867  cp ../arty-a7-test-setup/arty_a7_test_setup.xdc .
+ 1868  vi arty_a7_test_setup.xdc 
+ 1869  vi nexys_a7_test_setup.xdc 
+ 1870  vi create_project.tcl 
+ 1871  ls -al
+ 1872  \rm -rf work .Xil vivado.*
+ 1873  clear
+ 1874  git status
+ 1875  vi arty_a7_test_setup.xdc 
+ 1876  vi create_project.tcl 
+ 1877  vivado -mode batch -source create_project.tcl 
+ 1878  diff create_project.tcl ../arty-a7-test-setup/create_project.tcl 
+ 1879  cd ../arty-a7-test-setup/
+ 1880  vi create_project.tcl 
+ 1881  cd -
+ 1882  vi create_project.tcl ../arty-a7-test-setup/create_project.tcl 
+ 1883  clear
+ 1884  cd ../arty-a7-test-setup/
+ 1885  git status
+ 1886  vi create_project.tcl 
+ 1887  vi ../nexys-a7-test-setup/create_project.tcl 
+ 1888  vi create_project.tcl 
+ 1889  git status create_project.tcl 
+ 1890  ls -al
+ 1891  \rm -rf .Xil work vivado.*
+ 1892  clear
+ 1893  vivado -mode batch -source create_project.tcl 
+ 1894  cd ..
+ 1895  git status
+ 1896  cd nexys-a7-test-setup/
+ 1897  ls -al
+ 1898  \rm arty_a7_test_setup.xdc 
+ 1899  git status .
+ 1900  git diff create_project.tcl
+ 1901  git restore create_project.tcl 
+ 1902  git status .
+ 1903  ls -al
+ 1904  \rm -rf .Xil vivado.* work
+ 1905  cd ..
+ 1906  clear
+ 1907  git status
+ 1908  git diff arty-a7-test-setup/create_project.tcl
+ 1909  clear
+ 1910  ls -al
+ 1911  cd arty-a7-test-setup/
+ 1912  vi create_project.tcl 
+ 1913  git status
+ 1914  vi arty_a7_test_setup.xdc 
+ 1915  cd ..
+ 1916  ls -al
+ 1917  cd z7-nano-test-setup/
+ 1918  ls
+ 1919  vi pin_constraints.xdc 
+ 1920  cd 
+ 1921  cd -
+ 1922  ls -al
+ 1923  \rm -rf .Xil work/ vivado.*
+ 1924  vi timings.xdc 
+ 1925  clear
+ 1926  ls -al
+ 1927  cd ..
+ 1928  ls -al
+ 1929  cd ..
+ 1930  ls
+ 1931  cd neorv32/
+ 1932  ls -al
+ 1933  cd rtl/
+ 1934  ls -al
+ 1935  cd test_setups/
+ 1936  ls
+ 1937  vi README.md 
+ 1938  ls -al
+ 1939  vi neorv32_test_setup_bootloader.vhd 
+ 1940  grep -r -i jtag *
+ 1941  pwd
+ 1942  cd ../../../
+ 1943  ls
+ 1944  cd vivado/
+ 1945  ls
+ 1946  cd arty-a7-test-setup/
+ 1947  ls -al
+ 1948  vi vivado.
+ 1949  vi vivado.log 
+ 1950  sudo apt install gtkterm
+ 1951  gtkterm &
+ 1952  sudo minicom -s
+ 1953  cd
+ 1954  vi /etc/minicom/minirc.nullmodem 
+ 1955  clear
+ 1956  ls
+ 1957  cd
+ 1958  ls
+ 1959  cd SAFE_CORES/
+ 1960  ls
+ 1961  cd neorv32-setups/
+ 1962  ls
+ 1963  cd vivado/
+ 1964  ls
+ 1965  cd arty-a7-test-setup/
+ 1966  ls
+ 1967  vi arty_a7_test_setup.xdc 
+ 1968  ls
+ 1969  vi create_project.tcl 
+ 1970  cd ../..
+ 1971  cd neorv32/
+ 1972  ls
+ 1973  cd sw/
+ 1974  ls
+ 1975  cd example/
+ 1976  ls
+ 1977  cd demo_blink_led/
+ 1978  ls
+ 1979  make clean_all exe
+ 1980  cd
+ 1981  git clone https://github.com/riscv-collab/riscv-gnu-toolchain
+ 1982  cd riscv-gnu-toolchain/
+ 1983  ./configure --prefix=/opt/riscv --with-arch=rv32i --with-abi=ilp32
+ 1984  make
+ 1985  sudo apt install gawk
+ 1986  ./configure --prefix=/opt/riscv --with-arch=rv32i --with-abi=ilp32
+ 1987  make
+ 1988  history
+ 1989  sudo -i
+ 1990  exit
+ 1991  sudo -i
+ 1992  exit
+ 1993  clear
+ 1994  pwd
+ 1995  ls
+ 1996  whomai
+ 1997  whoami
+ 1998  sudo -i
+ 1999  pwd
+ 2000  exit
+ 2001  cd ../../..
+ 2002  ls
+ 2003  cd solar_femtoTX/
+ 2004  ls
+ 2005  cd src/
+ 2006  ls
+ 2007  cd ips/
+ 2008  ls -al
+ 2009  vi uart16550/
+ 2010  cd uart16550/
+ 2011  ls
+ 2012  cd rtl/
+ 2013  ls -al
+ 2014  cd verilog
+ 2015  ls -al
+ 2016  vi uart.v 
+ 2017  ls
+ 2018  vi uart.v 
+ 2019  ls
+ 2020  vi uart_top.v 
+ 2021  ls
+ 2022  cd ..
+ 2023  ls
+ 2024  cd ..
+ 2025  ls
+ 2026  cd syn/
+ 2027  ls -al
+ 2028  cd src/
+ 2029  ls
+ 2030  ls -al
+ 2031  cd ../run/
+ 2032  ls -al
+ 2033  cd ..
+ 2034  ls -al
+ 2035  cd bin/
+ 2036  ls -al
+ 2037  cd ..
+ 2038  ls -al
+ 2039  cd ..
+ 2040  ls -al
+ 2041  cd bench/
+ 2042  ls -al
+ 2043  cd v
+ 2044  cd verilog/
+ 2045  ls -al
+ 2046  vi readme.txt 
+ 2047  lcd ..
+ 2048  ls -al
+ 2049  cd ../..
+ 2050  ls -al
+ 2051  cd syn/
+ 2052  ls
+ 2053  cd src/
+ 2054  cp ../../../../syn/syn.tcl .
+ 2055  vi syn.tcl 
+ 2056  ls ../../rtl/verilog/
+ 2057  ls -l ../../rtl/verilog/
+ 2058  pushd ../../rtl/verilog/
+ 2059  ls
+ 2060  vi uart_top.v 
+ 2061  grep raminfr *
+ 2062  grep uart_debug_if *
+ 2063  vi uart_top.v 
+ 2064  ls
+ 2065  grep uart_rfifo *
+ 2066  cd ../..
+ 2067  cd ..
+ 2068  mkdir test
+ 2069  cd test/
+ 2070  ls -al
+ 2071  git clone https://github.com/freecores/uart16550.git
+ 2072  cd uart16550/
+ 2073  ls -al
+ 2074  cd doc/
+ 2075  ls -al
+ 2076  cd src/
+ 2077  ls -al
+ 2078  cd ..
+ 2079  ls
+ 2080  cd ..
+ 2081  ls
+ 2082  cd rtl/
+ 2083  ls -al
+ 2084  cd vhdl/
+ 2085  ls -al
+ 2086  cd ..
+ 2087  ls -al
+ 2088  cd verilog
+ 2089  ls -al
+ 2090  grep uart_receiver *
+ 2091  grep raminfr *
+ 2092  cd ../../syn/src/
+ 2093  ls -al
+ 2094  ls -l ../../rtl/verilog/
+ 2095  ls -l ../../rtl/verilog/*.v
+ 2096  cp ../../../../uart16550/syn/src/syn.tcl .
+ 2097  vi syn.tcl 
+ 2098  cp ../../../../../syn/syn.xdc .
+ 2099  vi syn.xdc 
+ 2100  pwd
+ 2101  ls -al
+ 2102  cd ../../rtl/verilog
+ 2103  ls -al
+ 2104  vi uart_top.v 
+ 2105  vi ../../../../uart16550/rtl/verilog/uart_top.v 
+ 2106  vi uart_top.v 
+ 2107  pwd
+ 2108  vi uart_top.v 
+ 2109  grep clkgen *
+ 2110  vi uart_regs.v 
+ 2111  ls -al
+ 2112  vi uart_regs.v 
+ 2113  pwd
+ 2114  ls -al
+ 2115  pwd
+ 2116  cd ../../../..
+ 2117  ls -al
+ 2118  mkdir rom_wb
+ 2119  cd rom_wb/
+ 2120  ls -l ../ram_wb/
+ 2121  vi rom.v
+ 2122  mv rom.v wishbone_rom.v
+ 2123  clear
+ 2124  ls -al
+ 2125  cd ..
+ 2126  ls -al
+ 2127  clear
+ 2128  pwd
+ 2129  ls -al
+ 2130  cd ../testbench/
+ 2131  ls
+ 2132  ls -al
+ 2133  vi zap_soc.v
+ 2134  git status
+ 2135  git diff ../ips/ethmac/rtl/verilog/eth_registers.v
+ 2136  vi ../ips/ethmac/rtl/verilog/eth_registers.v
+ 2137  git diff ../ips/ethmac/rtl/verilog/eth_registers.v
+ 2138  vi ../ips/ethmac/rtl/verilog/eth_registers.v
+ 2139  git status
+ 2140  clear
+ 2141  ls -al
+ 2142  diff zap_soc.v zap_soc.v_1 
+ 2143  vi zap_soc.v
+ 2144  ls -al
+ 2145  vi zap_soc.v_1 
+ 2146  ls -l
+ 2147  \rm zap_soc.v_1 
+ 2148  git status
+ 2149  ls -al ../ips/test/
+ 2150  pwd
+ 2151  ls -al
+ 2152  vi zap_soc.v 
+ 2153  pwd
+ 2154  ls -al
+ 2155  vi zap_soc.v 
+ 2156  ls -al
+ 2157  vi zap_test.cpp 
+ 2158  ls -al
+ 2159  vi zap_test.v
+ 2160  clear
+ 2161  ls -al
+ 2162  vi zap_soc.v 
+ 2163  vi zap_test.v
+ 2164  vi zap_test.cpp 
+ 2165  vi vi zap_soc.v 
+ 2166  pwd
+ 2167  cd ../..
+ 2168  ls -al
+ 2169  cd ..
+ 2170  pwd
+ 2171  ls
+ 2172  cd solar_femtoTX_SAFE/
+ 2173  ls
+ 2174  vi uart.log 
+ 2175  pwd
+ 2176  cd src/rtl/
+ 2177  ls
+ 2178  grep -r -i BAL *
+ 2179  cd ..
+ 2180  grep -r -i BAL *
+ 2181  cd ..
+ 2182  grep -r -i BAL *
+ 2183  grep -r BAL *
+ 2184  cd ..
+ 2185  pwd
+ 2186  ls
+ 2187  cd solar_femtoTX
+ 2188  ls
+ 2189  cd src/
+ 2190  ls
+ 2191  cd testbench/
+ 2192  ls
+ 2193  vi zap_test.cpp 
+ 2194  pwd
+ 2195  clear
+ 2196  ls -al
+ 2197  pwd
+ 2198  ls
+ 2199  git status
+ 2200  vi zap_test.v
+ 2201  pwd
+ 2202  vi zap_test.v
+ 2203  ls
+ 2204  vi zap_soc.v 
+ 2205  clear
+ 2206  ls -al
+ 2207  diff zap_test.v temp/zap_test.v_org 
+ 2208  vi zap_test.v temp/zap_test.v_org 
+ 2209  ls -al
+ 2210  cd ../ts/
+ 2211  ls -al
+ 2212  cd uart/
+ 2213  ls -al
+ 2214  cd ../../ips/
+ 2215  ls -al
+ 2216  cd test/
+ 2217  ls -al
+ 2218  cd uart16550/
+ 2219  ls -al
+ 2220  cd rtl/
+ 2221  ls -al
+ 2222  cd verilog
+ 2223  ls -al
+ 2224  vi timescale.v 
+ 2225  ls -al
+ 2226  grep timescale *
+ 2227  vi uart_regs.v 
+ 2228  grep -r -i baud *
+ 2229  cd ..
+ 2230  ls -al
+ 2231  cd vhdl/
+ 2232  ls -al
+ 2233  cd ../verilog-backup/
+ 2234  ls -al
+ 2235  cd ..
+ 2236  ls -al
+ 2237  cd ..
+ 2238  ls -al
+ 2239  cd sim/
+ 2240  ls -al
+ 2241  cd rtl_sim/
+ 2242  ls -al
+ 2243  cd run/
+ 2244  ls -al
+ 2245  vi run_sim
+ 2246  vi run_sim.scr 
+ 2247  pwd
+ 2248  cd ..
+ 2249  ls
+ 2250  cd ../../rtl/
+ 2251  ls
+ 2252  ls -al
+ 2253  cd co
+ 2254  cd ..
+ 2255  ls -al
+ 2256  cd sim/
+ 2257  ls -al
+ 2258  cd rtl_sim/
+ 2259  ls -al
+ 2260  cd src/
+ 2261  ls -al
+ 2262  cd ../
+ 2263  ls -al *
+ 2264  cd run/
+ 2265  ls -al
+ 2266  vi run_sim.scr 
+ 2267  cd ../
+ 2268  ls
+ 2269  cd ../..
+ 2270  ls
+ 2271  cd sim/
+ 2272  ls -al
+ 2273  cd ..
+ 2274  ls -al
+ 2275  cd uart16550/
+ 2276  ls -al
+ 2277  cd bench/
+ 2278  ls -al
+ 2279  cd verilog/
+ 2280  ls -al
+ 2281  vi readme.txt 
+ 2282  ls
+ 2283  ls -al
+ 2284  vi uart_testbench.v 
+ 2285  ls
+ 2286  find . -name timescale.v
+ 2287  cd ../..
+ 2288  find . -name timescale.v
+ 2289  cat ./rtl/verilog/timescale.v
+ 2290  cd bench/
+ 2291  cd verilog/
+ 2292  ls -al
+ 2293  vi uart_testbench.v 
+ 2294  ls -al
+ 2295  cd test_cases/
+ 2296  ls -al
+ 2297  vi uart_int.v 
+ 2298  cd ..
+ 2299  ls
+ 2300  cd ..
+ 2301  ls -al
+ 2302  cd sim/
+ 2303  ls -al
+ 2304  cd rtl_sim/
+ 2305  ls -al
+ 2306  cd src/
+ 2307  ls -al
+ 2308  cd ..
+ 2309  cd bin/
+ 2310  ls -al
+ 2311  vi sim.tcl 
+ 2312  vi nc.scr 
+ 2313  cd ..
+ 2314  ls -al
+ 2315  cd run/
+ 2316  ls -al
+ 2317  vi run_sim
+ 2318  vi run_sim.scr 
+ 2319  source run_sim.scr 
+ 2320  pwd
+ 2321  ls -al
+ 2322  vi run_sim
+ 2323  ls -al
+ 2324  xelab -top testbench -snapshot my_ss
+ 2325  ls -al
+ 2326  \rm t1
+ 2327  \rm -rf xelab.* xvlog.* xsim.dir
+ 2328  ls -al
+ 2329  xelab -top testbench -snapshot my_ss
+ 2330  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/uart_testbench.v
+ 2331  vi compile.args 
+ 2332  clear
+ 2333  \rm -rf xelab.* xvlog.* xsim.dir
+ 2334  ls -al
+ 2335  \rm t1
+ 2336  xvlog -f compile.args | tee t1
+ 2337  grep ERR t1
+ 2338  hhistory
+ 2339  history
+ 2340  xelab -top testbench -snapshot my_ss
+ 2341  vi run_sim.scr 
+ 2342  clear
+ 2343  ls -l
+ 2344  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2345  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2346  grep -r -i error t1
+ 2347  vi compile.args 
+ 2348  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2349  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2350  xelab -top testbench -snapshot my_ss
+ 2351  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/uart_testbench.v
+ 2352  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2353  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2354  grep -r -i ERROR t1
+ 2355  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/uart_testbench.v
+ 2356  vi ../../../bench/verilog/test_cases/uart_int.v 
+ 2357  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2358  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2359  grep -r -i ERROR t1
+ 2360  xelab -top testbench -snapshot my_ss
+ 2361  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/test_cases/uart_int.v
+ 2362  ls -al
+ 2363  vi compile.args 
+ 2364  clear
+ 2365  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2366  xvlog -f compile.args ../../../bench/verilog/test_cases/uart_int.v | tee t1
+ 2367  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2368  xvlog -f compile.args | tee t1
+ 2369  grep -r -i Error t
+ 2370  grep -r -i Error t1
+ 2371  cat t1 | grep -v WAR
+ 2372  clear
+ 2373  ls -al
+ 2374  xelab -top testbench -snapshot my_ss
+ 2375  vi compile.args 
+ 2376  vi t1
+ 2377  vi compile.args 
+ 2378  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2379  clear
+ 2380  xvlog -f compile.args | tee t1
+ 2381  vi compile.args 
+ 2382  clear
+ 2383  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2384  xvlog -f compile.args | tee t1
+ 2385  vi compile.args 
+ 2386  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2387  xvlog -f compile.args | tee t1
+ 2388  vi compile.args 
+ 2389  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2390  xvlog -f compile.args | tee t1
+ 2391  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/test_cases/uart_int.v
+ 2392  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2393  clear
+ 2394  xvlog -f compile.args | tee t1
+ 2395  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/test_cases/uart_int.v
+ 2396  clear
+ 2397  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2398  xvlog -f compile.args | tee t1
+ 2399  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/test_cases/uart_int.v
+ 2400  vi compile.args 
+ 2401  clear
+ 2402  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2403  xvlog -f compile.args | tee t1
+ 2404  xelab -top testbench -snapshot my_ss
+ 2405  vi compile.args 
+ 2406  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2407  xvlog -f compile.args | tee t1
+ 2408  xelab -top testbench -snapshot my_ss
+ 2409  vi compile.args 
+ 2410  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2411  xvlog -f compile.args | tee t1
+ 2412  xelab -top testbench -snapshot my_ss
+ 2413  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/test_cases/uart_int.v
+ 2414  vi compile.args 
+ 2415  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/test_cases/uart_int.v
+ 2416  clear
+ 2417  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2418  xelab -top testbench -snapshot my_ss
+ 2419  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2420  xvlog -f compile.args | tee t1
+ 2421  xelab -top testbench -snapshot my_ss
+ 2422  vi /home/vedulas/solar_femtoTX/src/ips/test/uart16550/bench/verilog/test_cases/uart_int.v
+ 2423  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2424  clear
+ 2425  xvlog -f compile.args | tee t1
+ 2426  xelab -top testbench -snapshot my_ss
+ 2427  ls
+ 2428  xsim my_ss -R
+ 2429  ls -al
+ 2430  vi sim.do 
+ 2431  ls -al
+ 2432  ls -al xsim.dir/
+ 2433  vi sim.do 
+ 2434  vi run_sim.scr 
+ 2435  clear
+ 2436  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2437  cat sim.do 
+ 2438  vlog -work testbench_utilities ../../../bench/verilog/uart_testbench_utilities.v 
+ 2439  xvlog -work testbench_utilities ../../../bench/verilog/uart_testbench_utilities.v 
+ 2440  vi compile.args 
+ 2441  cd ../../..
+ 2442  grep -r -i uart_defines *
+ 2443  find . -name uart_defines.v
+ 2444  vi ./rtl/verilog/uart_defines.v
+ 2445  cd -
+ 2446  clear
+ 2447  ls -al
+ 2448  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2449  clear
+ 2450  xvlog -work testbench_utilities ../../../rtl/verilog/uart_defines.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2451  cp ../../../rtl/verilog/uart_defines.v .
+ 2452  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2453  xvlog -work testbench_utilities ./uart_defines.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2454  cp ../../../rtl/verilog/timescale.v .
+ 2455  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2456  xvlog -work testbench_utilities ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2457  ls -al xsim.dir/
+ 2458  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2459  clear
+ 2460  xvlog -work work.testbench_utilities ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2461  ls -al xsim.dir/
+ 2462  clear
+ 2463  cat sim.do 
+ 2464  xvlog -work work.uart_wb_utilities ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2465  ls -al xsim.dir/
+ 2466  cat sim.do 
+ 2467  xvlog -work work.uart_device_utilities ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2468  cat sim.do 
+ 2469  cat compile.args 
+ 2470  vi ../../../bench/verilog/test_cases/uart_int.v
+ 2471  cp ../../../bench/verilog/uart_log.v .
+ 2472  xvlog -work work.testcase ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2473  ls -al
+ 2474  cp ../../../bench/verilog/uart_testbench_defines.v .
+ 2475  xvlog -work work.testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2476  ls -al
+ 2477  ls -l xsim.dir/
+ 2478  cat sim.do 
+ 2479  clear
+ 2480  history
+ 2481  vi safe_1
+ 2482  clear
+ 2483  history
+ 2484  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2485  clear
+ 2486  ls -al
+ 2487  cat safe_1 
+ 2488  xvlog -work work.testbench_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2489  cat safe_1 
+ 2490  xvlog -work work.uart_wb_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2491  cat safe_1 
+ 2492  xvlog -work work.uart_device_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2493  cat safe_1 
+ 2494  xvlog -work work.testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2495  clear
+ 2496  ls -al
+ 2497  ls -al xsim.dir/
+ 2498  cd ..
+ 2499  cd -
+ 2500  cp compile.args compile.args_SAFE
+ 2501  ls -al
+ 2502  mkdir SAFE
+ 2503  cp compile.args_SAFE SAFE/
+ 2504  cp safe_1 SAFE/
+ 2505  ls -al
+ 2506  cat safe_1 
+ 2507  vi compile.args
+ 2508  clear
+ 2509  ls -al
+ 2510  cat safe_1 
+ 2511  vi safe_1 
+ 2512  \rm -rf xelab.* xvlog.* xsim.dir t1
+ 2513  clear
+ 2514  cat safe_1 
+ 2515  xvlog -work testbench_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2516  cat safe_1 
+ 2517  xvlog -work uart_wb_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2518  cat safe_1 
+ 2519  xvlog -work uart_device_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2520  cat safe_1 
+ 2521  xvlog -work testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2522  clear
+ 2523  ls -al
+ 2524  ls -l xsim.dir/
+ 2525  vi compile.args
+ 2526  xvlog -f compile.args
+ 2527  ls -al
+ 2528  \rm -rf xsim.dir/testbench
+ 2529  xvlog -f compile.args | tee t1
+ 2530  vi t1
+ 2531  ls -al
+ 2532  ls -al xsim.dir/
+ 2533  history
+ 2534  ls -al xsim.dir/
+ 2535  xelab -top testbench -L testbench -L testbench_utilities -L testcase -L uart_device_utilities -L uart_wb_utilities
+ 2536  ls -al
+ 2537  ls -al xsim.dir/
+ 2538  xelab -top testbench -L testbench -L testbench_utilities -L testcase -L uart_device_utilities -L uart_wb_utilities -s my_ss
+ 2539  xelab testbench::testbench -L testbench -L testbench_utilities -L testcase -L uart_device_utilities -L uart_wb_utilities -s my_ss
+ 2540  xvlog --list
+ 2541  xelab testbench::testbench -L testbench -L testbench_utilities -L testcase -L uart_device_utilities -L uart_wb_utilities -s my_ss
+ 2542* cat xsim.dir/testbench/
+ 2543  xelab testbench -L testbench -L testbench_utilities -L testcase -L uart_device_utilities -L uart_wb_utilities -s my_ss
+ 2544  clear
+ 2545  history
+ 2546  vi safe_1 
+ 2547  clear
+ 2548  ls -al
+ 2549  ls
+ 2550  \rm -rf xsim.* xelab.* xsim.dir/
+ 2551  clear
+ 2552  ls -al
+ 2553  \rm t1
+ 2554  ls -al
+ 2555  \rm -rv xvlog.*
+ 2556  \rm -rf xvlog.*
+ 2557  clear
+ 2558  cat safe_1 
+ 2559  xvlog -work work.testbench_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2560  cat safe_1 
+ 2561  xvlog -work work.uart_wb_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2562  cat safe_1 
+ 2563  xvlog -work work.uart_device_utilities ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2564  cat safe_1 
+ 2565  xvlog -work work.testcase ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2566  cat safe_1 
+ 2567  xvlog -f compile.args
+ 2568  ls -l xsim.dir/
+ 2569  history
+ 2570  xelab -top testbench -L testbench -L testbench_utilities -L testcase -L uart_device_utilities -L uart_wb_utilities -s my_ss
+ 2571  ls -l xsim.dir/work.testbench
+ 2572  xelab -top testbench -L work.testbench -L testbench_utilities -L testcase -L uart_device_utilities -L uart_wb_utilities -s my_ss
+ 2573  ls -al
+ 2574  cat xsim.dir/
+ 2575  ls -l xsim.dir/
+ 2576  xelab -top testbench -L work.testbench -L work.testbench_utilities -L work.testcase -L work.uart_device_utilities -L work.uart_wb_utilities -s my_ss
+ 2577  ls -al
+ 2578  xelab work.testbench -L work.testbench_utilities -L work.testcase -L work.uart_device_utilities -L work.uart_wb_utilities -s my_ss
+ 2579  ls -l xsim.dir/work.testbench
+ 2580  xelab -top testbench -s my_ss
+ 2581  vi compile.args
+ 2582  xvlog -f compile.args
+ 2583  vi compile.args
+ 2584  xvlog -f compile.args
+ 2585  ls -al xsim.dir/
+ 2586  ls -al xsim.dir/work
+ 2587  xelab -top testbench -s my_ss
+ 2588  xelab -top testbench -s my_ss -L work.testcase
+ 2589  cat safe_1 
+ 2590  vi safe_1 
+ 2591  cat safe_1 
+ 2592  vi safe_1 
+ 2593  ls -al SAFE/
+ 2594  vi safe_1 
+ 2595  cat safe_1 
+ 2596  xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ./uart_log.v ../../../bench/verilog/test_cases/uart_int.v
+ 2597  xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_device_utilities.v 
+ 2598  cat safe_1 
+ 2599  xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_wb_utilities.v 
+ 2600  cat safe_1 
+ 2601  <pre>xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2602  </pre>
+ 2603  cat safe_1 
+ 2604  xvlog -work work ./uart_testbench_defines.v ./uart_defines.v ./timescale.v ../../../bench/verilog/uart_testbench_utilities.v 
+ 2605  ls -l xsim.dir/work
+ 2606  ls -al
+ 2607  xelab -top testbench -s my_ss
+ 2608  xelab -s my_ss
+ 2609  ls xsim.dir/
+ 2610  xelab work.testbench  work.testbench_utilities  work.testcase  work.uart_device_utilities  work.uart_wb_utilities
+ 2611  ls -al
+ 2612  xelab work.testbench  work.testbench_utilities  work.testcase  work.uart_device_utilities  work.uart_wb_utilities -s my_ss
+ 2613  ls -al
+ 2614  ls -l xsim.dir/
+ 2615  xsim my_ss -R
+ 2616  clear
+ 2617  ls -l
+ 2618  history
+ 2619  ls -al
+ 2620  grep "Compiling module" xsim.dir/*/compile.log
+ 2621  grep "Compiling module" xsim.dir/*/
+ 2622  grep "Compiling module" xsim.dir/*/ -r
+ 2623  cd xsim.dir/
+ 2624  grep -r -i Compiling *
+ 2625  clear
+ 2626  pwd
+ 2627  cd ..
+ 2628  ls -al
+ 2629  history
+ 2630  vi safe_1 
+ 2631  clear
+ 2632  pwd
+ 2633  ls -al
+ 2634  vi safe_1 
+ 2635  clear
+ 2636  ls -al
+ 2637  \rm -rf xvlog.* xsim.* xelab.*
+ 2638  ls -al
+ 2639  cat safe_1 
+ 2640  vi run_sim
+ 2641  mv safe_1 run_vivado.scr
+ 2642  vi run_vivado.scr 
+ 2643  chmod +x run_vivado.scr 
+ 2644  ls -al
+ 2645  ./run_vivado.scr 
+ 2646  cat run_vivado.scr 
+ 2647  history
+ 2648  ls -al xsim.dir/work/
+ 2649  history
+ 2650  vi sim.do 
+ 2651  histtory > tt
+ 2652  history > tt

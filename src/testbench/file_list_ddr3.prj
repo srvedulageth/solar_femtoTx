@@ -1,0 +1,100 @@
+sv work ../rtl/zap_alu_main.sv
+sv work ../rtl/zap_btb.sv
+sv work ../rtl/zap_cache_fsm.sv
+sv work ../rtl/zap_cache.sv
+sv work ../rtl/zap_cache_tag_ram.sv
+sv work ../rtl/zap_core.sv
+sv work ../rtl/zap_cp15_cb.sv
+sv work ../rtl/zap_dcache_fsm.sv
+sv work ../rtl/zap_dcache.sv
+sv work ../rtl/zap_decode_main.sv
+sv work ../rtl/zap_decode.sv
+sv work ../rtl/zap_decompile.sv
+sv work ../rtl/zap_dual_rank_synchronizer.sv
+sv work ../rtl/zap_fetch_main.sv
+sv work ../rtl/zap_fifo.sv
+sv work ../rtl/zap_issue_main.sv
+sv work ../rtl/zap_mem_inv_block.sv
+sv work ../rtl/zap_memory_main.sv
+sv work ../rtl/zap_mode16_decoder_main.sv
+sv work ../rtl/zap_mode16_decoder.sv
+sv work ../rtl/zap_ones_counter.sv
+sv work ../rtl/zap_postalu_main.sv
+sv work ../rtl/zap_predecode_coproc.sv
+sv work ../rtl/zap_predecode_main.sv
+sv work ../rtl/zap_predecode_uop_sequencer.sv
+sv work ../rtl/zap_ram_simple_ben.sv
+sv work ../rtl/zap_ram_simple_nopipe.sv
+sv work ../rtl/zap_ram_simple.sv
+sv work ../rtl/zap_register_file.sv
+sv work ../rtl/zap_shifter_main.sv
+sv work ../rtl/zap_shifter_multiply.sv
+sv work ../rtl/zap_shifter_shift.sv
+sv work ../rtl/zap_sync_fifo.sv
+sv work ../rtl/zap_tlb_check.sv
+sv work ../rtl/zap_tlb_fsm.sv
+sv work ../rtl/zap_tlb.sv
+sv work ../rtl/zap_wb_merger.sv
+sv work ../rtl/zap_writeback.sv
+sv work ../rtl/zap_top.sv
+
+verilog work ../ips/ram_wb/verilog/ram_wb.v
+verilog work ../ips/ram_wb/verilog/ram_wb_sc_sw.v
+
+verilog work ./wb_arb2.v
+
+verilog work ../ips/test/uart16550/rtl/verilog/raminfr.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_debug_if.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_receiver.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_regs.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_rfifo.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_sync_flops.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_tfifo.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_transmitter.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_wb.v
+verilog work ../ips/test/uart16550/rtl/verilog/uart_top.v
+
+verilog work ../ips/original/ethmac/rtl/verilog/eth_clockgen.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_cop.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_crc.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_fifo.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_maccontrol.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_macstatus.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_miim.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_outputcontrol.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_random.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_receivecontrol.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_registers.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_rxaddrcheck.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_rxcounters.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_register.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_rxethmac.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_rxstatem.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_spram_256x32.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_shiftreg.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_transmitcontrol.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_txcounters.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_txethmac.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_txstatem.v
+verilog work ../ips/original/ethmac/rtl/verilog/eth_wishbone.v
+verilog work ../ips/original/ethmac/rtl/verilog/xilinx_dist_ram_16x32.v
+verilog work ../ips/original/ethmac/rtl/verilog/ethmac.v
+
+verilog work ./timer.v
+verilog work ./vic.v
+verilog work ./uart_tx_dumper.v
+
+verilog work ../ips/ram_wb/verilog/wb_ddr3_bridge.v
+verilog work ../ips/ddr3/core_ddr3_controller/examples/arty_a7/artix7_pll.v
+verilog work ../ips/ddr3/core_ddr3_controller/src_v/ddr3_dfi_seq.v
+verilog work ../ips/ddr3/core_ddr3_controller/src_v/ddr3_core.v
+verilog work ../ips/ddr3/core_ddr3_controller/src_v/phy/xc7/ddr3_dfi_phy.v
+verilog work $XILINX_VIVADO/data/verilog/src/glbl.v
+
+verilog work ./zap_soc.v
+
+verilog work ../ips/original/ethmac/bench/verilog/eth_phy.v
+verilog work ../ips/ddr3/core_ddr3_controller/tb/ddr3_core_xc7/ddr3.v
+//sv work MIG/mig_7series_0_ex/imports/ddr3_model.sv -d x2Gb -d sg15E -d x16
+
+sv work ./zap_test.v

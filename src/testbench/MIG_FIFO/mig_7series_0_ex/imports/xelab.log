@@ -1,0 +1,331 @@
+Vivado Simulator v2024.2.0
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /tools/Xilinx/Vivado/2024.2/bin/unwrapped/lnx64.o/xelab work.sim_tb_top work.glbl -prj xsim_files.prj -L unisims_ver -L secureip -s xsim_test -debug typical 
+Multi-threading is on. Using 6 slave threads.
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_memc_flow_vcontrol.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_memc_flow_vcontrol
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_wr_data_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_wr_data_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_memc_traffic_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_memc_traffic_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_init_mem_pattern_ctr.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_init_mem_pattern_ctr
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_read_data_path.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_read_data_path
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_rd_data_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_rd_data_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_cmd_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_cmd_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_cmd_prbs_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_cmd_prbs_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_traffic_gen_top.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_traffic_gen_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_data_prbs_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_data_prbs_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_s7ven_data_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_s7ven_data_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_read_posted_fifo.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_read_posted_fifo
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_vio_init_pattern_bram.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_vio_init_pattern_bram
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_write_data_path.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_write_data_path
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_tg_status.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_tg_status
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_tg_prbs_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_tg_prbs_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/mig_7series_v4_2_afifo.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_afifo
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/example_top.v" into library work
+INFO: [VRFC 10-311] analyzing module example_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_ocd_po_cntlr.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_ocd_po_cntlr
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_ocd_cntlr.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_ocd_cntlr
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_top.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_ocd_lim.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_ocd_lim
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_wrlvl_off_delay.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_wrlvl_off_delay
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_poc_meta.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_poc_meta
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_init.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_init
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_4lanes.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_4lanes
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_dqs_found_cal.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_dqs_found_cal
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_tempmon.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_tempmon
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_ocd_samp.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_ocd_samp
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_of_pre_fifo.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_of_pre_fifo
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_oclkdelay_cal.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_oclkdelay_cal
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_prbs_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_prbs_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_ocd_edge.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_ocd_edge
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_wrcal.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_wrcal
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_prbs_rdlvl.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_prbs_rdlvl
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_if_post_fifo.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_if_post_fifo
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_skip_calib_tap.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_skip_calib_tap
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_dqs_found_cal_hr.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_dqs_found_cal_hr
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_mc_phy.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_mc_phy
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_ocd_mux.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_ocd_mux
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_byte_lane.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_byte_lane
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_ocd_data.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_ocd_data
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_byte_group_io.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_byte_group_io
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_mc_phy_wrapper.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_mc_phy_wrapper
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_calib_top.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_calib_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_poc_cc.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_poc_cc
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_rdlvl.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_rdlvl
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_wrlvl.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_wrlvl
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_ck_addr_cmd_delay.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ddr_phy_ck_addr_cmd_delay
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_poc_tap_base.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_poc_tap_base
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_poc_pd.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_poc_pd
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_poc_edge_store.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_poc_edge_store
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_poc_top.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_poc_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ui/mig_7series_v4_2_ui_wr_data.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ui_wr_data
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ui/mig_7series_v4_2_ui_top.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ui_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ui/mig_7series_v4_2_ui_rd_data.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ui_rd_data
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ui/mig_7series_v4_2_ui_cmd.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ui_cmd
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_bank_common.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_bank_common
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_bank_queue.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_bank_queue
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_mc.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_mc
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_rank_mach.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_rank_mach
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_rank_common.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_rank_common
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_round_robin_arb.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_round_robin_arb
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_bank_mach.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_bank_mach
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_arb_mux.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_arb_mux
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_rank_cntrl.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_rank_cntrl
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_bank_state.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_bank_state
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_bank_cntrl.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_bank_cntrl
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_arb_row_col.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_arb_row_col
+WARNING: [VRFC 10-8332] begin/end is required for generate-for in this mode of Verilog [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_arb_row_col.v:252]
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_col_mach.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_col_mach
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_bank_compare.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_bank_compare
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_arb_select.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_arb_select
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ecc/mig_7series_v4_2_ecc_buf.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ecc_buf
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ecc/mig_7series_v4_2_ecc_gen.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ecc_gen
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ecc/mig_7series_v4_2_fi_xor.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_fi_xor
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ecc/mig_7series_v4_2_ecc_merge_enc.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ecc_merge_enc
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ecc/mig_7series_v4_2_ecc_dec_fix.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_ecc_dec_fix
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/mig_7series_0_mig_sim.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_0_mig
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/mig_7series_0.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/clocking/mig_7series_v4_2_infrastructure.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_infrastructure
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/clocking/mig_7series_v4_2_tempmon.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_tempmon
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/clocking/mig_7series_v4_2_iodelay_ctrl.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_iodelay_ctrl
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/clocking/mig_7series_v4_2_clk_ibuf.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_clk_ibuf
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ip_top/mig_7series_v4_2_mem_intfc.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_mem_intfc
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/ip_top/mig_7series_v4_2_memc_ui_top_std.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_v4_2_memc_ui_top_std
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/mig_7series_0_mig_sim.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_0_mig
+WARNING: [VRFC 10-3609] overwriting previous definition of module 'mig_7series_0_mig' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/mig_7series_0_mig_sim.v:74]
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/mig_7series_0.v" into library work
+INFO: [VRFC 10-311] analyzing module mig_7series_0
+WARNING: [VRFC 10-3609] overwriting previous definition of module 'mig_7series_0' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/mig_7series_0.v:69]
+INFO: [VRFC 10-2263] Analyzing Verilog file "/tools/Xilinx/Vivado/2024.2/data/verilog/src/glbl.v" into library work
+INFO: [VRFC 10-311] analyzing module glbl
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/ddr3_model.sv" into library work
+WARNING: [VRFC 10-3381] ignoring re-definition of command line macro 'x2Gb' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/ddr3_model.sv:99]
+WARNING: [VRFC 10-3381] ignoring re-definition of command line macro 'sg15E' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/ddr3_model.sv:100]
+WARNING: [VRFC 10-3381] ignoring re-definition of command line macro 'x16' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/ddr3_model.sv:101]
+INFO: [VRFC 10-311] analyzing module ddr3_model
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/wiredly.v" into library work
+INFO: [VRFC 10-311] analyzing module WireDelay
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/sim_tb_top.v" into library work
+INFO: [VRFC 10-311] analyzing module sim_tb_top
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-3091] actual bit length 12 differs from formal bit length 4 for port 'pi_dqs_found_lanes' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_mc_phy_wrapper.v:1671]
+WARNING: [VRFC 10-3091] actual bit length 12 differs from formal bit length 4 for port 'pi_phase_locked_lanes' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_mc_phy_wrapper.v:1679]
+WARNING: [VRFC 10-3091] actual bit length 12 differs from formal bit length 4 for port 'pi_dqs_found_lanes' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_top.v:1339]
+WARNING: [VRFC 10-3091] actual bit length 28 differs from formal bit length 32 for port 'memc_cmd_addr' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/imports/example_top.v:499]
+WARNING: [VRFC 10-3645] port 'idle' remains unconnected for this instance [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/controller/mig_7series_v4_2_mc.v:627]
+WARNING: [VRFC 10-3645] port 'afull' remains unconnected for this instance [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_mc_phy_wrapper.v:1422]
+WARNING: [VRFC 10-3645] port 'afull' remains unconnected for this instance [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_mc_phy_wrapper.v:1439]
+WARNING: [VRFC 10-3645] port 'afull' remains unconnected for this instance [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_mc_phy_wrapper.v:1456]
+WARNING: [VRFC 10-3645] port 'of_data_a_full' remains unconnected for this instance [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_mc_phy_wrapper.v:1484]
+WARNING: [VRFC 10-5021] port 'complex_oclk_prech_req' is not connected on this instance [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_calib_top.v:1317]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1fs
+Compiling module work.WireDelay(Delay_g=0.0,Delay_rd=0...
+Compiling module unisims_ver.IDELAYCTRL_default
+Compiling module work.mig_7series_v4_2_iodelay_ctrl(IO...
+Compiling module work.mig_7series_v4_2_clk_ibuf(SYSCLK...
+Compiling module unisims_ver.XADC(INIT_40=16'b01000000000000,...
+Compiling module work.mig_7series_v4_2_tempmon_default
+Compiling module unisims_ver.PLLE2_ADV(CLKFBOUT_MULT=4,CLKIN1...
+Compiling module unisims_ver.BUFG
+Compiling module unisims_ver.BUFH
+Compiling module unisims_ver.MMCME2_ADV(BANDWIDTH="HIGH",CLKF...
+Compiling module work.mig_7series_v4_2_infrastructure(...
+Compiling module unisims_ver.SRLC32E_default
+Compiling module work.mig_7series_v4_2_rank_cntrl(DQRD...
+Compiling module work.mig_7series_v4_2_round_robin_arb...
+Compiling module work.mig_7series_v4_2_round_robin_arb...
+Compiling module work.mig_7series_v4_2_rank_common(MAI...
+Compiling module work.mig_7series_v4_2_rank_mach(CS_WI...
+Compiling module work.mig_7series_v4_2_bank_compare(CO...
+Compiling module work.mig_7series_v4_2_bank_state(DATA...
+Compiling module work.mig_7series_v4_2_bank_queue(ORDE...
+Compiling module work.mig_7series_v4_2_bank_cntrl(COL_...
+Compiling module work.mig_7series_v4_2_bank_state(DATA...
+Compiling module work.mig_7series_v4_2_bank_queue(ORDE...
+Compiling module work.mig_7series_v4_2_bank_cntrl(COL_...
+Compiling module work.mig_7series_v4_2_bank_state(DATA...
+Compiling module work.mig_7series_v4_2_bank_queue(ORDE...
+Compiling module work.mig_7series_v4_2_bank_cntrl(COL_...
+Compiling module work.mig_7series_v4_2_bank_state(DATA...
+Compiling module work.mig_7series_v4_2_bank_queue(ORDE...
+Compiling module work.mig_7series_v4_2_bank_cntrl(COL_...
+Compiling module work.mig_7series_v4_2_bank_common(LOW...
+Compiling module work.mig_7series_v4_2_round_robin_arb...
+Compiling module work.mig_7series_v4_2_arb_row_col(nCK...
+Compiling module work.mig_7series_v4_2_arb_select(CS_W...
+Compiling module work.mig_7series_v4_2_arb_mux(CS_WIDT...
+Compiling module work.mig_7series_v4_2_bank_mach(COL_W...
+Compiling module unisims_ver.RAM32M
+Compiling module work.mig_7series_v4_2_col_mach(COL_WI...
+Compiling module work.mig_7series_v4_2_mc(COL_WIDTH=10...
+Compiling module unisims_ver.OBUF
+Compiling module unisims_ver.OBUFT
+Compiling module unisims_ver.IOBUF_INTERMDISABLE(IBUF_LOW_PWR...
+Compiling module unisims_ver.IOBUFDS_INTERMDISABLE(DQS_BIAS="...
+Compiling module work.mig_7series_v4_2_ddr_of_pre_fifo...
+Compiling module work.mig_7series_v4_2_ddr_of_pre_fifo...
+Compiling module unisims_ver.BUFIO
+Compiling module work.mig_7series_v4_2_ddr_of_pre_fifo...
+Compiling module unisims_ver.PHASER_OUT_PHY(FINE_DELAY=60,MEM...
+Compiling module unisims_ver.OUT_FIFO(ARRAY_MODE="ARRAY_MODE_...
+Compiling module unisims_ver.OSERDESE2(DATA_RATE_OQ="SDR",DAT...
+Compiling module work.mig_7series_v4_2_ddr_byte_group_...
+Compiling module unisims_ver.ODDR(DDR_CLK_EDGE="SAME_EDGE")
+Compiling module unisims_ver.OBUFDS
+Compiling module work.mig_7series_v4_2_ddr_byte_lane(B...
+Compiling module work.mig_7series_v4_2_ddr_byte_group_...
+Compiling module work.mig_7series_v4_2_ddr_byte_lane(A...
+Compiling module work.mig_7series_v4_2_ddr_if_post_fif...
+Compiling module unisims_ver.PHASER_IN_PHY(BURST_MODE="TRUE",...
+Compiling module unisims_ver.PHASER_OUT_PHY(CLKOUT_DIV=2,DATA...
+Compiling module unisims_ver.IN_FIFO
+Compiling module unisims_ver.OUT_FIFO
+Compiling module unisims_ver.ISERDESE2(INTERFACE_TYPE="MEMORY...
+Compiling module unisims_ver.IDELAYE2(HIGH_PERFORMANCE_MODE="...
+Compiling module unisims_ver.OSERDESE2(INIT_OQ=1'b1,INIT_TQ=1...
+Compiling module unisims_ver.OSERDESE2(INIT_OQ=1'b1,INIT_TQ=1...
+Compiling module work.mig_7series_v4_2_ddr_byte_group_...
+Compiling module work.mig_7series_v4_2_ddr_byte_lane(A...
+Compiling module work.mig_7series_v4_2_ddr_byte_lane(A...
+Compiling module unisims_ver.PHY_CONTROL(AO_TOGGLE=1,BURST_MO...
+Compiling module unisims_ver.PHASER_REF
+Compiling module work.mig_7series_v4_2_ddr_phy_4lanes(...
+WARNING: [VRFC 10-8809] cannot index into scalar type parameter/localparam 'PRESENT_DATA_A' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_4lanes.v:709]
+WARNING: [VRFC 10-8809] cannot index into scalar type parameter/localparam 'PRESENT_DATA_B' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_4lanes.v:708]
+WARNING: [VRFC 10-8809] cannot index into scalar type parameter/localparam 'PRESENT_DATA_C' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_4lanes.v:707]
+WARNING: [VRFC 10-8809] cannot index into scalar type parameter/localparam 'PRESENT_DATA_D' [/home/vedulas/solar_femtoTX/src/testbench/MIG_FIFO/mig_7series_0_ex/mig_7series_0_ex.gen/sources_1/ip/mig_7series_0/mig_7series_0/user_design/rtl/phy/mig_7series_v4_2_ddr_phy_4lanes.v:706]
+Compiling module work.mig_7series_v4_2_ddr_mc_phy(DATA...
+Compiling module work.mig_7series_v4_2_ddr_mc_phy_wrap...
+Compiling module work.mig_7series_v4_2_ddr_prbs_gen(DQ...
+Compiling module work.mig_7series_v4_2_ddr_phy_init(tC...
+Compiling module work.mig_7series_v4_2_ddr_phy_wrcal(n...
+Compiling module work.mig_7series_v4_2_ddr_phy_wrlvl(D...
+Compiling module work.mig_7series_v4_2_ddr_phy_ck_addr...
+Compiling module work.mig_7series_v4_2_ddr_phy_dqs_fou...
+Compiling module work.mig_7series_v4_2_ddr_phy_rdlvl(n...
+Compiling module work.mig_7series_v4_2_ddr_phy_tempmon...
+Compiling module work.mig_7series_v4_2_ddr_calib_top(n...
+Compiling module work.mig_7series_v4_2_ddr_phy_top(DDR...
+Compiling module work.mig_7series_v4_2_mem_intfc(PAYLO...
+Compiling module work.mig_7series_v4_2_ui_cmd(ADDR_WID...
+Compiling module work.mig_7series_v4_2_ui_wr_data(APP_...
+Compiling module work.mig_7series_v4_2_ui_rd_data(APP_...
+Compiling module work.mig_7series_v4_2_ui_top(APP_DATA...
+Compiling module work.mig_7series_v4_2_memc_ui_top_std...
+Compiling module work.mig_7series_0_mig_default
+Compiling module work.mig_7series_0
+Compiling module work.mig_7series_v4_2_init_mem_patter...
+Compiling module work.mig_7series_v4_2_afifo(DSIZE=42)
+Compiling module work.mig_7series_v4_2_cmd_prbs_gen(FA...
+Compiling module work.mig_7series_v4_2_cmd_prbs_gen(AD...
+Compiling module work.mig_7series_v4_2_cmd_prbs_gen(DW...
+Compiling module work.mig_7series_v4_2_cmd_prbs_gen(FA...
+Compiling module work.mig_7series_v4_2_cmd_gen(FAMILY=...
+Compiling module work.mig_7series_v4_2_memc_flow_vcont...
+Compiling module work.mig_7series_v4_2_read_posted_fif...
+Compiling module work.mig_7series_v4_2_vio_init_patter...
+Compiling module work.mig_7series_v4_2_data_prbs_gen
+Compiling module work.mig_7series_v4_2_tg_prbs_gen(PRB...
+Compiling module work.mig_7series_v4_2_s7ven_data_gen(...
+Compiling module work.mig_7series_v4_2_rd_data_gen(FAM...
+Compiling module work.mig_7series_v4_2_afifo(DSIZE=128...
+Compiling module work.mig_7series_v4_2_read_data_path(...
+Compiling module work.mig_7series_v4_2_s7ven_data_gen(...
+Compiling module work.mig_7series_v4_2_wr_data_gen(FAM...
+Compiling module work.mig_7series_v4_2_write_data_path...
+Compiling module work.mig_7series_v4_2_tg_status(DWIDT...
+Compiling module work.mig_7series_v4_2_memc_traffic_ge...
+Compiling module work.mig_7series_v4_2_traffic_gen_top...
+Compiling module work.example_top(END_ADDRESS=32'b0111...
+Compiling module work.ddr3_model_default
+Compiling module work.sim_tb_top
+Compiling module work.glbl
+Built simulation snapshot xsim_test

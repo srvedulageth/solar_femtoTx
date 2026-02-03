@@ -24,11 +24,9 @@ create_project project_1 -part xc7a100tcsg324-1
 add_files -scan_for_includes {
 ../rtl/verilog/ethmac_defines.v \
 ../rtl/verilog/timescale.v \
-../rtl/verilog/ethmac.v \
 ../rtl/verilog/eth_clockgen.v \
 ../rtl/verilog/eth_cop.v \
 ../rtl/verilog/eth_crc.v \
-../rtl/verilog/xilinx_dist_ram_16x32.v \
 ../rtl/verilog/eth_fifo.v \
 ../rtl/verilog/eth_maccontrol.v \
 ../rtl/verilog/eth_macstatus.v \
@@ -49,6 +47,8 @@ add_files -scan_for_includes {
 ../rtl/verilog/eth_txethmac.v \
 ../rtl/verilog/eth_txstatem.v \
 ../rtl/verilog/eth_wishbone.v \
+../rtl/verilog/xilinx_dist_ram_16x32.v \
+../rtl/verilog/ethmac.v \
 }
 
 # Create a sources_1 fileset.

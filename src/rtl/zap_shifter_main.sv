@@ -23,6 +23,9 @@
 //  in this unit but a given time, only one pathway may be active. The 3
 //  execution pathways are: shifter, multiplier, value feedback network.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_shifter_main
 #(

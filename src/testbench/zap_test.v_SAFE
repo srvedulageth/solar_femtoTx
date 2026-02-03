@@ -1,0 +1,1190 @@
+//
+// (C)2016-2024 Revanth Kamaraj (krevanth) <revanth91kamaraj@gmail.com>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 3
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+// 02110-1301, USA.
+//
+//`timescale 1ps/1ps
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
+module zap_test;
+
+localparam STRING_LENGTH                = 12;
+
+reg i_clk = 0;
+initial begin
+   forever #5ns i_clk = ~i_clk; //100MHz
+end
+
+reg clk_baud_19200 = 0;
+initial begin
+  //forever #2605 clk_baud_19200 = ~clk_baud_19200;
+  forever #26040 clk_baud_19200 = ~clk_baud_19200;
+end
+
+reg i_reset;
+initial begin
+  i_reset = 'b 1;
+  repeat(50) @(posedge i_clk);
+  #1;
+  i_reset = 'b 0;
+end
+
+`ifdef DUAL_UART
+reg [1:0]                  i_uart = 2'b11;
+reg [1:0]                  o_uart;
+`else
+reg [0:0]                  i_uart = 'b1;
+reg [0:0]                  o_uart;
+`endif
+
+reg [3:0]                  clk_ctr = 4'd0;
+//reg [STRING_LENGTH*8-1:0]  uart_string = "DLROW OLLEH ";
+reg [STRING_LENGTH*8-1:0]  uart_string = "H";
+reg [6:0]                  uart_ctr    = 7'd10;
+reg [31:0]                 btrace      = 32'd0;
+reg                        uart_done = 1'd0;
+//reg [8:0]                  uart_init_done = 9'd0;
+reg [3:0]                  uart_init_done = 4'd0;
+
+wire            UART_SR_DAV_0;
+wire    [7:0]   UART_SR_0;
+`ifdef DUAL_UART
+wire            UART_SR_DAV_1;
+wire    [7:0]   UART_SR_1;
+`endif
+
+//EthMAC
+//Tx
+wire              mtx_clk_pad_i; // Transmit clock (from PHY)
+wire [3:0]        mtxd_pad_o;    // Transmit nibble (to PHY)
+wire              mtxen_pad_o;   // Transmit enable (to PHY)
+wire              mtxerr_pad_o;  // Transmit error (to PHY)
+
+//Rx
+wire              mrx_clk_pad_i; // Receive clock (from PHY)
+wire [3:0]        mrxd_pad_i;    // Receive nibble (from PHY)
+wire              mrxdv_pad_i;   // Receive data valid (from PHY)
+wire              mrxerr_pad_i;  // Receive data error (from PHY)
+
+//Common Tx and Rx
+wire              mcoll_pad_i;   // Collision (from PHY)
+wire              mcrs_pad_i;    // Carrier sense (from PHY)
+
+//Phy Reference Clock and Reset ...
+wire              eth_ref_clk;
+wire              eth_rstn;
+
+// MIIM MII Management interface
+wire              mdc_pad_o;     // MII Management data clock (to PHY)
+wire              mdio_pad_io;
+
+// Divided clocks.
+reg clk_2 = 1'd0, clk_4 = 1'd0, clk_8 = 1'd0, clk_16 = 1'd0;
+
+// Digital clock dividers.
+always @ ( posedge i_clk ) clk_2 = clk_2 + 1;
+always @ ( posedge clk_2 ) clk_4 = clk_4 + 1;
+always @ ( posedge clk_4 ) clk_8 = clk_8 + 1;
+always @ ( posedge clk_8 ) clk_16 = clk_16 + 1;
+
+//always @ ( posedge clk_16 )
+always @ ( posedge clk_baud_19200 )
+begin
+        if ( !(&uart_init_done) )
+                uart_init_done <= uart_init_done + 1;
+end
+
+// UART data into the core.
+//always @ ( posedge clk_16 ) if ( !uart_done && (&uart_init_done) )
+always @ ( posedge clk_baud_19200 ) if ( !uart_done && (&uart_init_done) )
+begin
+        if ( uart_ctr <= 8 )
+        begin
+                i_uart[0] <= uart_ctr == 0 ? 0 : uart_string[((btrace*8) + uart_ctr - 1)];
+                uart_ctr  <= uart_ctr + 1;
+        end
+        else if ( uart_ctr == 9 )
+        begin
+                uart_ctr  <= uart_ctr + 1;
+                i_uart[0] <= 1'd1;
+        end
+        else
+        begin
+                uart_ctr  <= uart_ctr + 1;
+                i_uart[0] <= 1'd1;
+
+                if ( &uart_ctr )
+                begin
+                        btrace <= (btrace == STRING_LENGTH - 1) ? 0 : btrace + 1;
+
+                        if ( btrace == STRING_LENGTH - 1 )
+                                uart_done <= 1;
+                end
+        end
+end
+
+// UART TX related. Data out of core.
+//uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(i_clk), .i_line(o_uart[0]),
+uart_tx_dumper u_uart_tx_dumper_dev0 (  .i_clk(clk_baud_19200), .i_line(o_uart[0]),
+                                        .UART_SR_DAV(UART_SR_DAV_0), .UART_SR(UART_SR_0) );
+`ifdef DUAL_UART
+uart_tx_dumper u_uart_tx_dumper_dev1 (  .i_clk(i_clk), .i_line(o_uart[1]),
+                                        .UART_SR_DAV(UART_SR_DAV_1), .UART_SR(UART_SR_1) );
+`endif
+
+`ifdef XILINX_DDR3_CONTROLLER
+//***************************************************************************
+// The following parameters refer to width of various ports
+//***************************************************************************
+parameter COL_WIDTH             = 10;
+                                  // # of memory Column Address bits.
+parameter CS_WIDTH              = 1;
+                                  // # of unique CS outputs to memory.
+parameter DM_WIDTH              = 2;
+                                  // # of DM (data mask)
+parameter DQ_WIDTH              = 16;
+                                  // # of DQ (data)
+parameter DQS_WIDTH             = 2;
+parameter DQS_CNT_WIDTH         = 1;
+                                  // = ceil(log2(DQS_WIDTH))
+parameter DRAM_WIDTH            = 8;
+                                  // # of DQ per DQS
+parameter ECC                   = "OFF";
+parameter RANKS                 = 1;
+                                  // # of Ranks.
+parameter ODT_WIDTH             = 1;
+                                  // # of ODT outputs to memory.
+parameter ROW_WIDTH             = 14;
+                                  // # of memory Row Address bits.
+parameter ADDR_WIDTH            = 28;
+                                  // # = RANK_WIDTH + BANK_WIDTH
+                                  //     + ROW_WIDTH + COL_WIDTH;
+                                  // Chip Select is always tied to low for
+                                  // single rank devices
+//***************************************************************************
+// The following parameters are mode register settings
+//***************************************************************************
+parameter BURST_MODE            = "8";
+                                  // DDR3 SDRAM:
+                                  // Burst Length (Mode Register 0).
+                                  // # = "8", "4", "OTF".
+                                  // DDR2 SDRAM:
+                                  // Burst Length (Mode Register).
+                                  // # = "8", "4".
+parameter CA_MIRROR             = "OFF";
+                                  // C/A mirror opt for DDR3 dual rank
+
+//***************************************************************************
+// The following parameters are multiplier and divisor factors for PLLE2.
+// Based on the selected design frequency these parameters vary.
+//***************************************************************************
+//parameter CLKIN_PERIOD          = 6000;
+parameter CLKIN_PERIOD          = 6; //timescale is 1ns/1ps
+                                  // Input Clock Period
+
+
+//***************************************************************************
+// Simulation parameters
+//***************************************************************************
+parameter SIM_BYPASS_INIT_CAL   = "FAST";
+                                  // # = "SIM_INIT_CAL_FULL" -  Complete
+                                  //              memory init &
+                                  //              calibration sequence
+                                  // # = "SKIP" - Not supported
+                                  // # = "FAST" - Complete memory init & use
+                                  //              abbreviated calib sequence
+
+//***************************************************************************
+// IODELAY and PHY related parameters
+//***************************************************************************
+parameter TCQ                   = 100;
+//***************************************************************************
+// IODELAY and PHY related parameters
+//***************************************************************************
+parameter RST_ACT_LOW           = 1;
+                                  // =1 for active low reset,
+                                  // =0 for active high.
+
+//***************************************************************************
+// Referece clock frequency parameters
+//***************************************************************************
+parameter REFCLK_FREQ           = 200.0;
+                                  // IODELAYCTRL reference clock frequency
+//***************************************************************************
+// System clock frequency parameters
+//***************************************************************************
+parameter tCK                   = 3000;
+                                  // memory tCK paramter.
+                  // # = Clock Period in pS.
+parameter nCK_PER_CLK           = 4;
+                                  // # of memory CKs per fabric CLK
+
+
+//***************************************************************************
+// AXI4 Shim parameters
+//***************************************************************************
+parameter C_S_AXI_ID_WIDTH              = 4;
+                                          // Width of all master and slave ID signals.
+                                          // # = >= 1.
+parameter C_S_AXI_ADDR_WIDTH            = 28;
+                                          // Width of S_AXI_AWADDR, S_AXI_ARADDR, M_AXI_AWADDR and
+                                          // M_AXI_ARADDR for all SI/MI slots.
+                                          // # = 32.
+parameter C_S_AXI_DATA_WIDTH            = 32;
+                                          // Width of WDATA and RDATA on SI slot.
+                                          // Must be <= APP_DATA_WIDTH.
+                                          // # = 32, 64, 128, 256.
+parameter C_S_AXI_SUPPORTS_NARROW_BURST = 0;
+                                          // Indicates whether to instatiate upsizer
+                                          // Range: 0, 1
+
+
+//***************************************************************************
+// Debug and Internal parameters
+//***************************************************************************
+parameter DEBUG_PORT            = "OFF";
+                                  // # = "ON" Enable debug signals/controls.
+                                  //   = "OFF" Disable debug signals/controls.
+//***************************************************************************
+// Debug and Internal parameters
+//***************************************************************************
+parameter DRAM_TYPE             = "DDR3";
+
+  
+
+//**************************************************************************//
+// Local parameters Declarations
+//**************************************************************************//
+localparam real TPROP_DQS          = 0.00;
+                                     // Delay for DQS signal during Write Operation
+localparam real TPROP_DQS_RD       = 0.00;
+                     // Delay for DQS signal during Read Operation
+localparam real TPROP_PCB_CTRL     = 0.00;
+                     // Delay for Address and Ctrl signals
+localparam real TPROP_PCB_DATA     = 0.00;
+                     // Delay for data signal during Write operation
+localparam real TPROP_PCB_DATA_RD  = 0.00;
+                     // Delay for data signal during Read operation
+
+localparam MEMORY_WIDTH            = 16;
+localparam NUM_COMP                = DQ_WIDTH/MEMORY_WIDTH;
+localparam ECC_TEST 		   = "OFF" ;
+localparam ERR_INSERT = (ECC_TEST == "ON") ? "OFF" : ECC ;
+
+
+localparam real REFCLK_PERIOD = (1000000.0/(2*REFCLK_FREQ));
+localparam RESET_PERIOD = 200000; //in pSec  
+
+localparam real SYSCLK_PERIOD = tCK;
+  
+wire [15:0]  ddr3_dq_fpga;
+wire [1:0]   ddr3_dqs_n_fpga;
+wire [1:0]   ddr3_dqs_p_fpga;
+
+wire [13:0]  ddr3_addr_fpga;
+wire [2:0]   ddr3_ba_fpga;
+wire         ddr3_ras_n_fpga;
+wire         ddr3_cas_n_fpga;
+wire         ddr3_we_n_fpga;
+wire [0:0]   ddr3_ck_p_fpga;
+wire [0:0]   ddr3_ck_n_fpga;
+wire [0:0]   ddr3_cke_fpga;
+wire [0:0]   ddr3_cs_n_fpga;
+wire [1:0]   ddr3_dm_fpga;
+wire [0:0]   ddr3_odt_fpga;
+
+wire         ddr3_reset_n;
+
+reg [1-1:0]  ddr3_ck_p_sdram; 
+reg [1-1:0]  ddr3_ck_n_sdram;
+reg          ddr3_ras_n_sdram;
+reg          ddr3_cas_n_sdram;
+reg          ddr3_we_n_sdram;
+reg [3-1:0]  ddr3_ba_sdram [0:1];
+reg [ROW_WIDTH-1:0]  ddr3_addr_sdram [0:1];
+
+reg [1-1:0]  ddr3_cke_sdram;
+reg [(CS_WIDTH*1)-1:0] ddr3_cs_n_sdram_tmp;
+reg [DM_WIDTH-1:0]     ddr3_dm_sdram_tmp;
+reg [ODT_WIDTH-1:0]    ddr3_odt_sdram_tmp;
+wire [(CS_WIDTH*1)-1:0] ddr3_cs_n_sdram;
+wire [DM_WIDTH-1:0]     ddr3_dm_sdram;
+wire [ODT_WIDTH-1:0]    ddr3_odt_sdram;
+
+wire [DQS_WIDTH-1:0]    ddr3_dqs_p_sdram;
+wire [DQS_WIDTH-1:0]    ddr3_dqs_n_sdram;
+
+wire [DQ_WIDTH-1:0]     ddr3_dq_sdram;
+
+reg                     sys_clk_i;
+reg                     clk_ref_i;
+reg                     sys_rst_n;
+wire                    sys_rst;
+`elsif DDR3_CONTROLLER
+wire [15:0]  ddr3_dq_fpga;
+wire [1:0]   ddr3_dqs_n_fpga;
+wire [1:0]   ddr3_dqs_p_fpga;
+
+wire [13:0]  ddr3_addr_fpga;
+wire [2:0]   ddr3_ba_fpga;
+wire         ddr3_ras_n_fpga;
+wire         ddr3_cas_n_fpga;
+wire         ddr3_we_n_fpga;
+wire [0:0]   ddr3_ck_p_fpga;
+wire [0:0]   ddr3_ck_n_fpga;
+wire [0:0]   ddr3_cke_fpga;
+wire [0:0]   ddr3_cs_n_fpga;
+wire [1:0]   ddr3_dm_fpga;
+wire [0:0]   ddr3_odt_fpga;
+
+wire         ddr3_reset_n;
+`endif //`ifdef XILINX_DDR3_CONTROLLER
+
+// DUT
+parameter DATA_SECTION_TLB_ENTRIES      = 4;
+parameter DATA_LPAGE_TLB_ENTRIES        = 8;
+parameter DATA_SPAGE_TLB_ENTRIES        = 16;
+parameter DATA_FPAGE_TLB_ENTRIES        = 32;
+parameter DATA_CACHE_SIZE               = 1024;
+parameter CODE_SECTION_TLB_ENTRIES      = 4;
+parameter CODE_LPAGE_TLB_ENTRIES        = 8;
+parameter CODE_SPAGE_TLB_ENTRIES        = 16;
+parameter CODE_FPAGE_TLB_ENTRIES        = 32;
+parameter CODE_CACHE_SIZE               = 1024;
+parameter FIFO_DEPTH                    = 4;
+parameter BP_ENTRIES                    = 1024;
+parameter ONLY_CORE                     = 0;
+parameter BE_32_ENABLE                  = 0;
+
+zap_soc #(
+        .FIFO_DEPTH(FIFO_DEPTH),
+        .BP_ENTRIES(BP_ENTRIES),
+        .DATA_SECTION_TLB_ENTRIES(DATA_SECTION_TLB_ENTRIES),
+        .DATA_LPAGE_TLB_ENTRIES(DATA_LPAGE_TLB_ENTRIES),
+        .DATA_SPAGE_TLB_ENTRIES(DATA_SPAGE_TLB_ENTRIES),
+        .DATA_FPAGE_TLB_ENTRIES(DATA_FPAGE_TLB_ENTRIES),
+        .DATA_CACHE_SIZE(DATA_CACHE_SIZE),
+        .CODE_SECTION_TLB_ENTRIES(CODE_SECTION_TLB_ENTRIES),
+        .CODE_LPAGE_TLB_ENTRIES(CODE_LPAGE_TLB_ENTRIES),
+        .CODE_SPAGE_TLB_ENTRIES(CODE_SPAGE_TLB_ENTRIES),
+        .CODE_FPAGE_TLB_ENTRIES(CODE_FPAGE_TLB_ENTRIES),
+        .CODE_CACHE_SIZE(CODE_CACHE_SIZE),
+        .BE_32_ENABLE(BE_32_ENABLE),
+        .ONLY_CORE(ONLY_CORE)
+) u_chip_top (
+        // Clk and rst
+`ifdef XILINX_DDR3_CONTROLLER
+        .SYS_CLK  (sys_clk_i),
+        .SYS_RST  (~sys_rst),
+
+        .ddr3_dq(ddr3_dq_fpga),
+        .ddr3_dqs_n(ddr3_dqs_n_fpga),
+        .ddr3_dqs_p(ddr3_dqs_p_fpga),
+
+        .ddr3_addr(ddr3_addr_fpga),
+        .ddr3_ba(ddr3_ba_fpga),
+        .ddr3_ras_n(ddr3_ras_n_fpga),
+        .ddr3_cas_n(ddr3_cas_n_fpga),
+        .ddr3_we_n(ddr3_we_n_fpga),
+        .ddr3_ck_p(ddr3_ck_p_fpga),
+        .ddr3_ck_n(ddr3_ck_n_fpga),
+        .ddr3_cke(ddr3_cke_fpga),
+        .ddr3_cs_n(ddr3_cs_n_fpga),
+        .ddr3_dm(ddr3_dm_fpga),
+        .ddr3_odt(ddr3_odt_fpga),
+
+        .ddr3_reset_n(ddr3_reset_n),
+
+        .sys_clk_i          (sys_clk_i),
+        .clk_ref_i          (clk_ref_i),
+
+        .sys_rst            (sys_rst),
+`elsif DDR3_CONTROLLER //DDR3 controller from github
+        .SYS_CLK  (i_clk),
+        .SYS_RST  (i_reset),
+
+        .ddr3_dq(ddr3_dq_fpga),
+        .ddr3_dqs_n(ddr3_dqs_n_fpga),
+        .ddr3_dqs_p(ddr3_dqs_p_fpga),
+
+        .ddr3_addr(ddr3_addr_fpga),
+        .ddr3_ba(ddr3_ba_fpga),
+        .ddr3_ras_n(ddr3_ras_n_fpga),
+        .ddr3_cas_n(ddr3_cas_n_fpga),
+        .ddr3_we_n(ddr3_we_n_fpga),
+        .ddr3_ck_p(ddr3_ck_p_fpga),
+        .ddr3_ck_n(ddr3_ck_n_fpga),
+        .ddr3_cke(ddr3_cke_fpga),
+        .ddr3_cs_n(ddr3_cs_n_fpga),
+        .ddr3_dm(ddr3_dm_fpga),
+        .ddr3_odt(ddr3_odt_fpga),
+
+        .ddr3_reset_n(ddr3_reset_n),
+`else //FPGA RAM
+        .SYS_CLK  (i_clk),
+        .SYS_RST  (i_reset),
+`endif
+
+        //EthMAC
+        //TX
+        .mtx_clk_pad_i(mtx_clk_pad_i),
+        .mtxd_pad_o(mtxd_pad_o),
+        .mtxen_pad_o(mtxen_pad_o),
+        .mtxerr_pad_o(mtxerr_pad_o),
+
+        //RX
+        .mrx_clk_pad_i(mrx_clk_pad_i),
+        .mrxd_pad_i(mrxd_pad_i),
+        .mrxdv_pad_i(mrxdv_pad_i),
+        .mrxerr_pad_i(mrxerr_pad_i),
+
+        //Common Tx and Rx
+        .mcoll_pad_i(mcoll_pad_i),
+        .mcrs_pad_i(mcrs_pad_i),
+  
+        //Phy Reference Clock and Reset ...
+        .eth_ref_clk(eth_ref_clk),
+        .eth_rstn(eth_rstn),
+
+        // MIIM
+        .mdc_pad_o(mdc_pad_o),
+        .mdio_pad_io(mdio_pad_io),
+
+        // UART 0
+        .UART0_RXD(i_uart[0]),
+        .UART0_TXD(o_uart[0])
+
+`ifdef DUAL_UART
+        ,
+        // UART 1
+        .UART1_RXD(i_uart[1]),
+        .UART1_TXD(o_uart[1])
+`endif
+
+        //Wishbone External Master Interface
+        //.int_sel  ('b 1)
+);
+
+integer phy_log_file_desc;
+initial begin
+  phy_log_file_desc = $fopen("./eth_tb_phy.log");
+end
+
+eth_phy eth_phy (
+  // WISHBONE reset
+  .m_rst_n_i(!i_reset),
+
+  // MAC TX
+  .mtx_clk_o(mtx_clk_pad_i),    .mtxd_i(mtxd_pad_o),    .mtxen_i(mtxen_pad_o),    .mtxerr_i(mtxerr_pad_o),
+
+  // MAC RX
+  .mrx_clk_o(mrx_clk_pad_i),    .mrxd_o(mrxd_pad_i),    .mrxdv_o(mrxdv_pad_i),    .mrxerr_o(mrxerr_pad_i),
+  .mcoll_o(mcoll_pad_i),        .mcrs_o(mcrs_pad_i),
+
+  // MIIM
+  .mdc_i(mdc_pad_o),          .md_io(mdio_pad_io),
+
+  // SYSTEM
+  .phy_log(phy_log_file_desc)
+  //.phy_log() //Not connected
+);
+initial begin
+  $dumpfile("zap.vcd");
+  $dumpvars(0);
+end
+
+initial begin
+  #100;
+  wait(uart_done);
+  //repeat(1000)  @(posedge clk_16);
+  repeat(10)  @(posedge clk_baud_19200);
+  $display("Simulation OK");
+  $finish;
+end
+
+initial begin
+  #50000ns;
+  eth_phy.link_up_down(1);
+end
+
+task set_rx_packet;
+  input  [31:0] rxpnt;
+  input  [15:0] len;
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input  [47:0] eth_dest_addr;
+  input  [47:0] eth_source_addr;
+  input  [15:0] eth_type_len;
+  input  [7:0]  eth_start_data;
+  integer       i, sd;
+  reg    [47:0] dest_addr;
+  reg    [47:0] source_addr;
+  reg    [15:0] type_len;
+  reg    [21:0] buffer;
+  reg           delta_t;
+begin
+  buffer = rxpnt[21:0];
+  dest_addr = eth_dest_addr;
+  source_addr = eth_source_addr;
+  type_len = eth_type_len;
+  sd = eth_start_data;
+  delta_t = 0;
+  for(i = 0; i < len; i = i + 1) 
+  begin
+    if (i < 6)
+    begin
+      eth_phy.rx_mem[buffer] = dest_addr[47:40];
+      dest_addr = dest_addr << 8;
+    end
+    else if (i < 12)
+    begin
+      eth_phy.rx_mem[buffer] = source_addr[47:40];
+      source_addr = source_addr << 8;
+    end
+    else if (i < 14)
+    begin
+      eth_phy.rx_mem[buffer] = type_len[15:8];
+      type_len = type_len << 8;
+    end
+    else
+    begin
+      eth_phy.rx_mem[buffer] = sd[7:0];
+      sd = sd + 1;
+    end
+    buffer = buffer + 1;
+  end
+  delta_t = !delta_t;
+  if (plus_dribble_nibble)
+    eth_phy.rx_mem[buffer] = {4'h0, 4'hD /*sd[3:0]*/};
+  delta_t = !delta_t;
+end
+endtask // set_rx_packet
+
+`ifdef XILINX
+byte arp_payload [0:27] = {
+    8'h00, 8'h01, 8'h08, 8'h00, 8'h06, 8'h04, 8'h00, 8'h01,
+    8'hA4, 8'hBB, 8'h6D, 8'h52, 8'hE4, 8'h53,
+    8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'hC0, 8'hA8, 8'h01, 8'h14
+};
+
+byte ip_icmp_payload [0:59] = {
+    8'h45, 8'h00, 8'h00, 8'h3C, 8'hD7, 8'h06, 8'h00, 8'h00,
+    8'h80, 8'h01, 8'h00, 8'h00, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    // ICMP (type 8 echo request + data)
+    8'h08, 8'h00, 8'h4A, 8'h07, 8'h00, 8'h01, 8'h03, 8'h54,
+    8'h61, 8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68,
+    8'h69, 8'h6A, 8'h6B, 8'h6C, 8'h6D, 8'h6E, 8'h6F, 8'h70,
+    8'h71, 8'h72, 8'h73, 8'h74, 8'h75, 8'h76, 8'h77, 8'h61,
+    8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68, 8'h69
+};
+byte ip_udp_payload_1 [0:55] = {
+    8'h45, 8'h00, 8'h00, 8'h38, 8'h18, 8'h8b, 8'h00, 8'h00,
+    8'h80, 8'h11, 8'h60, 8'h78, 8'hc0, 8'ha8, 8'h01, 8'h0A,
+    8'hff, 8'hff, 8'hff, 8'hff, 8'hc0, 8'h69, 8'h56, 8'hce,
+    8'h00, 8'h24, 8'h61, 8'h76, 8'h53, 8'h54, 8'h52, 8'h5f,
+    8'h42, 8'h43, 8'h41, 8'h53, 8'h54, 8'h00, 8'h00, 8'h00,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h52, 8'h51, 8'h31, 8'h2e,
+    8'h30, 8'he2, 8'h30, 8'h00, 8'h00, 8'h1c, 8'h64, 8'h31
+};
+`else
+reg [7:0] arp_payload [0:27] = {
+    8'h00,8'h01,8'h08,8'h00,8'h06,8'h04,8'h00,8'h01,
+    8'hA4,8'hBB,8'h6D,8'h52,8'hE4,8'h53,
+    8'hC0,8'hA8,8'h01,8'h0A,
+    8'h00,8'h00,8'h00,8'h00,8'h00,8'h00,
+    8'hC0,8'hA8,8'h01,8'h14
+};
+
+reg [7:0] ip_icmp_payload [0:59] = {
+    8'h45, 8'h00, 8'h00, 8'h3C, 8'hD7, 8'h06, 8'h00, 8'h00,
+    8'h80, 8'h01, 8'h00, 8'h00, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    // ICMP (type 8 echo request + data)
+    8'h08, 8'h00, 8'h4A, 8'h07, 8'h00, 8'h01, 8'h03, 8'h54,
+    8'h61, 8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68,
+    8'h69, 8'h6A, 8'h6B, 8'h6C, 8'h6D, 8'h6E, 8'h6F, 8'h70,
+    8'h71, 8'h72, 8'h73, 8'h74, 8'h75, 8'h76, 8'h77, 8'h61,
+    8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68, 8'h69
+};
+
+reg [7:0] ip_icmp_payload_1 [0:115] = {
+    //IP ...
+    8'h45, 8'h00, 8'h00, 8'h74, 8'hf4, 8'hf1, 8'h00, 8'h00,
+    8'h80, 8'h01, 8'h00, 8'h00, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+    8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    // ICMP (type 3 echo request + data)
+    8'h03, 8'h02, 8'hfc, 8'hfd, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'h45, 8'h00, 8'h00, 8'h58, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'h40, 8'h01, 8'hF7, 8'h36, 8'hC0, 8'hA8, 8'h01, 8'h14,
+
+    8'hC0, 8'hA8, 8'h01, 8'h0A, 8'h00, 8'h00, 8'h80, 8'h76,
+
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h45, 8'h00, 8'h00, 8'h3C,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h40, 8'h01, 8'hF7, 8'h52,
+
+    8'hC0, 8'hA8, 8'h01, 8'h14, 8'hC0, 8'hA8, 8'h01, 8'h0A,
+
+    8'h00, 8'h00, 8'h1B, 8'hEC, 8'h00, 8'h01, 8'h39, 8'h6F,
+
+    8'h61, 8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h00, 8'h00,
+
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00, 8'h00
+};
+
+reg [7:0] ip_udp_payload_1 [0:55] = {
+    8'h45, 8'h00, 8'h00, 8'h38, 8'h18, 8'h8b, 8'h00, 8'h00,
+    8'h80, 8'h11, 8'h60, 8'h78, 8'hc0, 8'ha8, 8'h01, 8'h0A,
+    8'hff, 8'hff, 8'hff, 8'hff, 8'hc0, 8'h69, 8'h56, 8'hce,
+    8'h00, 8'h24, 8'h61, 8'h76, 8'h53, 8'h54, 8'h52, 8'h5f,
+    8'h42, 8'h43, 8'h41, 8'h53, 8'h54, 8'h00, 8'h00, 8'h00,
+    8'h00, 8'h00, 8'h00, 8'h00, 8'h52, 8'h51, 8'h31, 8'h2e,
+    8'h30, 8'he2, 8'h30, 8'h00, 8'h00, 8'h1c, 8'h64, 8'h31
+};
+`endif
+
+task set_rx_packet_1;
+  input  [31:0] rxpnt;
+  input  [15:0] len;
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input  [47:0] eth_dest_addr;
+  input  [47:0] eth_source_addr;
+  input  [15:0] eth_type_len;
+  input  [7:0]  eth_start_data;
+  integer       i, sd;
+  reg    [47:0] dest_addr;
+  reg    [47:0] source_addr;
+  reg    [15:0] type_len;
+  reg    [21:0] buffer;
+  reg           delta_t;
+begin
+  buffer = rxpnt[21:0];
+  dest_addr = eth_dest_addr;
+  source_addr = eth_source_addr;
+  type_len = eth_type_len;
+  sd = eth_start_data;
+  delta_t = 0;
+  for(i = 0; i < len; i = i + 1) 
+  begin
+    if (i < 6)
+    begin
+      eth_phy.rx_mem[buffer] = dest_addr[47:40];
+      dest_addr = dest_addr << 8;
+    end
+    else if (i < 12)
+    begin
+      eth_phy.rx_mem[buffer] = source_addr[47:40];
+      source_addr = source_addr << 8;
+    end
+    else if (i < 14)
+    begin
+      eth_phy.rx_mem[buffer] = type_len[15:8];
+      type_len = type_len << 8;
+    end
+
+    else if(eth_type_len == 'h 0806) begin //ARP Pkt ...
+      if (i < 42) begin //28 bytes from arp payload
+        eth_phy.rx_mem[buffer] = arp_payload[i-14];
+      end
+      else if((i >=42) && (i < 60)) begin
+        eth_phy.rx_mem[buffer] = 8'h 00;
+      end
+    end
+
+    else if(eth_type_len == 'h 0800) begin //ICMP Pkt ...
+      if (i < 74) begin //60 bytes from icmp payload
+        eth_phy.rx_mem[buffer] = ip_icmp_payload[i-14];
+      end
+    end
+
+    else
+    begin
+      eth_phy.rx_mem[buffer] = sd[7:0];
+      sd = sd + 1;
+    end
+    buffer = buffer + 1;
+  end
+  delta_t = !delta_t;
+  if (plus_dribble_nibble)
+    eth_phy.rx_mem[buffer] = {4'h0, 4'hD /*sd[3:0]*/};
+  delta_t = !delta_t;
+end
+endtask // set_rx_packet_1
+
+task set_rx_packet_udp;
+  input  [31:0] rxpnt;
+  input  [15:0] len;
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input  [47:0] eth_dest_addr;
+  input  [47:0] eth_source_addr;
+  input  [15:0] eth_type_len;
+  input  [7:0]  eth_start_data;
+  input  [15:0] pkt_len;
+
+  integer       i, sd;
+  reg    [47:0] dest_addr;
+  reg    [47:0] source_addr;
+  reg    [15:0] type_len;
+  reg    [21:0] buffer;
+  reg           delta_t;
+begin
+  buffer = rxpnt[21:0];
+  dest_addr = eth_dest_addr;
+  source_addr = eth_source_addr;
+  type_len = eth_type_len;
+  sd = eth_start_data;
+  delta_t = 0;
+  for(i = 0; i < len; i = i + 1) 
+  begin
+    if (i < 6)
+    begin
+      eth_phy.rx_mem[buffer] = dest_addr[47:40];
+      dest_addr = dest_addr << 8;
+    end
+    else if (i < 12)
+    begin
+      eth_phy.rx_mem[buffer] = source_addr[47:40];
+      source_addr = source_addr << 8;
+    end
+    else if (i < 14)
+    begin
+      eth_phy.rx_mem[buffer] = type_len[15:8];
+      type_len = type_len << 8;
+    end
+
+    else if(type_len == 'h0800) begin //ICMP+IP packet ...
+      if (i < pkt_len) begin
+        eth_phy.rx_mem[buffer] = ip_udp_payload_1[i-14];
+      end
+    end
+
+    else
+    begin
+      eth_phy.rx_mem[buffer] = sd[7:0];
+      sd = sd + 1;
+    end
+    buffer = buffer + 1;
+  end
+  delta_t = !delta_t;
+  if (plus_dribble_nibble)
+    eth_phy.rx_mem[buffer] = {4'h0, 4'hD /*sd[3:0]*/};
+  delta_t = !delta_t;
+end
+endtask // set_rx_packet_udp
+
+task append_rx_crc;
+  input  [31:0] rxpnt_phy; // source
+  input  [15:0] len; // length in bytes without CRC
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  input         negated_crc; // if appended CRC is correct or not
+  reg    [31:0] crc;
+  reg    [7:0]  tmp;
+  reg    [31:0] addr_phy;
+  reg           delta_t;
+begin
+  addr_phy = rxpnt_phy + len;
+  delta_t = 0;
+  // calculate CRC from prepared packet
+  paralel_crc_phy_rx(rxpnt_phy, {16'h0, len}, plus_dribble_nibble, crc);
+  if (negated_crc)
+    crc = ~crc;
+  delta_t = !delta_t;
+
+  if (plus_dribble_nibble)
+  begin
+    tmp = eth_phy.rx_mem[addr_phy];
+    eth_phy.rx_mem[addr_phy]     = {crc[27:24], tmp[3:0]};
+    eth_phy.rx_mem[addr_phy + 1] = {crc[19:16], crc[31:28]};
+    eth_phy.rx_mem[addr_phy + 2] = {crc[11:8], crc[23:20]};
+    eth_phy.rx_mem[addr_phy + 3] = {crc[3:0], crc[15:12]};
+    eth_phy.rx_mem[addr_phy + 4] = {4'h0, crc[7:4]};
+  end
+  else
+  begin
+    eth_phy.rx_mem[addr_phy]     = crc[31:24];
+    eth_phy.rx_mem[addr_phy + 1] = crc[23:16];
+    eth_phy.rx_mem[addr_phy + 2] = crc[15:8];
+    eth_phy.rx_mem[addr_phy + 3] = crc[7:0];
+  end
+end
+endtask // append_rx_crc
+
+// paralel CRC calculating for PHY RX
+task paralel_crc_phy_rx;
+  input  [31:0] start_addr; // start address
+  input  [31:0] len; // length of frame in Bytes without CRC length
+  input         plus_dribble_nibble; // if length is longer for one nibble
+  output [31:0] crc_out;
+  reg    [21:0] addr_cnt; // only 22 address lines
+  integer       word_cnt;
+  integer       nibble_cnt;
+  reg    [31:0] load_reg;
+  reg           delta_t;
+  reg    [31:0] crc_next;
+  reg    [31:0] crc;
+  reg           crc_error;
+  reg     [3:0] data_in;
+  integer       i;
+begin
+  #1 addr_cnt = start_addr[21:0];
+  word_cnt = 24; // 27; // start of the frame - nibble granularity (MSbit first)
+  crc = 32'hFFFF_FFFF; // INITIAL value
+  delta_t = 0;
+  // length must include 4 bytes of ZEROs, to generate CRC
+  // get number of nibbles from Byte length (2^1 = 2)
+  if (plus_dribble_nibble)
+    nibble_cnt = ((len + 4) << 1) + 1'b1; // one nibble longer
+  else
+    nibble_cnt = ((len + 4) << 1);
+  // because of MAGIC NUMBER nibbles are swapped [3:0] -> [0:3]
+  load_reg[31:24] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[23:16] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[15: 8] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  load_reg[ 7: 0] = eth_phy.rx_mem[addr_cnt];
+  addr_cnt = addr_cnt + 1;
+  while (nibble_cnt > 0)
+  begin
+    // wait for delta time
+    delta_t = !delta_t;
+    // shift data in
+
+    if(nibble_cnt <= 8) // for additional 8 nibbles shift ZEROs in!
+      data_in[3:0] = 4'h0;
+    else
+
+      data_in[3:0] = {load_reg[word_cnt], load_reg[word_cnt+1], load_reg[word_cnt+2], load_reg[word_cnt+3]};
+    crc_next[0]  = (data_in[0] ^ crc[28]);
+    crc_next[1]  = (data_in[1] ^ data_in[0] ^ crc[28]    ^ crc[29]);
+    crc_next[2]  = (data_in[2] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[30]);
+    crc_next[3]  = (data_in[3] ^ data_in[2] ^ data_in[1] ^ crc[29]  ^ crc[30] ^ crc[31]);
+    crc_next[4]  = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[0];
+    crc_next[5]  = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[1];
+    crc_next[6]  = (data_in[2] ^ data_in[1] ^ crc[29]    ^ crc[30]) ^ crc[ 2];
+    crc_next[7]  = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[3];
+    crc_next[8]  = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[4];
+    crc_next[9]  = (data_in[2] ^ data_in[1] ^ crc[29]    ^ crc[30]) ^ crc[5];
+    crc_next[10] = (data_in[3] ^ data_in[2] ^ data_in[0] ^ crc[28]  ^ crc[30] ^ crc[31]) ^ crc[6];
+    crc_next[11] = (data_in[3] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[31]) ^ crc[7];
+    crc_next[12] = (data_in[2] ^ data_in[1] ^ data_in[0] ^ crc[28]  ^ crc[29] ^ crc[30]) ^ crc[8];
+    crc_next[13] = (data_in[3] ^ data_in[2] ^ data_in[1] ^ crc[29]  ^ crc[30] ^ crc[31]) ^ crc[9];
+    crc_next[14] = (data_in[3] ^ data_in[2] ^ crc[30]    ^ crc[31]) ^ crc[10];
+    crc_next[15] = (data_in[3] ^ crc[31])   ^ crc[11];
+    crc_next[16] = (data_in[0] ^ crc[28])   ^ crc[12];
+    crc_next[17] = (data_in[1] ^ crc[29])   ^ crc[13];
+    crc_next[18] = (data_in[2] ^ crc[30])   ^ crc[14];
+    crc_next[19] = (data_in[3] ^ crc[31])   ^ crc[15];
+    crc_next[20] =  crc[16];
+    crc_next[21] =  crc[17];
+    crc_next[22] = (data_in[0] ^ crc[28])   ^ crc[18];
+    crc_next[23] = (data_in[1] ^ data_in[0] ^ crc[29]    ^ crc[28]) ^ crc[19];
+    crc_next[24] = (data_in[2] ^ data_in[1] ^ crc[30]    ^ crc[29]) ^ crc[20];
+    crc_next[25] = (data_in[3] ^ data_in[2] ^ crc[31]    ^ crc[30]) ^ crc[21];
+    crc_next[26] = (data_in[3] ^ data_in[0] ^ crc[31]    ^ crc[28]) ^ crc[22];
+    crc_next[27] = (data_in[1] ^ crc[29])   ^ crc[23];
+    crc_next[28] = (data_in[2] ^ crc[30])   ^ crc[24];
+    crc_next[29] = (data_in[3] ^ crc[31])   ^ crc[25];
+    crc_next[30] =  crc[26];
+    crc_next[31] =  crc[27];
+
+    crc = crc_next;
+    crc_error = crc[31:0] != 32'hc704dd7b;  // CRC not equal to magic number
+    case (nibble_cnt)
+    9: crc_out = {!crc[24], !crc[25], !crc[26], !crc[27], !crc[28], !crc[29], !crc[30], !crc[31],
+                  !crc[16], !crc[17], !crc[18], !crc[19], !crc[20], !crc[21], !crc[22], !crc[23],
+                  !crc[ 8], !crc[ 9], !crc[10], !crc[11], !crc[12], !crc[13], !crc[14], !crc[15],
+                  !crc[ 0], !crc[ 1], !crc[ 2], !crc[ 3], !crc[ 4], !crc[ 5], !crc[ 6], !crc[ 7]};
+    default: crc_out = crc_out;
+    endcase
+    // wait for delta time
+    delta_t = !delta_t;
+    // increment address and load new data
+    if ((word_cnt+3) == 7)//4)
+    begin
+      // because of MAGIC NUMBER nibbles are swapped [3:0] -> [0:3]
+      load_reg[31:24] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[23:16] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[15: 8] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+      load_reg[ 7: 0] = eth_phy.rx_mem[addr_cnt];
+      addr_cnt = addr_cnt + 1;
+    end
+    // set new load bit position
+    if((word_cnt+3) == 31)
+      word_cnt = 16;
+    else if ((word_cnt+3) == 23)
+      word_cnt = 8;
+    else if ((word_cnt+3) == 15)
+      word_cnt = 0;
+    else if ((word_cnt+3) == 7)
+      word_cnt = 24;
+    else
+      word_cnt = word_cnt + 4;// - 4;
+    // decrement nibble counter
+    nibble_cnt = nibble_cnt - 1;
+    // wait for delta time
+    delta_t = !delta_t;
+  end // while
+  #1;
+end
+endtask // paralel_crc_phy_rx
+
+`ifdef XILINX_DDR3_CONTROLLER
+wire init_calib_complete;
+assign init_calib_complete = u_chip_top.init_calib_complete;
+`endif
+
+initial begin
+  #100000ns;
+
+`ifdef XILINX_DDR3_CONTROLLER
+  wait(init_calib_complete == 'b 1);
+`endif //`ifdef XILINX_DDR3_CONTROLLER
+
+  repeat(5) begin
+    //Start Rx ...
+    $display("Rx Begin");
+
+    //For ARP, uncomment below 3 and comment ICMP below...
+    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'hff_ff_ff_ff_ff_ff, 48'hA4_BB_6D_52_E4_53, 16'h0806, 'h 0F);
+    append_rx_crc (0, 'd 60, 1'b0, 1'b0); //ARP packet length 42 bytes + 18 bytes padding...
+    #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 64, 1'b0); //Length = 42(ARP Packet Length) + 18 bytes padding + 4 bytes CRC ...
+
+    repeat(20000) @(posedge i_clk);
+
+    //For ICMP, uncomment below 3 and comment above ARP ...
+    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'hA4_BB_6D_52_E4_53, 16'h0800, 'h 0F);
+    append_rx_crc (0, 'd 74, 1'b0, 1'b0); //ICMP packet length 74 bytes... without CRC
+    #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 78, 1'b0); //Length = 74(ICMP Packet Length) + 4 bytes CRC ...
+
+    repeat(20000) @(posedge i_clk);
+
+    $display("Rx Done");
+  end
+  #5000ns;
+  $finish;
+end
+
+always @(posedge UART_SR_DAV_0) begin
+  $display("Transmitted UART Data = %h", UART_SR_0);
+end
+
+`ifdef XILINX_DDR3_CONTROLLER
+//XILINX DDR3 Model ...
+  initial sys_clk_i = 1'b0;
+  //always sys_clk_i = #(CLKIN_PERIOD/2.0) ~sys_clk_i;
+  always sys_clk_i = #3ns ~sys_clk_i;
+  
+  initial clk_ref_i = 1'b0;
+  always clk_ref_i = #2.5ns ~clk_ref_i;
+
+  initial begin
+    sys_rst_n = 1'b0;
+    //#RESET_PERIOD sys_rst_n = 1'b1;
+    #200ns sys_rst_n = 1'b1;
+  end
+  assign sys_rst = RST_ACT_LOW ? sys_rst_n : ~sys_rst_n;
+
+  always @( * ) begin         
+    ddr3_ck_p_sdram      <=  #(TPROP_PCB_CTRL) ddr3_ck_p_fpga;
+    ddr3_ck_n_sdram      <=  #(TPROP_PCB_CTRL) ddr3_ck_n_fpga;
+    ddr3_addr_sdram[0]   <=  #(TPROP_PCB_CTRL) ddr3_addr_fpga;
+    ddr3_addr_sdram[1]   <=  #(TPROP_PCB_CTRL) (CA_MIRROR == "ON") ?
+                                                 {ddr3_addr_fpga[ROW_WIDTH-1:9],
+                                                  ddr3_addr_fpga[7], ddr3_addr_fpga[8],
+                                                  ddr3_addr_fpga[5], ddr3_addr_fpga[6],
+                                                  ddr3_addr_fpga[3], ddr3_addr_fpga[4],
+                                                  ddr3_addr_fpga[2:0]} :
+                                                 ddr3_addr_fpga;
+    ddr3_ba_sdram[0]     <=  #(TPROP_PCB_CTRL) ddr3_ba_fpga;
+    ddr3_ba_sdram[1]     <=  #(TPROP_PCB_CTRL) (CA_MIRROR == "ON") ?
+                                                 {ddr3_ba_fpga[3-1:2],
+                                                  ddr3_ba_fpga[0],
+                                                  ddr3_ba_fpga[1]} :
+                                                 ddr3_ba_fpga;
+    ddr3_ras_n_sdram     <=  #(TPROP_PCB_CTRL) ddr3_ras_n_fpga;
+    ddr3_cas_n_sdram     <=  #(TPROP_PCB_CTRL) ddr3_cas_n_fpga;
+    ddr3_we_n_sdram      <=  #(TPROP_PCB_CTRL) ddr3_we_n_fpga;
+    ddr3_cke_sdram       <=  #(TPROP_PCB_CTRL) ddr3_cke_fpga;
+  end
+
+  always @( * )                      
+    ddr3_cs_n_sdram_tmp   <=  #(TPROP_PCB_CTRL) ddr3_cs_n_fpga;
+  assign ddr3_cs_n_sdram =  ddr3_cs_n_sdram_tmp;
+
+  always @( * )
+    ddr3_dm_sdram_tmp <=  #(TPROP_PCB_DATA) ddr3_dm_fpga;//DM signal generation
+  assign ddr3_dm_sdram = ddr3_dm_sdram_tmp;
+    
+  always @( * )
+    ddr3_odt_sdram_tmp  <=  #(TPROP_PCB_CTRL) ddr3_odt_fpga;
+  assign ddr3_odt_sdram =  ddr3_odt_sdram_tmp;
+
+  genvar dqwd;
+  generate
+    for (dqwd = 1;dqwd < DQ_WIDTH;dqwd = dqwd+1) begin : dq_delay
+      WireDelay #
+       (
+        .Delay_g    (TPROP_PCB_DATA),
+        .Delay_rd   (TPROP_PCB_DATA_RD),
+        .ERR_INSERT ("OFF")
+       )
+      u_delay_dq
+       (
+        .A             (ddr3_dq_fpga[dqwd]),
+        .B             (ddr3_dq_sdram[dqwd]),
+        .reset         (sys_rst_n),  
+        .phy_init_done (init_calib_complete)
+       );                            
+    end                              
+          WireDelay #                
+       (
+        .Delay_g    (TPROP_PCB_DATA),
+        .Delay_rd   (TPROP_PCB_DATA_RD),
+        .ERR_INSERT ("OFF")
+       )
+      u_delay_dq_0
+       (                             
+        .A             (ddr3_dq_fpga[0]),
+        .B             (ddr3_dq_sdram[0]),
+        .reset         (sys_rst_n),
+        .phy_init_done (init_calib_complete)
+       );
+  endgenerate
+
+  genvar dqswd;
+  generate
+    for (dqswd = 0;dqswd < DQS_WIDTH;dqswd = dqswd+1) begin : dqs_delay
+      WireDelay #
+       (
+        .Delay_g    (TPROP_DQS),
+        .Delay_rd   (TPROP_DQS_RD),
+        .ERR_INSERT ("OFF")
+       )
+      u_delay_dqs_p
+       (
+        .A             (ddr3_dqs_p_fpga[dqswd]),
+        .B             (ddr3_dqs_p_sdram[dqswd]),
+        .reset         (sys_rst_n),
+        .phy_init_done (init_calib_complete)
+       );
+
+      WireDelay #
+       (
+        .Delay_g    (TPROP_DQS),
+        .Delay_rd   (TPROP_DQS_RD),
+        .ERR_INSERT ("OFF")
+       )
+      u_delay_dqs_n
+       (
+        .A             (ddr3_dqs_n_fpga[dqswd]),
+        .B             (ddr3_dqs_n_sdram[dqswd]),
+        .reset         (sys_rst_n),
+        .phy_init_done (init_calib_complete)
+       );
+    end
+  endgenerate
+
+  genvar r,i;
+  generate
+    for (r = 0; r < CS_WIDTH; r = r + 1) begin: mem_rnk
+      if(DQ_WIDTH/16) begin: mem
+        for (i = 0; i < NUM_COMP; i = i + 1) begin: gen_mem
+          ddr3_model u_comp_ddr3
+            (
+             .rst_n   (ddr3_reset_n),
+             .ck      (ddr3_ck_p_sdram),
+             .ck_n    (ddr3_ck_n_sdram),
+             .cke     (ddr3_cke_sdram[r]),
+             .cs_n    (ddr3_cs_n_sdram[r]),
+             .ras_n   (ddr3_ras_n_sdram),
+             .cas_n   (ddr3_cas_n_sdram),
+             .we_n    (ddr3_we_n_sdram),
+             .dm_tdqs (ddr3_dm_sdram[(2*(i+1)-1):(2*i)]),
+             .ba      (ddr3_ba_sdram[r]),
+             .addr    (ddr3_addr_sdram[r]),
+             .dq      (ddr3_dq_sdram[16*(i+1)-1:16*(i)]),
+             .dqs     (ddr3_dqs_p_sdram[(2*(i+1)-1):(2*i)]),
+             .dqs_n   (ddr3_dqs_n_sdram[(2*(i+1)-1):(2*i)]),
+             .tdqs_n  (),
+             .odt     (ddr3_odt_sdram[r])
+             );
+        end
+      end
+      if (DQ_WIDTH%16) begin: gen_mem_extrabits
+        ddr3_model u_comp_ddr3
+          (
+           .rst_n   (ddr3_reset_n),
+           .ck      (ddr3_ck_p_sdram),
+           .ck_n    (ddr3_ck_n_sdram),
+           .cke     (ddr3_cke_sdram[r]),
+           .cs_n    (ddr3_cs_n_sdram[r]),
+           .ras_n   (ddr3_ras_n_sdram),
+           .cas_n   (ddr3_cas_n_sdram),
+           .we_n    (ddr3_we_n_sdram),
+           .dm_tdqs ({ddr3_dm_sdram[DM_WIDTH-1],ddr3_dm_sdram[DM_WIDTH-1]}),
+           .ba      (ddr3_ba_sdram[r]),
+           .addr    (ddr3_addr_sdram[r]),
+           .dq      ({ddr3_dq_sdram[DQ_WIDTH-1:(DQ_WIDTH-8)],
+                      ddr3_dq_sdram[DQ_WIDTH-1:(DQ_WIDTH-8)]}),
+           .dqs     ({ddr3_dqs_p_sdram[DQS_WIDTH-1],
+                      ddr3_dqs_p_sdram[DQS_WIDTH-1]}),
+           .dqs_n   ({ddr3_dqs_n_sdram[DQS_WIDTH-1],
+                      ddr3_dqs_n_sdram[DQS_WIDTH-1]}),
+           .tdqs_n  (),
+           .odt     (ddr3_odt_sdram[r])
+           );
+      end
+    end
+  endgenerate
+//XILINX DDR3 Model ...
+`elsif DDR3_CONTROLLER
+    ddr3 u_ram (
+        .dq(ddr3_dq_fpga),
+        .dqs(ddr3_dqs_p_fpga),
+        .dqs_n(ddr3_dqs_n_fpga),
+
+        .addr(ddr3_addr_fpga),
+        .ba(ddr3_ba_fpga),
+        .ras_n(ddr3_ras_n_fpga),
+        .cas_n(ddr3_cas_n_fpga),
+        .we_n(ddr3_we_n_fpga),
+        .ck(ddr3_ck_p_fpga),
+        .ck_n(ddr3_ck_n_fpga),
+        .cke(ddr3_cke_fpga),
+        .cs_n(ddr3_cs_n_fpga),
+        .dm_tdqs(ddr3_dm_fpga),
+        .odt(ddr3_odt_fpga),
+
+        .rst_n(ddr3_reset_n),
+
+        .tdqs_n()
+    );
+`endif //`ifdef XILINX_DDR3_CONTROLLER
+
+endmodule //zap_test

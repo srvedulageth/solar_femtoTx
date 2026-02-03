@@ -1,0 +1,21 @@
+
+---------------------------------------------------------------------------
+
+Initialization of UART.
+    FAILED!
+    Failure message: Bit 6 of LSR register should not change!.
+      Simulation Time:                91100
+
+---------------------------------------------------------------------------
+
+Interrupt test.
+
+---------------------------------------------------------------------------
+
+TEST CASE execution summary:
+Number of tests PASSED=0
+Number of tests FAILED=2
+  Simulation End Time:            100091100
+
+---------------------------------------------------------------------------
+

@@ -19,6 +19,9 @@
 // This is the ZAP core which contains the bare processor core without any
 // cache or MMU. In other words, this is the bare pipeline.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_core #(
 

@@ -109,7 +109,9 @@
 //
 //
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_macstatus(

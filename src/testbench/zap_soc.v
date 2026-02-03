@@ -1,6 +1,5 @@
 /*
 //
-// EthMAC address space FFFF0000 to FFFFFFFF
 // UART0  address space FFFEFFE0 to FFFEFFFF
 // Timer0 address space FFFEFFC0 to FFFEFFDF
 // VIC0   address space FFFEFFA0 to FFFEFFBF
@@ -10,6 +9,10 @@
 Rev 2
 Added EthMac
 */
+
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_soc #(
 
@@ -30,168 +33,274 @@ parameter BE_32_ENABLE                  = 0,
 parameter ONLY_CORE                     = 0
 
 )(
-        // Clk and rst
+        //Clk and rst
         input wire          SYS_CLK,
         input wire          SYS_RST,
 
+`ifdef SYNTHESIS
+        output wire         led_0,
+        output wire         led_1,
+        output wire         led_2,
+        output wire         led_3,
+`endif
+
+`ifdef DDR3_CONTROLLER
+        inout  wire [15:0]  ddr3_dq,
+        inout  wire [1:0]   ddr3_dqs_n,
+        inout  wire [1:0]   ddr3_dqs_p,
+
+        output wire [13:0]  ddr3_addr,
+        output wire [2:0]   ddr3_ba,
+        output wire         ddr3_ras_n,
+        output wire         ddr3_cas_n,
+        output wire         ddr3_we_n,
+        output wire [0:0]   ddr3_ck_p,
+        output wire [0:0]   ddr3_ck_n,
+        output wire [0:0]   ddr3_cke,
+        output wire [0:0]   ddr3_cs_n,
+        output wire [1:0]   ddr3_dm,
+        output wire [0:0]   ddr3_odt,
+        output wire         ddr3_reset_n,
+`endif //`ifdef DDR3_CONTROLLER
+
+        //EthMAC
+        //Tx
+        input               mtx_clk_pad_i, // Transmit clock (from PHY)
+        output wire [3:0]   mtxd_pad_o,    // Transmit nibble (to PHY)
+        output              mtxen_pad_o,   // Transmit enable (to PHY)
+        output              mtxerr_pad_o,  // Transmit error (to PHY)
+
+        //Rx
+        input               mrx_clk_pad_i, // Receive clock (from PHY)
+        input [3:0]         mrxd_pad_i,    // Receive nibble (from PHY)
+        input               mrxdv_pad_i,   // Receive data valid (from PHY)
+        input               mrxerr_pad_i,  // Receive data error (from PHY)
+
+        //Common Tx and Rx
+        input               mcoll_pad_i,   // Collision (from PHY)
+        input               mcrs_pad_i,    // Carrier sense (from PHY)
+
+        //Phy Reference Clock and Reset ...
+        output wire         eth_ref_clk,
+        output wire         eth_rstn,
+
+        // MIIM MII Management interface
+        inout               mdio_pad_io,
+        output wire         mdc_pad_o,     // MII Management data clock (to PHY)
+
         // UART 0
         input  wire         UART0_RXD,
-        output wire         UART0_TXD,
+        output wire         UART0_TXD
 
+`ifdef DUAL_UART
+        ,
         // UART 1
         input  wire         UART1_RXD,
-        output wire         UART1_TXD,
-
-        //ETHMAC TX
-        mtx_clk_pad_i, mtxd_pad_o, mtxen_pad_o, mtxerr_pad_o,
-
-        //ETHMAC RX
-        mrx_clk_pad_i, mrxd_pad_i, mrxdv_pad_i, mrxerr_pad_i, mcoll_pad_i, mcrs_pad_i,
-  
-        //ETHMAC MIIM
-        mdc_pad_o, md_pad_i, md_pad_o, md_padoe_o,
+        output wire         UART1_TXD
+`endif
 
         // Interrupt sel..
-        input wire          int_sel,
-
-        // Remaining IRQs to the interrupt controller.
-        input   wire [26:0] I_IRQ,
-
-        // Single FIQ input directly to ZAP CPU.
-        input   wire        I_FIQ,
-
-        // External Wishbone Connection (for RAMs etc).
-        output reg          O_WB_STB,
-        output reg          O_WB_CYC,
-        output wire [31:0]  O_WB_DAT,
-        output wire [31:0]  O_WB_ADR,
-        output wire [3:0]   O_WB_SEL,
-        output wire         O_WB_WE,
-        output wire [2:0]   O_WB_CTI,
-        input  wire         I_WB_ACK,
-        input  wire [31:0]  I_WB_DAT
+        //input wire          int_sel
 );
 
+wire md_pad_i, md_padoe_o, md_pad_o;
+assign mdio_pad_io = md_padoe_o ? md_pad_o : 1'bz ;
+assign md_pad_i = mdio_pad_io;
+
+wire int_sel;
+assign int_sel = 'b 1;
+
 // Peripheral addresses.
-localparam TIMER1_LO                    = 32'hFFFEFF60;
-localparam TIMER1_HI                    = 32'hFFFEFF7F;
-localparam UART1_LO                     = 32'hFFFEFF80;
-localparam UART1_HI                     = 32'hFFFEFF9F;
-localparam VIC_LO                       = 32'hFFFEFFA0;
-localparam VIC_HI                       = 32'hFFFEFFBF;
-localparam TIMER0_LO                    = 32'hFFFEFFC0;
-localparam TIMER0_HI                    = 32'hFFFEFFDF;
-localparam UART0_LO                     = 32'hFFFEFFE0;
-localparam UART0_HI                     = 32'hFFFEFFFF;
-localparam ETHMAC_LO                    = 32'hFFFF0000;
-localparam ETHMAC_HI                    = 32'hFFFFFFFF;
+`ifdef DUAL_UART
+localparam TIMER1_LO                    = 32'hFFFFFF60;
+localparam TIMER1_HI                    = 32'hFFFFFF7F;
+localparam UART1_LO                     = 32'hFFFFFF80;
+localparam UART1_HI                     = 32'hFFFFFF9F;
+`else
+localparam TIMER0_LO                    = 32'hFFFFFFC0;
+localparam TIMER0_HI                    = 32'hFFFFFFDF;
+localparam UART0_LO                     = 32'hFFFFFFE0;
+localparam UART0_HI                     = 32'hFFFFFFFF;
+`endif
+localparam VIC_LO                       = 32'hFFFFFFA0;
+localparam VIC_HI                       = 32'hFFFFFFBF;
+localparam ETHMAC_LO                    = 32'hFFFFE000; //Internal Slave Ram of EthMAC total 2K bytes
+localparam ETHMAC_HI                    = 32'hFFFFEFFF;
+
+localparam ETHMAC_BUF_RAM_LO            = 32'h10000000;
+localparam ETHMAC_BUF_RAM_HI            = 32'h1FFFFFFF; //Total 256MB, accessed both by processor and ethmac...
 
 // Internal signals.
+wire            clk_ddr;
+wire            clk_ref;
+wire            clk2ddr3;
+
 wire            i_clk    = SYS_CLK;
 wire            i_reset  = SYS_RST;
 
+wire            ddr3_init_done;
+wire            dfi_wrdata_en;
+wire            dfi_rddata_valid;
+
+reg             eth_ref_clk_r1, eth_ref_clk_r2;
+
+always @(posedge i_clk) begin
+  if (SYS_RST) begin
+    eth_ref_clk_r1 <= 'b 0;
+  end else begin
+    eth_ref_clk_r1 <= ~eth_ref_clk_r1;
+  end
+end
+
+always @(posedge eth_ref_clk_r1) begin
+  if (SYS_RST) begin
+    eth_ref_clk_r2 <= 'b 0;
+  end else begin
+    eth_ref_clk_r2 <= ~eth_ref_clk_r2;
+  end
+end
+assign eth_ref_clk = eth_ref_clk_r2;
+assign eth_rstn = ~SYS_RST;
+
+`ifdef DUAL_UART
 wire [1:0]      uart_in;
 wire [1:0]      uart_out;
-
 assign          {UART1_TXD, UART0_TXD} = uart_out;
 assign          uart_in = {UART1_RXD, UART0_RXD};
+`else
+wire [0:0]      uart_in;
+wire [0:0]      uart_out;
+assign          UART0_TXD = uart_out;
+assign          uart_in = UART0_RXD;
+`endif
 
 wire            data_wb_cyc;
 wire            data_wb_stb;
 reg [31:0]      data_wb_din;
 reg             data_wb_ack;
-reg             data_wb_cyc_ethmac, data_wb_cyc_uart [1:0], data_wb_cyc_timer [1:0], data_wb_cyc_vic;
-reg             data_wb_stb_ethmac, data_wb_stb_uart [1:0], data_wb_stb_timer [1:0], data_wb_stb_vic;
-wire [31:0]     data_wb_din_ethmac, data_wb_din_uart [1:0], data_wb_din_timer [1:0], data_wb_din_vic;
-wire            data_wb_ack_ethmac, data_wb_ack_uart [1:0], data_wb_ack_timer [1:0], data_wb_ack_vic;
+
+wire ram_ack_o;
+
+//EthMAC Wishbone Master
+wire [31:0] ethmac_m_wb_adr_o;
+wire [3:0] ethmac_m_wb_sel_o;
+wire ethmac_m_wb_we_o;
+wire [31:0] ethmac_m_wb_dat_o;
+wire [31:0] ethmac_m_wb_dat_i;
+wire ethmac_m_wb_cyc_o;
+wire ethmac_m_wb_stb_o;
+wire ethmac_m_wb_ack_i;
+wire ethmac_m_wb_err_i;
+
+`ifdef DUAL_UART
+reg             data_wb_cyc_uart [1:0], data_wb_cyc_timer [1:0];
+reg             data_wb_stb_uart [1:0], data_wb_stb_timer [1:0];
+wire [31:0]     data_wb_din_uart [1:0], data_wb_din_timer [1:0];
+wire            data_wb_ack_uart [1:0], data_wb_ack_timer [1:0];
+`else
+reg             data_wb_cyc_uart [0:0], data_wb_cyc_timer [0:0];
+reg             data_wb_stb_uart [0:0], data_wb_stb_timer [0:0];
+wire [31:0]     data_wb_din_uart [0:0], data_wb_din_timer [0:0];
+wire            data_wb_ack_uart [0:0], data_wb_ack_timer [0:0];
+`endif
+reg             data_wb_cyc_ram, data_wb_cyc_vic, data_wb_cyc_ethmac, data_wb_cyc_ethmac_ram;
+reg             data_wb_stb_ram, data_wb_stb_vic, data_wb_stb_ethmac, data_wb_stb_ethmac_ram;
+wire [31:0]     data_wb_din_ram, data_wb_din_vic, data_wb_din_ethmac, data_wb_din_ethmac_ram;
+wire            data_wb_ack_ram, data_wb_ack_vic, data_wb_ack_ethmac, data_wb_ack_ethmac_ram;
+
 wire [3:0]      data_wb_sel;
 wire            data_wb_we;
 wire [31:0]     data_wb_dout;
 wire [31:0]     data_wb_adr;
 wire [2:0]      data_wb_cti; // Cycle Type Indicator.
 wire            global_irq;
+
+`ifdef DUAL_UART
 wire [1:0]      uart_irq;
 wire [1:0]      timer_irq;
+`else
+wire [0:0]      uart_irq;
+wire [0:0]      timer_irq;
+`endif
 wire            ethmac_irq;
 
-// Common WB signals to output.
-assign        O_WB_ADR        = data_wb_adr;
-assign        O_WB_WE         = data_wb_we;
-assign        O_WB_DAT        = data_wb_dout;
-assign        O_WB_SEL        = data_wb_sel;
-assign        O_WB_CTI        = data_wb_cti;
-
 // Wishbone fabric.
-always @*
-begin:blk1
-        integer ii;
+always @* begin:blk1
+  integer ii;
 
-        for(ii=0;ii<=1;ii=ii+1)
-        begin
-                data_wb_cyc_uart [ii]  = 0;
-                data_wb_stb_uart [ii]  = 0;
-                data_wb_cyc_timer[ii] = 0;
-                data_wb_stb_timer[ii] = 0;
-        end
+`ifdef DUAL_UART
+  for(ii=0;ii<=1;ii=ii+1) begin
+`else
+  for(ii=0;ii<1;ii=ii+1) begin
+`endif
+    data_wb_cyc_uart [ii]  = 0;
+    data_wb_stb_uart [ii]  = 0;
+    data_wb_cyc_timer[ii] = 0;
+    data_wb_stb_timer[ii] = 0;
+  end
 
-        data_wb_cyc_vic   = 0;
-        data_wb_stb_vic   = 0;
+  data_wb_cyc_vic   = 0;
+  data_wb_stb_vic   = 0;
 
-        data_wb_cyc_ethmac   = 0;
-        data_wb_stb_ethmac   = 0;
+  data_wb_cyc_ram   = 0;
+  data_wb_stb_ram   = 0;
 
-        O_WB_CYC          = 0;
-        O_WB_STB          = 0;
+  data_wb_cyc_ethmac = 0;
+  data_wb_stb_ethmac = 0;
 
-        if ( data_wb_adr >= ETHMAC_LO && data_wb_adr <= ETHMAC_HI )        // ETHMAC access
-        begin
-                data_wb_cyc_ethmac = data_wb_cyc;
-                data_wb_stb_ethmac = data_wb_stb;
-                data_wb_ack        = data_wb_ack_ethmac;
-                data_wb_din        = data_wb_din_ethmac;
-        end
-        else if ( data_wb_adr >= UART0_LO && data_wb_adr <= UART0_HI )        // UART0 access
-        begin
-                data_wb_cyc_uart[0] = data_wb_cyc;
-                data_wb_stb_uart[0] = data_wb_stb;
-                data_wb_ack        = data_wb_ack_uart[0];
-                data_wb_din        = data_wb_din_uart[0];
-        end
-        else if ( data_wb_adr >= TIMER0_LO && data_wb_adr <= TIMER0_HI )  // Timer0 access
-        begin
-                data_wb_cyc_timer[0] = data_wb_cyc;
-                data_wb_stb_timer[0] = data_wb_stb;
-                data_wb_ack          = data_wb_ack_timer[0];
-                data_wb_din          = data_wb_din_timer[0];
-        end
-        else if ( data_wb_adr >= VIC_LO && data_wb_adr <= VIC_HI )        // VIC access.
-        begin
-                data_wb_cyc_vic   = data_wb_cyc;
-                data_wb_stb_vic   = data_wb_stb;
-                data_wb_ack       = data_wb_ack_vic;
-                data_wb_din       = data_wb_din_vic;
-        end
-        else if ( data_wb_adr >= UART1_LO && data_wb_adr <= UART1_HI )    // UART1 access
-        begin
-                data_wb_cyc_uart[1] = data_wb_cyc;
-                data_wb_stb_uart[1] = data_wb_stb;
-                data_wb_ack        = data_wb_ack_uart[1];
-                data_wb_din        = data_wb_din_uart[1];
-        end
-        else if ( data_wb_adr >= TIMER1_LO && data_wb_adr <= TIMER1_HI )  // Timer1 access
-        begin
-                data_wb_cyc_timer[1] = data_wb_cyc;
-                data_wb_stb_timer[1] = data_wb_stb;
-                data_wb_ack          = data_wb_ack_timer[1];
-                data_wb_din          = data_wb_din_timer[1];
-        end
-        else // External WB access.
-        begin
-                O_WB_CYC         = data_wb_cyc;
-                O_WB_STB         = data_wb_stb;
-                data_wb_ack      = I_WB_ACK;
-                data_wb_din      = I_WB_DAT;
-        end
+  data_wb_cyc_ethmac_ram = 0;
+  data_wb_stb_ethmac_ram = 0;
+
+  if(data_wb_adr >= UART0_LO && data_wb_adr <= UART0_HI) begin        // UART0 access
+    data_wb_cyc_uart[0] = data_wb_cyc;
+    data_wb_stb_uart[0] = data_wb_stb;
+    data_wb_ack        = data_wb_ack_uart[0];
+    data_wb_din        = data_wb_din_uart[0];
+  end
+  else if(data_wb_adr >= TIMER0_LO && data_wb_adr <= TIMER0_HI) begin  // Timer0 access
+    data_wb_cyc_timer[0] = data_wb_cyc;
+    data_wb_stb_timer[0] = data_wb_stb;
+    data_wb_ack          = data_wb_ack_timer[0];
+    data_wb_din          = data_wb_din_timer[0];
+  end
+  else if(data_wb_adr >= VIC_LO && data_wb_adr <= VIC_HI) begin       // VIC access.
+    data_wb_cyc_vic   = data_wb_cyc;
+    data_wb_stb_vic   = data_wb_stb;
+    data_wb_ack       = data_wb_ack_vic;
+    data_wb_din       = data_wb_din_vic;
+  end
+`ifdef DUAL_UART
+  else if(data_wb_adr >= UART1_LO && data_wb_adr <= UART1_HI) begin    // UART1 access
+    data_wb_cyc_uart[1] = data_wb_cyc;
+    data_wb_stb_uart[1] = data_wb_stb;
+    data_wb_ack        = data_wb_ack_uart[1];
+    data_wb_din        = data_wb_din_uart[1];
+  end
+  else if(data_wb_adr >= TIMER1_LO && data_wb_adr <= TIMER1_HI) begin  // Timer1 access
+    data_wb_cyc_timer[1] = data_wb_cyc;
+    data_wb_stb_timer[1] = data_wb_stb;
+    data_wb_ack          = data_wb_ack_timer[1];
+    data_wb_din          = data_wb_din_timer[1];
+  end
+`endif
+  else if(data_wb_adr >= ETHMAC_LO && data_wb_adr <= ETHMAC_HI) begin  // EthMAC 0 Slave Address Space ...
+    data_wb_cyc_ethmac = data_wb_cyc;
+    data_wb_stb_ethmac = data_wb_stb;
+    data_wb_ack        = data_wb_ack_ethmac;
+    data_wb_din        = data_wb_din_ethmac;
+  end
+  else if(data_wb_adr >= ETHMAC_BUF_RAM_LO && data_wb_adr <= ETHMAC_BUF_RAM_HI) begin  // EthMAC 0 Master Address Space ...
+    data_wb_cyc_ethmac_ram = data_wb_cyc;
+    data_wb_stb_ethmac_ram = data_wb_stb;
+    data_wb_ack        = data_wb_ack_ethmac_ram;
+    data_wb_din        = data_wb_din_ethmac_ram;
+  end
+  else begin // External RAM access.
+    data_wb_cyc_ram  = data_wb_cyc;
+    data_wb_stb_ram  = data_wb_stb;
+    data_wb_ack      = data_wb_ack_ram;
+    data_wb_din      = data_wb_din_ram;
+  end
 end
 
 // =========================
@@ -219,8 +328,8 @@ u_zap_top
 (
         .i_clk    (i_clk),
         .i_reset  (i_reset),
-        .i_irq    (int_sel == 1'd0 ? global_irq : I_FIQ),
-        .i_fiq    (int_sel == 1'd1 ? global_irq : I_FIQ),
+        .i_irq    (int_sel == 1'd0 ? global_irq : 1'b 0),
+        .i_fiq    (int_sel == 1'd1 ? global_irq : 1'b 0),
         .o_wb_cyc (data_wb_cyc),
         .o_wb_stb (data_wb_stb),
         .o_wb_adr (data_wb_adr),
@@ -232,75 +341,12 @@ u_zap_top
         .i_wb_err (1'd0),
         .o_wb_sel (data_wb_sel),
         .o_wb_bte ()             // Always zero (Linear)
-
-);
-
-// ===============================
-// Eth MAC
-// ===============================
-ethmac ethmac(
-
-  // WISHBONE common
-  .wb_clk_i(i_clk),
-  .wb_rst_i(i_reset),
-  .wb_dat_i(data_wb_dout),
-  .wb_dat_o(data_wb_din_ethmac),
-
-  // WISHBONE slave
-  .wb_adr_i(data_wb_adr),
-  .wb_sel_i(data_wb_sel),
-  .wb_we_i(data_wb_we),
-  .wb_cyc_i(data_wb_cyc_ethmac),
-  .wb_stb_i(data_wb_stb_ethmac),
-  .wb_ack_o(data_wb_ack_ethmac),
-  .wb_err_o(), //TODO
-
-  // WISHBONE master
-  .m_wb_adr_o(),
-  .m_wb_sel_o(),
-  .m_wb_we_o(),
-  .m_wb_dat_o(),
-  .m_wb_dat_i(),
-  .m_wb_cyc_o(),
-  .m_wb_stb_o(),
-  .m_wb_ack_i(),
-  .m_wb_err_i(),
-
-`ifdef ETH_WISHBONE_B3
-  m_wb_cti_o, m_wb_bte_o, 
+`ifndef SYNTHESIS
+        ,
+        .o_trace(),
+        .o_trace_valid(),
+        .o_trace_uop_last()
 `endif
-
-  //TX
-  .mtx_clk_pad_i(mtx_clk_pad_i),
-  .mtxd_pad_o(mtxd_pad_o),
-  .mtxen_pad_o(mtxen_pad_o),
-  .mtxerr_pad_o(mtxerr_pad_o),
-
-  //RX
-  .mrx_clk_pad_i(mrx_clk_pad_i),
-  .mrxd_pad_i(mrxd_pad_i),
-  .mrxdv_pad_i(mrxdv_pad_i),
-  .mrxerr_pad_i(mrxerr_pad_i),
-  .mcoll_pad_i(mcoll_pad_i),
-  .mcrs_pad_i(mcrs_pad_i),
-  
-  // MIIM
-  .mdc_pad_o(mdc_pad_o),
-  .md_pad_i(md_pad_i),
-  .md_pad_o(md_pad_o),
-  .md_padoe_o(md_padoe_o),
-
-  .int_o(ethmac_irq)
-
-  // Bist
-`ifdef ETH_BIST
-  ,
-  // debug chain signals
-  mbist_si_i,       // bist scan serial in
-  mbist_so_o,       // bist scan serial out
-  mbist_ctrl_i        // bist chain shift control
-`endif
-
 );
 
 // ===============================
@@ -309,7 +355,11 @@ ethmac ethmac(
 
 genvar gi;
 generate
+`ifdef DUAL_UART
         for(gi=0;gi<=1;gi=gi+1)
+`else
+        for(gi=0;gi<1;gi=gi+1)
+`endif
         begin: uart_gen
                 uart_top u_uart_top (
 
@@ -370,8 +420,393 @@ vic #(.SOURCES(32)) u_vic (
         .i_wb_sel(data_wb_sel),
         .o_wb_dat(data_wb_din_vic), // To core.
         .o_wb_ack(data_wb_ack_vic),
-        .i_irq({I_IRQ, ethmac_irq, timer_irq[1], uart_irq[1], timer_irq[0], uart_irq[0]}), // Concatenate 32 interrupt sources.
+`ifdef DUAL_UART
+        .i_irq({27'h 0, ethmac_irq, timer_irq[1], uart_irq[1], timer_irq[0], uart_irq[0]}), // Concatenate 32 interrupt sources.
+`else
+        .i_irq({29'h 0, ethmac_irq, timer_irq[0], uart_irq[0]}), // Concatenate 32 interrupt sources.
+`endif
         .o_irq(global_irq)                                                     // Interrupt out
 );
+
+// ===============================
+// EthMAC
+// ===============================
+
+ethmac ethmac(
+  // WISHBONE common
+  .wb_clk_i(i_clk),
+  .wb_rst_i(i_reset),
+
+  // WISHBONE slave
+  .wb_adr_i(data_wb_adr[11:2]),
+  .wb_sel_i(data_wb_sel),
+  .wb_we_i(data_wb_we),
+  .wb_cyc_i(data_wb_cyc_ethmac),
+  .wb_stb_i(data_wb_stb_ethmac),
+  .wb_ack_o(data_wb_ack_ethmac),
+  .wb_err_o(), //Not Used
+  .wb_dat_i(data_wb_dout),
+  .wb_dat_o(data_wb_din_ethmac),
+
+  // WISHBONE master
+  .m_wb_adr_o(ethmac_m_wb_adr_o),
+  .m_wb_sel_o(ethmac_m_wb_sel_o),
+  .m_wb_we_o(ethmac_m_wb_we_o),
+  .m_wb_dat_o(ethmac_m_wb_dat_o),
+  .m_wb_dat_i(ethmac_m_wb_dat_i),
+  .m_wb_cyc_o(ethmac_m_wb_cyc_o),
+  .m_wb_stb_o(ethmac_m_wb_stb_o),
+  .m_wb_ack_i(ethmac_m_wb_ack_i),
+
+  .m_wb_err_i(1'b 0), //Not Used
+
+  .m_wb_cti_o(), //Not Used
+  .m_wb_bte_o(), //Not Used
+
+  //TX
+  .mtx_clk_pad_i(mtx_clk_pad_i),
+  .mtxd_pad_o(mtxd_pad_o),
+  .mtxen_pad_o(mtxen_pad_o),
+  .mtxerr_pad_o(mtxerr_pad_o),
+
+  //RX
+  .mrx_clk_pad_i(mrx_clk_pad_i),
+  .mrxd_pad_i(mrxd_pad_i),
+  .mrxdv_pad_i(mrxdv_pad_i),
+  .mrxerr_pad_i(mrxerr_pad_i),
+
+  //Common Tx and Rx
+  .mcoll_pad_i(mcoll_pad_i),
+  .mcrs_pad_i(mcrs_pad_i),
+  
+  // MIIM
+  .mdc_pad_o(mdc_pad_o),
+  .md_pad_i(md_pad_i),
+  .md_pad_o(md_pad_o),
+  .md_padoe_o(md_padoe_o),
+
+  .int_o(ethmac_irq)
+
+  // Bist
+`ifdef ETH_BIST
+  ,
+  // debug chain signals
+  mbist_si_i,       // bist scan serial in
+  mbist_so_o,       // bist scan serial out
+  mbist_ctrl_i        // bist chain shift control
+`endif
+
+);
+
+// ===============================
+// RAM
+// ===============================
+
+//Processor RAM ...
+localparam RAM_ADDR_WIDTH        = 14;
+localparam RAM_DATA_WIDTH        = 32;
+localparam RAM_MEM_SIZE          = 16384;
+
+ram_wb
+      #
+        (
+          .adr_width(RAM_ADDR_WIDTH),
+          .dat_width(RAM_DATA_WIDTH),
+          .mem_size(RAM_MEM_SIZE),
+          .MEMFILE("ethmac_zap.dump")
+        )
+      ram_wb (
+              .clk_i(i_clk),
+              .rst_i(i_reset),
+              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:0]),
+              .dat_i(data_wb_dout),
+              .we_i(data_wb_we),
+              .sel_i(data_wb_sel),
+              .dat_o(data_wb_din_ram),
+              .cyc_i(data_wb_cyc_ram),
+              .stb_i(data_wb_stb_ram),
+              .ack_o(data_wb_ack_ram),
+              .cti_i(3'b 000)
+            );
+
+//EthMAC TX/RX/BDS RAM ...
+wire [31:0] ethmac_ram_adr;
+wire [31:0] ethmac_ram_dat_i;
+wire [31:0] ethmac_ram_dat_o;
+wire ethmac_ram_we;
+wire [3:0] ethmac_ram_sel;
+wire ethmac_ram_cyc;
+wire ethmac_ram_stb;
+wire ethmac_ram_ack;
+wire ethmac_rd_o;
+
+//Wishbone Arbiter ...
+wb_arb2 #(
+  .ADR_WIDTH(32),
+  .DAT_WIDTH(32),
+  .PARK_ON_M0(1)      // park on CPU
+) u_arb (
+  .clk     (i_clk),
+  .rst     (i_reset),
+
+  // M0: CPU
+  .m0_adr_i(data_wb_adr),
+  .m0_dat_i(data_wb_dout),
+  .m0_dat_o(data_wb_din_ethmac_ram),
+  .m0_we_i (data_wb_we),
+  .m0_sel_i(data_wb_sel),
+  .m0_cyc_i(data_wb_cyc_ethmac_ram),
+  .m0_stb_i(data_wb_stb_ethmac_ram),
+  .m0_cti_i(3'b 000),
+  .m0_ack_o(data_wb_ack_ethmac_ram),
+
+  // M1: EthMAC master
+  .m1_adr_i(ethmac_m_wb_adr_o),
+  .m1_dat_i(ethmac_m_wb_dat_o),
+  .m1_dat_o(ethmac_m_wb_dat_i),
+  .m1_we_i (ethmac_m_wb_we_o),
+  .m1_sel_i(ethmac_m_wb_sel_o),
+  .m1_cyc_i(ethmac_m_wb_cyc_o),
+  .m1_stb_i(ethmac_m_wb_stb_o),
+  .m1_cti_i(3'b 000),
+  .m1_ack_o(ethmac_m_wb_ack_i),
+
+  .ethmac_rd_o(ethmac_rd_o),
+
+  // Slave: 8K RAM
+  .s_adr_o (ethmac_ram_adr),
+  .s_dat_o (ethmac_ram_dat_i),
+  .s_dat_i (ethmac_ram_dat_o),
+  .s_we_o  (ethmac_ram_we),
+  .s_sel_o (ethmac_ram_sel),
+  .s_cyc_o (ethmac_ram_cyc),
+  .s_stb_o (ethmac_ram_stb),
+  .s_cti_o (), //NOT USED
+  .s_ack_i (ethmac_ram_ack)
+);
+
+`ifdef SYNTHESIS
+   reg [23:0] count = 0;
+   assign led_0 = count[23];
+   assign led_1 = count[22];
+   //assign led_2 = count[21];
+   //assign led_3 = count[20];
+   assign led_3 = ~uart_out[0:0];
+   always @(posedge i_clk) count <= count + 1;
+
+   reg [23:0] count_1 = 0;
+   assign led_2 = count_1[23];
+   always @(posedge clk25) count_1 <= count_1 + 1;
+`endif
+
+`ifdef DDR3_CONTROLLER
+//-----------------------------------------------------------------
+// PLL
+//-----------------------------------------------------------------
+wire clk;
+//wire clk_ddr;
+wire clk_ddr_dqs;
+//wire clk_ref;
+//wire clk2ddr3;
+
+artix7_pll u_pll
+(
+    //.clkref_i(osc)
+    .clkref_i(i_clk) //100MHz ...
+
+    // Outputs
+    //,.clkout0_o(clk)         // 100
+    ,.clkout0_o(clk2ddr3)         // 100
+    ,.clkout1_o(clk_ddr)     // 400
+    ,.clkout2_o(clk_ref)     // 200
+    ,.clkout3_o(clk_ddr_dqs) // 400 (phase 90)
+);
+
+//-----------------------------------------------------------------
+// Registers / Wires
+//-----------------------------------------------------------------
+wire  [ 14:0] dfi_address;
+wire  [  2:0] dfi_bank;
+wire          dfi_cas_n;
+wire          dfi_cke;
+wire          dfi_cs_n;
+wire          dfi_odt;
+wire          dfi_ras_n;
+wire          dfi_reset_n;
+wire          dfi_we_n;
+wire  [ 31:0] dfi_wrdata;
+//wire          dfi_wrdata_en;
+wire  [  3:0] dfi_wrdata_mask;
+wire          dfi_rddata_en;
+wire [ 31:0]  dfi_rddata;
+//wire          dfi_rddata_valid;
+wire [   1:0] dfi_rddata_dnv;
+
+wire  [  3:0] ddr3_command;
+wire  [  3:0] ddr3_state_q;
+
+//-----------------------------------------------------------------
+// DDR PHY
+//-----------------------------------------------------------------
+ddr3_dfi_phy
+#(
+     .DQS_TAP_DELAY_INIT(27)
+    ,.DQ_TAP_DELAY_INIT(0)
+    ,.TPHY_RDLAT(5)
+)
+u_phy
+(
+     .clk_i(clk2ddr3)
+    ,.clk_ddr_i(clk_ddr)
+    ,.clk_ddr90_i(clk_ddr_dqs)
+    ,.clk_ref_i(clk_ref)
+    ,.rst_i(i_reset)
+
+    ,.cfg_valid_i(1'b 0)
+    ,.cfg_i(32'h 0)
+
+    ,.dfi_address_i(dfi_address)
+    ,.dfi_bank_i(dfi_bank)
+    ,.dfi_cas_n_i(dfi_cas_n)
+    ,.dfi_cke_i(dfi_cke)
+    ,.dfi_cs_n_i(dfi_cs_n)
+    ,.dfi_odt_i(dfi_odt)
+    ,.dfi_ras_n_i(dfi_ras_n)
+    ,.dfi_reset_n_i(dfi_reset_n)
+    ,.dfi_we_n_i(dfi_we_n)
+
+    ,.dfi_wrdata_i(dfi_wrdata)
+    ,.dfi_wrdata_en_i(dfi_wrdata_en)
+    ,.dfi_wrdata_mask_i(dfi_wrdata_mask)
+
+    ,.dfi_rddata_en_i(dfi_rddata_en)
+    ,.dfi_rddata_o(dfi_rddata)
+    ,.dfi_rddata_valid_o(dfi_rddata_valid)
+    ,.dfi_rddata_dnv_o(dfi_rddata_dnv)
+
+    ,.ddr3_ck_p_o(ddr3_ck_p)
+    ,.ddr3_ck_n_o(ddr3_ck_n)
+    ,.ddr3_cke_o(ddr3_cke)
+    ,.ddr3_reset_n_o(ddr3_reset_n)
+    ,.ddr3_ras_n_o(ddr3_ras_n)
+    ,.ddr3_cas_n_o(ddr3_cas_n)
+    ,.ddr3_we_n_o(ddr3_we_n)
+    ,.ddr3_cs_n_o(ddr3_cs_n)
+    ,.ddr3_ba_o(ddr3_ba)
+    ,.ddr3_addr_o(ddr3_addr)
+    ,.ddr3_odt_o(ddr3_odt)
+    ,.ddr3_dm_o(ddr3_dm)
+    ,.ddr3_dqs_p_io(ddr3_dqs_p)
+    ,.ddr3_dqs_n_io(ddr3_dqs_n)
+    ,.ddr3_dq_io(ddr3_dq)
+);
+
+//-----------------------------------------------------------------
+// DDR Core
+//-----------------------------------------------------------------
+wire  [ 15:0]  ddr3_ram_wr;
+wire           ddr3_ram_rd;
+wire  [ 31:0]  ddr3_ram_addr;
+wire  [127:0]  ddr3_ram_write_data;
+wire  [ 15:0]  ddr3_ram_req_id;
+wire           ddr3_ram_accept;
+wire           ddr3_ram_ack;
+wire           ddr3_ram_error;
+wire [ 15:0]   ddr3_ram_resp_id;
+wire [127:0]   ddr3_ram_read_data;
+
+wire [2:0]     wb_ddr3_br_state;
+
+ddr3_core
+#(
+     .DDR_WRITE_LATENCY(4)
+    ,.DDR_READ_LATENCY(4)
+    ,.DDR_MHZ(100)
+)
+u_ddr_core
+(
+     .clk_i(clk2ddr3)
+    ,.rst_i(i_reset)
+
+    // Configuration (unused)
+    ,.cfg_enable_i(1'b1)
+    ,.cfg_stb_i(1'b0)
+    ,.cfg_data_i(32'b0)
+    ,.cfg_stall_o()
+
+    ,.init_done_o(ddr3_init_done)
+    ,.command_o(ddr3_command)
+    ,.state_q_o(ddr3_state_q)
+
+    ,.inport_wr_i(ddr3_ram_wr)
+    ,.inport_rd_i(ddr3_ram_rd)
+    ,.inport_addr_i(ddr3_ram_addr)
+    ,.inport_write_data_i(ddr3_ram_write_data)
+    ,.inport_req_id_i(ddr3_ram_req_id)
+    ,.inport_accept_o(ddr3_ram_accept)
+    ,.inport_ack_o(ddr3_ram_ack)
+    ,.inport_error_o(ddr3_ram_error)
+    ,.inport_resp_id_o(ddr3_ram_resp_id)
+    ,.inport_read_data_o(ddr3_ram_read_data)
+
+    ,.dfi_address_o(dfi_address)
+    ,.dfi_bank_o(dfi_bank)
+    ,.dfi_cas_n_o(dfi_cas_n)
+    ,.dfi_cke_o(dfi_cke)
+    ,.dfi_cs_n_o(dfi_cs_n)
+    ,.dfi_odt_o(dfi_odt)
+    ,.dfi_ras_n_o(dfi_ras_n)
+    ,.dfi_reset_n_o(dfi_reset_n)
+    ,.dfi_we_n_o(dfi_we_n)
+    ,.dfi_wrdata_o(dfi_wrdata)
+    ,.dfi_wrdata_en_o(dfi_wrdata_en)
+    ,.dfi_wrdata_mask_o(dfi_wrdata_mask)
+    ,.dfi_rddata_en_o(dfi_rddata_en)
+    ,.dfi_rddata_i(dfi_rddata)
+    ,.dfi_rddata_valid_i(dfi_rddata_valid)
+    ,.dfi_rddata_dnv_i(dfi_rddata_dnv)
+);
+
+wb_ddr3_bridge #(
+    .ADR_WIDTH(32),          // Wishbone address width
+    .DAT_WIDTH(32),          // Must be 32 for this bridge
+    .WB_ADDR_IS_WORD(0),     // 0: adr_i is byte address (common WB)
+                           // 1: adr_i is word address (adr<<2)
+    .ID_INIT(16'h0000)       // starting request id
+)
+u_wb_ddr3_bridge(
+    .clk_i(i_clk),
+    .rst_i(i_reset),      // synchronous active-high
+
+    // ---------------- Wishbone Slave ----------------
+    .dat_i(ethmac_ram_dat_i),
+    .dat_o(ethmac_ram_dat_o), //HERE 1111
+    .adr_i(ethmac_ram_adr),
+    .we_i(ethmac_ram_we),
+    .sel_i(ethmac_ram_sel),
+    .cyc_i(ethmac_ram_cyc),
+    .stb_i(ethmac_ram_stb),
+    .cti_i(3'd 0), //NOT USED
+    .ack_o(ethmac_ram_ack), //HERE 1111
+
+    .ethmac_rd_i(ethmac_rd_o),
+
+    // ---------------- DDR3 core "inport" interface ----------------
+    .inport_wr_o(ddr3_ram_wr),        // byte strobes (16 bytes)
+    .inport_rd_o(ddr3_ram_rd),
+    .inport_addr_o(ddr3_ram_addr),      // byte address
+    .inport_write_data_o(ddr3_ram_write_data),
+    .inport_req_id_o(ddr3_ram_req_id),
+    .inport_accept_i(ddr3_ram_accept),    // 1-cycle pulse when accepted
+    .inport_ack_i(ddr3_ram_ack),       // 1-cycle pulse when completed
+    .inport_error_i(ddr3_ram_error),
+    .inport_resp_id_i(ddr3_ram_resp_id),
+    .inport_read_data_i(ddr3_ram_read_data),
+
+    .init_done_i(ddr3_init_done),         // optional: tie to 1 if not used
+
+    .state(wb_ddr3_br_state)
+);
+`endif //`ifdef DDR3_CONTROLLER
 
 endmodule // zap_soc

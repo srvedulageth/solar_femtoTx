@@ -1,0 +1,14 @@
+After installing Vivado and Veriletor
+
+run the following command
+
+\rm -rf obj_dir zap.vcd*; verilator --trace-fst --binary --timing --exe --build -Wno-CMPCONST -Wno-WIDTHEXPAND -j $(nproc) -f file_list --top-module zap_test
+./obj_dir/Vzap_test //To run
+vcd2fst zap.vcd zap.fst //To reduce vcd file size
+gtkwave zap.fst/vcd
+
+This will run uart test at 192 baud, 1 stop bit, no parity and no flow control.
+
+DDR3
+----
+1. sys_clk_i 6ns clock and clk_ref_i is 5ns clock.

@@ -84,7 +84,9 @@
 //
 
 
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 
 
 module eth_txstatem  (MTxClk, Reset, ExcessiveDefer, CarrierSense, NibCnt, IPGT, IPGR1, 

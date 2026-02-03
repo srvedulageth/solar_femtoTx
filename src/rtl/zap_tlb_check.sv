@@ -18,6 +18,9 @@
 //
 // Examines TLB entries to authorize access.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 `include "zap_defines.svh"
 

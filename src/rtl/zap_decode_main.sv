@@ -19,6 +19,9 @@
 // This module decodes 32-bit mode32 instructions into an internal wide
 // instruction format that is understood by downstream logic.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_decode_main #(
         // Number of architectural registers.

@@ -22,6 +22,9 @@
 // processor core and the memory management units. I and D WB busses
 // are provided.
 //
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module zap_top #(
 
