@@ -397,6 +397,7 @@ assign TX_BD_NUM_Wr[0]   = Write[0]  & TX_BD_NUM_Sel & (DataIn<='h80);
 
 wire [31:0] MODEROut;
 wire [31:0] INT_SOURCEOut;
+wire [6:0] INT_SOURCEOut_1;
 wire [31:0] INT_MASKOut;
 wire [31:0] IPGTOut;
 wire [31:0] IPGR1Out;
@@ -1196,6 +1197,7 @@ assign int_o = irq_txb  & INT_MASKOut[0] |
 
 // For reading interrupt status
 assign INT_SOURCEOut = {{(32-`ETH_INT_SOURCE_WIDTH_0){1'b0}}, irq_rxc, irq_txc, irq_busy, irq_rxe, irq_rxb, irq_txe, irq_txb};
+assign INT_SOURCEOut_1 = {irq_rxc, irq_txc, irq_busy, irq_rxe, irq_rxb, irq_txe, irq_txb};
 
 
 

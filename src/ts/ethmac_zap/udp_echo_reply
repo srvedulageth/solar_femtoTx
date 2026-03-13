@@ -1,0 +1,143 @@
+#define IPPROTO_UDP   17
+#define ETH_P_IP      0x0800
+#define UDP_ECHO_PORT  12345   // choose a port you will test from PC
+
+struct __attribute__((packed)) udp_hdr_t {
+    uint16_t sport;   // be
+    uint16_t dport;   // be
+    uint16_t len;     // be (header+payload)
+    uint16_t csum;    // be (optional in IPv4, may be 0)
+};
+
+
+
+
+
+
+
+
+static void send_udp_echo_reply(const uint8_t dst_mac[6],
+                                uint32_t saddr_be,     // sender IP in BE
+                                uint16_t sport_be,     // sender port in BE
+                                uint16_t dport_be,     // our port in BE
+                                const uint8_t *udp_payload,
+                                unsigned payload_len)
+{
+    // Keep your 256 limit, or increase if you want bigger UDP
+    uint8_t pkt[256];
+
+    struct eth_hdr_t *eth = (struct eth_hdr_t*)pkt;
+    struct ip_hdr_r_t *ip = (struct ip_hdr_r_t*)(pkt + sizeof(*eth));
+    struct udp_hdr_t *udp = (struct udp_hdr_t*)((uint8_t*)ip + sizeof(*ip));
+    uint8_t *pl          = (uint8_t*)udp + sizeof(*udp);
+
+    if (sizeof(*eth) + sizeof(*ip) + sizeof(*udp) + payload_len > sizeof(pkt))
+        return; // drop if too big for our tx buffer
+
+    // Ethernet
+    for (volatile unsigned k = 0; k < 6; ++k) { pkt[k]   = dst_mac[k]; }
+    for (volatile unsigned k = 0; k < 6; ++k) { pkt[k+6] = MY_MAC[k]; }
+    eth->type = htons(ETH_P_IP);
+
+    // IPv4
+    ip->ver_ihl = 0x45;
+    ip->tos     = 0;
+    ip->tot_len = htons(sizeof(*ip) + sizeof(*udp) + payload_len);
+    ip->id      = 0;
+    ip->frag_off= 0;
+    ip->ttl     = 64;
+    ip->proto   = IPPROTO_UDP;
+    ip->hdr_csum= 0;
+    ip->saddr   = htonl(MY_IP);
+    ip->daddr   = saddr_be;
+
+    // UDP (swap ports)
+    udp->sport = dport_be; // source = our port
+    udp->dport = sport_be; // dest   = sender port
+    udp->len   = htons(sizeof(*udp) + payload_len);
+    udp->csum  = 0;         // IPv4: checksum optional, 0 means disabled
+
+    // Payload
+    for (unsigned i = 0; i < payload_len; i++)
+        pl[i] = udp_payload[i];
+
+    // IP checksum
+    ip->hdr_csum = bswap16(csum16(ip, sizeof(*ip)));
+
+    eth_send(pkt, sizeof(*eth) + sizeof(*ip) + sizeof(*udp) + payload_len);
+}
+
+
+// Only IPv4 packets addressed to us (already checked ver_ihl/daddr above)
+unsigned ihl = 20;
+
+// ---------- ICMP ----------
+if (ip_info.proto == IPPROTO_ICMP) {
+    unsigned icmp_len = ip_info.tot_len - ihl;
+
+    if (len < sizeof(struct eth_hdr_t) + ihl + sizeof(struct icmp_hdr_t))
+        goto next_packet;
+
+    const uint8_t *ip_start = pkt + sizeof(struct eth_hdr_t);
+    const uint8_t *icmp_ptr = ip_start + ihl;
+    const struct icmp_hdr_t *icmp = (const struct icmp_hdr_t*)icmp_ptr;
+
+    if (ip_info.icmp_type != ICMP_ECHO_REQUEST)
+        goto next_packet;
+
+    uint8_t dst_mac[6];
+    load_eth_dst(pkt1, dst_mac);
+
+    send_icmp_echo_reply(dst_mac, ip_info.saddr, (const uint8_t*)icmp, icmp_len);
+    goto next_packet;
+}
+
+// ---------- UDP ----------
+if (ip_info.proto == IPPROTO_UDP) {
+    // Need at least UDP header
+    if (ip_info.tot_len < ihl + sizeof(struct udp_hdr_t))
+        goto next_packet;
+    if (len < sizeof(struct eth_hdr_t) + ihl + sizeof(struct udp_hdr_t))
+        goto next_packet;
+
+    const uint8_t *ip_start  = pkt + sizeof(struct eth_hdr_t);
+    const uint8_t *udp_ptr   = ip_start + ihl;
+    const struct udp_hdr_t *udp = (const struct udp_hdr_t*)udp_ptr;
+
+    uint16_t udp_len = ntohs(udp->len);
+    if (udp_len < sizeof(struct udp_hdr_t))
+        goto next_packet;
+
+    unsigned udp_payload_len = udp_len - sizeof(struct udp_hdr_t);
+
+    // Make sure the full UDP is inside the Ethernet frame we received
+    if (ip_info.tot_len < ihl + udp_len)
+        goto next_packet;
+    if (len < sizeof(struct eth_hdr_t) + ihl + udp_len)
+        goto next_packet;
+
+    // Optional: only respond to a specific UDP port to avoid broadcast noise
+    uint16_t dport = ntohs(udp->dport);
+    if (dport != UDP_ECHO_PORT)
+        goto next_packet;
+
+    const uint8_t *udp_payload = udp_ptr + sizeof(struct udp_hdr_t);
+
+    uint8_t dst_mac[6];
+    load_eth_dst(pkt1, dst_mac);
+
+    // Echo payload back
+    send_udp_echo_reply(dst_mac,
+                        ip_info.saddr,     // sender IP (BE)
+                        udp->sport,        // sender port (BE)
+                        udp->dport,        // our port   (BE)
+                        udp_payload,
+                        udp_payload_len);
+
+    goto next_packet;
+}
+
+// ---------- other IP protocols ----------
+goto next_packet;
+
+

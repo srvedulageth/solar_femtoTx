@@ -22,8 +22,8 @@
 #define TX_BD_COUNT   64u
 #define TX_BUF_SIZE   2048u     // ARP(42B) OK, ICMP(74B) OK
 
-static volatile unsigned tx_head = TX_BD_FIRST;
-static volatile unsigned rx_tail = RX_BD_FIRST;   // next BD to consume
+//static volatile unsigned tx_head = TX_BD_FIRST;
+//static volatile unsigned rx_tail = RX_BD_FIRST;   // next BD to consume
 
 // System RAM (packet buffers) accessible by EthMAC Wishbone master
 #define ETHMAC_BUF_RAM_BASE   0x10000000UL
@@ -175,8 +175,16 @@ typedef struct {
 int  eth_init(const uint8_t mac[6]);
 int  eth_tx_enqueue(const void* buf, unsigned len);
 void eth_rx_ring_init(void);
+void eth_tx_ring_init(void);
 void eth_set_bd_addr0(unsigned index, uint16_t length, uint16_t flags);
 
 // Optional helpers if you want to expose MDIO
 int  eth_mdio_write(uint8_t phy, uint8_t reg, uint16_t val);
 int  eth_mdio_read(uint8_t phy, uint8_t reg);
+
+
+static inline uint32_t get_sp(void) {
+   uint32_t        sp;
+   __asm__ volatile ("mov %0, sp" : "=r"(sp));
+   return sp;
+}

@@ -382,8 +382,10 @@ byte ip_icmp_payload [0:59] = {
     8'h62, 8'h63, 8'h64, 8'h65, 8'h66, 8'h67, 8'h68, 8'h69
 };
 byte ip_udp_payload_1 [0:55] = {
-    8'h45, 8'h00, 8'h00, 8'h38, 8'h18, 8'h8b, 8'h00, 8'h00,
-    8'h80, 8'h11, 8'h60, 8'h78, 8'hc0, 8'ha8, 8'h01, 8'h0A,
+    8'h45, 8'h00, 8'h00, 8'h38, 8'h0a, 8'h3e, 8'h00, 8'h00,
+    8'h80, 8'h11,
+    8'hac, 8'h1d, 8'hc0, 8'ha8,
+    8'h01, 8'h0A,
     8'hff, 8'hff, 8'hff, 8'hff, 8'hc0, 8'h69, 8'h56, 8'hce,
     8'h00, 8'h24, 8'h61, 8'h76, 8'h53, 8'h54, 8'h52, 8'h5f,
     8'h42, 8'h43, 8'h41, 8'h53, 8'h54, 8'h00, 8'h00, 8'h00,
@@ -458,6 +460,7 @@ task set_rx_packet_1;
   input  [47:0] eth_source_addr;
   input  [15:0] eth_type_len;
   input  [7:0]  eth_start_data;
+
   integer       i, sd;
   reg    [47:0] dest_addr;
   reg    [47:0] source_addr;
@@ -740,10 +743,12 @@ begin
 end
 endtask // paralel_crc_phy_rx
 
+integer no_of_txns;
 initial begin
+  no_of_txns = 0;
   #100000ns;
 
-  repeat(1) begin
+  repeat(15) begin
     //Start Rx ...
     $display("Rx Begin");
 
@@ -756,11 +761,39 @@ initial begin
     repeat(20000) @(posedge i_clk);
 
     //For ICMP, uncomment below 3 and comment above ARP ...
-    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'hA4_BB_6D_52_E4_53, 16'h0800, 'h 0F);
+    //set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'hA4_BB_6D_52_E4_53, 16'h0800, 'h 0F);
+    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'h64_00_6A_8B_CB_A6, 16'h0800, 'h 0F);
     append_rx_crc (0, 'd 74, 1'b0, 1'b0); //ICMP packet length 74 bytes... without CRC
     #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 78, 1'b0); //Length = 74(ICMP Packet Length) + 4 bytes CRC ...
 
     repeat(20000) @(posedge i_clk);
+    no_of_txns = no_of_txns + 1;
+
+    if(no_of_txns%5 == 0) begin //assert reset after every 25 txns
+      i_reset = 'b 1; repeat(500) @(posedge i_clk); #1; i_reset = 'b 0;
+      #100000ns;
+    end
+
+    $display("Rx Done");
+  end
+  #5000ns;
+  $finish;
+end
+
+/*
+initial begin
+  #100000ns;
+
+  repeat(70) begin
+    //Start Rx ...
+    $display("Rx Begin");
+
+    //For ARP, uncomment below 3 and comment ICMP below...
+    set_rx_packet_udp(0, 'h 5FC, 1'b0, 48'hhff_ff_ff_ff_ff_ff, 48'hh64_00_6A_8B_CB_A6, 16'h0800, 'h 0F, 56);
+    append_rx_crc (0, 'd 70, 1'b0, 1'b0); //UDP packet length 70(56 + 14) bytes... without CRC
+    #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 74, 1'b0); //Length = 42(ARP Packet Length) + 18 bytes padding + 4 bytes CRC ...
+
+    repeat(2000) @(posedge i_clk);
 
     $display("Rx Done");
   end
@@ -771,6 +804,7 @@ end
 always @(posedge UART_SR_DAV_0) begin
   $display("Transmitted UART Data = %h", UART_SR_0);
 end
+*/
 
 `ifdef DDR3_CONTROLLER
     ddr3 u_ram (

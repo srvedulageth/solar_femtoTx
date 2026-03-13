@@ -6,6 +6,8 @@
 #include "eth_structs.h"
 #include "ethmac_shared.h"
 
+#define RX_DRAIN_BUDGET  16   // start with 16, try 32 later
+
 // ---------------- CONFIG ----------------
 static const uint8_t MY_MAC[6] = {0x02,0x12,0x34,0x56,0x78,0x9A};
 #define PC_IP   0xC0A8010Au   // 192.168.1.10 (your Windows box)
@@ -393,7 +395,7 @@ void net_init(void){
 void net_poll_drain(void) {
     unsigned done = 0;
 
-    while (done < 1) {
+    while (done < RX_DRAIN_BUDGET) {
         volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + rx_tail*8u);
         uint32_t st = bd[0];
 
@@ -418,7 +420,7 @@ void net_poll_drain(void) {
         done++;
 
         // Ensure CPU sees fresh data
-        dcache_inval_range((void*)ptr, len);
+        //dcache_inval_range((void*)ptr, len);
 
         // --- process directly from BRAM (zero-copy) ---
         if (len >= sizeof(struct eth_hdr_t)) {
@@ -427,6 +429,14 @@ void net_poll_drain(void) {
             const struct eth_hdr_t *eth = (const struct eth_hdr_t*)pkt;
 
             uint16_t etype = load_ethertype(pkt1);   // 0x0806 ARP, 0x0800 IPv4, etc.
+
+            if (etype != ETH_P_ARP && etype != ETH_P_IP) {
+                // Not supported -> drop, don't inval big range
+                goto next_packet;
+            }
+
+            // Ensure CPU sees fresh data
+            dcache_inval_range((void*)ptr, len);
 
 #ifdef DEBUG_1
             uart_puts("net_mini etype=0x"); uart_puthex16(etype); uart_puts("\r\n");

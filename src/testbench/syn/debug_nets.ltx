@@ -51,7 +51,7 @@
                                 "portIndex": 1,
                                 "nets": [
                                     {
-                                        "name": "ethmac_ram_cyc_dbg",
+                                        "name": "ddr3_init_done_dbg",
                                         "isBus": false
                                     }
                                 ]
@@ -67,7 +67,7 @@
                                 "portIndex": 2,
                                 "nets": [
                                     {
-                                        "name": "ethmac_ram_ack_dbg",
+                                        "name": "ethmac_irq_dbg",
                                         "isBus": false
                                     }
                                 ]
@@ -77,14 +77,37 @@
                                 "id": 3,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
-                                "isVector": false,
+                                "isVector": true,
                                 "leftIndex": 0,
-                                "rightIndex": 0,
+                                "rightIndex": 6,
                                 "portIndex": 3,
                                 "nets": [
                                     {
-                                        "name": "dfi_wrdata_en_dbg",
-                                        "isBus": false
+                                        "name": "ethmac_int_dbg",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ethmac_int_dbg[6]"
+                                            },
+                                            {
+                                                "name": "ethmac_int_dbg[5]"
+                                            },
+                                            {
+                                                "name": "ethmac_int_dbg[4]"
+                                            },
+                                            {
+                                                "name": "ethmac_int_dbg[3]"
+                                            },
+                                            {
+                                                "name": "ethmac_int_dbg[2]"
+                                            },
+                                            {
+                                                "name": "ethmac_int_dbg[1]"
+                                            },
+                                            {
+                                                "name": "ethmac_int_dbg[0]"
+                                            }
+                                        ]
                                     }
                                 ]
                             },
@@ -95,216 +118,24 @@
                                 "direction": "IN",
                                 "isVector": true,
                                 "leftIndex": 0,
-                                "rightIndex": 0,
+                                "rightIndex": 3,
                                 "portIndex": 4,
                                 "nets": [
                                     {
-                                        "name": "dfi_wrdata_dbg_1",
+                                        "name": "mrxd_pad_dbg",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "dfi_wrdata_dbg_1[0]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe4",
-                                "id": 5,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 1,
-                                "rightIndex": 10,
-                                "portIndex": 4,
-                                "nets": [
-                                    {
-                                        "name": "dfi_wrdata_dbg_2",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_wrdata_dbg_2[19]"
+                                                "name": "mrxd_pad_dbg[3]"
                                             },
                                             {
-                                                "name": "dfi_wrdata_dbg_2[18]"
+                                                "name": "mrxd_pad_dbg[2]"
                                             },
                                             {
-                                                "name": "dfi_wrdata_dbg_2[17]"
+                                                "name": "mrxd_pad_dbg[1]"
                                             },
                                             {
-                                                "name": "dfi_wrdata_dbg_2[16]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_2[15]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_2[14]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_2[13]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_2[12]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_2[11]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_2[10]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe4",
-                                "id": 6,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 11,
-                                "rightIndex": 11,
-                                "portIndex": 4,
-                                "nets": [
-                                    {
-                                        "name": "dfi_wrdata_dbg_3",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_wrdata_dbg_3[1]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe4",
-                                "id": 7,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 12,
-                                "rightIndex": 21,
-                                "portIndex": 4,
-                                "nets": [
-                                    {
-                                        "name": "dfi_wrdata_dbg_4",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[29]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[28]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[27]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[26]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[25]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[24]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[23]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[22]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[21]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_4[20]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe4",
-                                "id": 8,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 22,
-                                "rightIndex": 22,
-                                "portIndex": 4,
-                                "nets": [
-                                    {
-                                        "name": "dfi_wrdata_dbg_5",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_wrdata_dbg_5[2]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe4",
-                                "id": 9,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 23,
-                                "rightIndex": 24,
-                                "portIndex": 4,
-                                "nets": [
-                                    {
-                                        "name": "dfi_wrdata_dbg_6",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_wrdata_dbg_6[31]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg_6[30]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe4",
-                                "id": 10,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 25,
-                                "rightIndex": 31,
-                                "portIndex": 4,
-                                "nets": [
-                                    {
-                                        "name": "dfi_wrdata_dbg",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_wrdata_dbg[9]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg[8]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg[7]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg[6]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg[5]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg[4]"
-                                            },
-                                            {
-                                                "name": "dfi_wrdata_dbg[3]"
+                                                "name": "mrxd_pad_dbg[0]"
                                             }
                                         ]
                                     }
@@ -312,7 +143,7 @@
                             },
                             {
                                 "name": "probe5",
-                                "id": 11,
+                                "id": 5,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": false,
@@ -321,330 +152,52 @@
                                 "portIndex": 5,
                                 "nets": [
                                     {
-                                        "name": "dfi_rddata_valid_dbg",
+                                        "name": "mrxdv_pad_dbg",
                                         "isBus": false
                                     }
                                 ]
                             },
                             {
                                 "name": "probe6",
-                                "id": 12,
+                                "id": 6,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
-                                "isVector": true,
+                                "isVector": false,
                                 "leftIndex": 0,
                                 "rightIndex": 0,
                                 "portIndex": 6,
                                 "nets": [
                                     {
-                                        "name": "dfi_rddata_dbg_1",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_rddata_dbg_1[0]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe6",
-                                "id": 13,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 1,
-                                "rightIndex": 10,
-                                "portIndex": 6,
-                                "nets": [
-                                    {
-                                        "name": "dfi_rddata_dbg_2",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_rddata_dbg_2[19]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[18]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[17]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[16]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[15]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[14]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[13]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[12]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[11]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_2[10]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe6",
-                                "id": 14,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 11,
-                                "rightIndex": 11,
-                                "portIndex": 6,
-                                "nets": [
-                                    {
-                                        "name": "dfi_rddata_dbg_3",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_rddata_dbg_3[1]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe6",
-                                "id": 15,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 12,
-                                "rightIndex": 21,
-                                "portIndex": 6,
-                                "nets": [
-                                    {
-                                        "name": "dfi_rddata_dbg_4",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_rddata_dbg_4[29]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[28]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[27]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[26]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[25]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[24]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[23]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[22]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[21]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_4[20]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe6",
-                                "id": 16,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 22,
-                                "rightIndex": 22,
-                                "portIndex": 6,
-                                "nets": [
-                                    {
-                                        "name": "dfi_rddata_dbg_5",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_rddata_dbg_5[2]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe6",
-                                "id": 17,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 23,
-                                "rightIndex": 24,
-                                "portIndex": 6,
-                                "nets": [
-                                    {
-                                        "name": "dfi_rddata_dbg_6",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_rddata_dbg_6[31]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg_6[30]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe6",
-                                "id": 18,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 25,
-                                "rightIndex": 31,
-                                "portIndex": 6,
-                                "nets": [
-                                    {
-                                        "name": "dfi_rddata_dbg",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "dfi_rddata_dbg[9]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg[8]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg[7]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg[6]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg[5]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg[4]"
-                                            },
-                                            {
-                                                "name": "dfi_rddata_dbg[3]"
-                                            }
-                                        ]
+                                        "name": "mtx_clk_pad_dbg",
+                                        "isBus": false
                                     }
                                 ]
                             },
                             {
                                 "name": "probe7",
-                                "id": 19,
+                                "id": 7,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
                                 "leftIndex": 0,
-                                "rightIndex": 0,
+                                "rightIndex": 3,
                                 "portIndex": 7,
                                 "nets": [
                                     {
-                                        "name": "ddr3_ram_wr_dbg_1",
+                                        "name": "mtxd_pad_dbg",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_ram_wr_dbg_1[0]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe7",
-                                "id": 20,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 1,
-                                "rightIndex": 6,
-                                "portIndex": 7,
-                                "nets": [
-                                    {
-                                        "name": "ddr3_ram_wr_dbg_2",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "ddr3_ram_wr_dbg_2[15]"
+                                                "name": "mtxd_pad_dbg[3]"
                                             },
                                             {
-                                                "name": "ddr3_ram_wr_dbg_2[14]"
+                                                "name": "mtxd_pad_dbg[2]"
                                             },
                                             {
-                                                "name": "ddr3_ram_wr_dbg_2[13]"
+                                                "name": "mtxd_pad_dbg[1]"
                                             },
                                             {
-                                                "name": "ddr3_ram_wr_dbg_2[12]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg_2[11]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg_2[10]"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "probe7",
-                                "id": 21,
-                                "type": "DATA_TRIGGER",
-                                "direction": "IN",
-                                "isVector": true,
-                                "leftIndex": 7,
-                                "rightIndex": 15,
-                                "portIndex": 7,
-                                "nets": [
-                                    {
-                                        "name": "ddr3_ram_wr_dbg",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[9]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[8]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[7]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[6]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[5]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[4]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[3]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[2]"
-                                            },
-                                            {
-                                                "name": "ddr3_ram_wr_dbg[1]"
+                                                "name": "mtxd_pad_dbg[0]"
                                             }
                                         ]
                                     }
@@ -652,7 +205,7 @@
                             },
                             {
                                 "name": "probe8",
-                                "id": 22,
+                                "id": 8,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": false,
@@ -661,473 +214,874 @@
                                 "portIndex": 8,
                                 "nets": [
                                     {
-                                        "name": "ddr3_ram_accept_dbg",
+                                        "name": "mtxen_pad_dbg",
                                         "isBus": false
                                     }
                                 ]
                             },
                             {
                                 "name": "probe9",
-                                "id": 23,
+                                "id": 9,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
-                                "isVector": true,
+                                "isVector": false,
                                 "leftIndex": 0,
-                                "rightIndex": 2,
+                                "rightIndex": 0,
                                 "portIndex": 9,
                                 "nets": [
                                     {
-                                        "name": "wb_ddr3_br_state_dbg",
-                                        "isBus": true,
-                                        "subnets": [
-                                            {
-                                                "name": "wb_ddr3_br_state_dbg[2]"
-                                            },
-                                            {
-                                                "name": "wb_ddr3_br_state_dbg[1]"
-                                            },
-                                            {
-                                                "name": "wb_ddr3_br_state_dbg[0]"
-                                            }
-                                        ]
+                                        "name": "dfi_wrdata_en_dbg",
+                                        "isBus": false
                                     }
                                 ]
                             },
                             {
                                 "name": "probe10",
-                                "id": 24,
+                                "id": 10,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 10,
+                                "nets": [
+                                    {
+                                        "name": "dfi_rddata_valid_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe11",
+                                "id": 11,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 11,
+                                "nets": [
+                                    {
+                                        "name": "data_wb_cyc_ethmac_ram_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 12,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "data_wb_ack_ethmac_ram_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe13",
+                                "id": 13,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 13,
+                                "nets": [
+                                    {
+                                        "name": "ram_ce_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe14",
+                                "id": 14,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
                                 "leftIndex": 0,
                                 "rightIndex": 3,
-                                "portIndex": 10,
+                                "portIndex": 14,
                                 "nets": [
                                     {
-                                        "name": "ddr3_state_q_dbg",
+                                        "name": "ram_we_dbg",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_state_q_dbg[3]"
+                                                "name": "ram_we_dbg[3]"
                                             },
                                             {
-                                                "name": "ddr3_state_q_dbg[2]"
+                                                "name": "ram_we_dbg[2]"
                                             },
                                             {
-                                                "name": "ddr3_state_q_dbg[1]"
+                                                "name": "ram_we_dbg[1]"
                                             },
                                             {
-                                                "name": "ddr3_state_q_dbg[0]"
+                                                "name": "ram_we_dbg[0]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe11",
+                                "name": "probe15",
+                                "id": 15,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 7,
+                                "portIndex": 15,
+                                "nets": [
+                                    {
+                                        "name": "ram_addr_dbg",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_addr_dbg[7]"
+                                            },
+                                            {
+                                                "name": "ram_addr_dbg[6]"
+                                            },
+                                            {
+                                                "name": "ram_addr_dbg[5]"
+                                            },
+                                            {
+                                                "name": "ram_addr_dbg[4]"
+                                            },
+                                            {
+                                                "name": "ram_addr_dbg[3]"
+                                            },
+                                            {
+                                                "name": "ram_addr_dbg[2]"
+                                            },
+                                            {
+                                                "name": "ram_addr_dbg[1]"
+                                            },
+                                            {
+                                                "name": "ram_addr_dbg[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe16",
+                                "id": 16,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 16,
+                                "nets": [
+                                    {
+                                        "name": "ram_datao_dbg_1",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datao_dbg_1[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe16",
+                                "id": 17,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 1,
+                                "rightIndex": 10,
+                                "portIndex": 16,
+                                "nets": [
+                                    {
+                                        "name": "ram_datao_dbg_2",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datao_dbg_2[19]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[18]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[17]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[16]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[15]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[14]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[13]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[12]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[11]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_2[10]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe16",
+                                "id": 18,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 11,
+                                "rightIndex": 11,
+                                "portIndex": 16,
+                                "nets": [
+                                    {
+                                        "name": "ram_datao_dbg_3",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datao_dbg_3[1]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe16",
+                                "id": 19,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 12,
+                                "rightIndex": 21,
+                                "portIndex": 16,
+                                "nets": [
+                                    {
+                                        "name": "ram_datao_dbg_4",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datao_dbg_4[29]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[28]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[27]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[26]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[25]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[24]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[23]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[22]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[21]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_4[20]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe16",
+                                "id": 20,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 22,
+                                "rightIndex": 22,
+                                "portIndex": 16,
+                                "nets": [
+                                    {
+                                        "name": "ram_datao_dbg_5",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datao_dbg_5[2]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe16",
+                                "id": 21,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 23,
+                                "rightIndex": 24,
+                                "portIndex": 16,
+                                "nets": [
+                                    {
+                                        "name": "ram_datao_dbg_6",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datao_dbg_6[31]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg_6[30]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe16",
+                                "id": 22,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 25,
+                                "rightIndex": 31,
+                                "portIndex": 16,
+                                "nets": [
+                                    {
+                                        "name": "ram_datao_dbg",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datao_dbg[9]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg[8]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg[7]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg[6]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg[5]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg[4]"
+                                            },
+                                            {
+                                                "name": "ram_datao_dbg[3]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe17",
+                                "id": 23,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 17,
+                                "nets": [
+                                    {
+                                        "name": "ram_datai_dbg_1",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datai_dbg_1[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe17",
+                                "id": 24,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 1,
+                                "rightIndex": 10,
+                                "portIndex": 17,
+                                "nets": [
+                                    {
+                                        "name": "ram_datai_dbg_2",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "ram_datai_dbg_2[19]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[18]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[17]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[16]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[15]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[14]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[13]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[12]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[11]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_2[10]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe17",
                                 "id": 25,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 0,
-                                "rightIndex": 0,
-                                "portIndex": 11,
+                                "leftIndex": 11,
+                                "rightIndex": 11,
+                                "portIndex": 17,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data0_w_dbg_1",
+                                        "name": "ram_datai_dbg_3",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data0_w_dbg_1[0]"
+                                                "name": "ram_datai_dbg_3[1]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe11",
+                                "name": "probe17",
                                 "id": 26,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 1,
-                                "rightIndex": 6,
-                                "portIndex": 11,
+                                "leftIndex": 12,
+                                "rightIndex": 21,
+                                "portIndex": 17,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data0_w_dbg_2",
+                                        "name": "ram_datai_dbg_4",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data0_w_dbg_2[15]"
+                                                "name": "ram_datai_dbg_4[29]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data0_w_dbg_2[14]"
+                                                "name": "ram_datai_dbg_4[28]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data0_w_dbg_2[13]"
+                                                "name": "ram_datai_dbg_4[27]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data0_w_dbg_2[12]"
+                                                "name": "ram_datai_dbg_4[26]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data0_w_dbg_2[11]"
+                                                "name": "ram_datai_dbg_4[25]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data0_w_dbg_2[10]"
+                                                "name": "ram_datai_dbg_4[24]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_4[23]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_4[22]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_4[21]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_4[20]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe11",
+                                "name": "probe17",
                                 "id": 27,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 7,
-                                "rightIndex": 15,
-                                "portIndex": 11,
+                                "leftIndex": 22,
+                                "rightIndex": 22,
+                                "portIndex": 17,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data0_w_dbg",
+                                        "name": "ram_datai_dbg_5",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data0_w_dbg[9]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data0_w_dbg[8]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data0_w_dbg[7]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data0_w_dbg[6]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data0_w_dbg[5]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data0_w_dbg[4]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data0_w_dbg[3]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data0_w_dbg[2]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data0_w_dbg[1]"
+                                                "name": "ram_datai_dbg_5[2]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe12",
+                                "name": "probe17",
                                 "id": 28,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 0,
-                                "rightIndex": 0,
-                                "portIndex": 12,
+                                "leftIndex": 23,
+                                "rightIndex": 24,
+                                "portIndex": 17,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data1_w_dbg_1",
+                                        "name": "ram_datai_dbg_6",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data1_w_dbg_1[0]"
+                                                "name": "ram_datai_dbg_6[31]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg_6[30]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe12",
+                                "name": "probe17",
                                 "id": 29,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 1,
-                                "rightIndex": 6,
-                                "portIndex": 12,
+                                "leftIndex": 25,
+                                "rightIndex": 31,
+                                "portIndex": 17,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data1_w_dbg_2",
+                                        "name": "ram_datai_dbg",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data1_w_dbg_2[15]"
+                                                "name": "ram_datai_dbg[9]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data1_w_dbg_2[14]"
+                                                "name": "ram_datai_dbg[8]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data1_w_dbg_2[13]"
+                                                "name": "ram_datai_dbg[7]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data1_w_dbg_2[12]"
+                                                "name": "ram_datai_dbg[6]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data1_w_dbg_2[11]"
+                                                "name": "ram_datai_dbg[5]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data1_w_dbg_2[10]"
+                                                "name": "ram_datai_dbg[4]"
+                                            },
+                                            {
+                                                "name": "ram_datai_dbg[3]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe12",
+                                "name": "probe18",
                                 "id": 30,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 7,
-                                "rightIndex": 15,
-                                "portIndex": 12,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 18,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data1_w_dbg",
+                                        "name": "decode_pc_dbg_1",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data1_w_dbg[9]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data1_w_dbg[8]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data1_w_dbg[7]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data1_w_dbg[6]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data1_w_dbg[5]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data1_w_dbg[4]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data1_w_dbg[3]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data1_w_dbg[2]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data1_w_dbg[1]"
+                                                "name": "decode_pc_dbg_1[0]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe13",
+                                "name": "probe18",
                                 "id": 31,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 0,
-                                "rightIndex": 0,
-                                "portIndex": 13,
+                                "leftIndex": 1,
+                                "rightIndex": 10,
+                                "portIndex": 18,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data2_w_dbg_1",
+                                        "name": "decode_pc_dbg_2",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg_1[0]"
+                                                "name": "decode_pc_dbg_2[19]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[18]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[17]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[16]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[15]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[14]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[13]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[12]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[11]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_2[10]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe13",
+                                "name": "probe18",
                                 "id": 32,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 1,
-                                "rightIndex": 6,
-                                "portIndex": 13,
+                                "leftIndex": 11,
+                                "rightIndex": 11,
+                                "portIndex": 18,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data2_w_dbg_2",
+                                        "name": "decode_pc_dbg_3",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg_2[15]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data2_w_dbg_2[14]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data2_w_dbg_2[13]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data2_w_dbg_2[12]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data2_w_dbg_2[11]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data2_w_dbg_2[10]"
+                                                "name": "decode_pc_dbg_3[1]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe13",
+                                "name": "probe18",
                                 "id": 33,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 7,
-                                "rightIndex": 15,
-                                "portIndex": 13,
+                                "leftIndex": 12,
+                                "rightIndex": 21,
+                                "portIndex": 18,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data2_w_dbg",
+                                        "name": "decode_pc_dbg_4",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[9]"
+                                                "name": "decode_pc_dbg_4[29]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[8]"
+                                                "name": "decode_pc_dbg_4[28]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[7]"
+                                                "name": "decode_pc_dbg_4[27]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[6]"
+                                                "name": "decode_pc_dbg_4[26]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[5]"
+                                                "name": "decode_pc_dbg_4[25]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[4]"
+                                                "name": "decode_pc_dbg_4[24]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[3]"
+                                                "name": "decode_pc_dbg_4[23]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[2]"
+                                                "name": "decode_pc_dbg_4[22]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data2_w_dbg[1]"
+                                                "name": "decode_pc_dbg_4[21]"
+                                            },
+                                            {
+                                                "name": "decode_pc_dbg_4[20]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe14",
+                                "name": "probe18",
                                 "id": 34,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 0,
-                                "rightIndex": 0,
-                                "portIndex": 14,
+                                "leftIndex": 22,
+                                "rightIndex": 22,
+                                "portIndex": 18,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data3_w_dbg_1",
+                                        "name": "decode_pc_dbg_5",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg_1[0]"
+                                                "name": "decode_pc_dbg_5[2]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe14",
+                                "name": "probe18",
                                 "id": 35,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 1,
-                                "rightIndex": 6,
-                                "portIndex": 14,
+                                "leftIndex": 23,
+                                "rightIndex": 24,
+                                "portIndex": 18,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data3_w_dbg_2",
+                                        "name": "decode_pc_dbg_6",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg_2[15]"
+                                                "name": "decode_pc_dbg_6[31]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg_2[14]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data3_w_dbg_2[13]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data3_w_dbg_2[12]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data3_w_dbg_2[11]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data3_w_dbg_2[10]"
+                                                "name": "decode_pc_dbg_6[30]"
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "probe14",
+                                "name": "probe18",
                                 "id": 36,
                                 "type": "DATA_TRIGGER",
                                 "direction": "IN",
                                 "isVector": true,
-                                "leftIndex": 7,
-                                "rightIndex": 15,
-                                "portIndex": 14,
+                                "leftIndex": 25,
+                                "rightIndex": 31,
+                                "portIndex": 18,
                                 "nets": [
                                     {
-                                        "name": "ddr3_rd_data3_w_dbg",
+                                        "name": "decode_pc_dbg",
                                         "isBus": true,
                                         "subnets": [
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg[9]"
+                                                "name": "decode_pc_dbg[9]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg[8]"
+                                                "name": "decode_pc_dbg[8]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg[7]"
+                                                "name": "decode_pc_dbg[7]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg[6]"
+                                                "name": "decode_pc_dbg[6]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg[5]"
+                                                "name": "decode_pc_dbg[5]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg[4]"
+                                                "name": "decode_pc_dbg[4]"
                                             },
                                             {
-                                                "name": "ddr3_rd_data3_w_dbg[3]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data3_w_dbg[2]"
-                                            },
-                                            {
-                                                "name": "ddr3_rd_data3_w_dbg[1]"
+                                                "name": "decode_pc_dbg[3]"
                                             }
                                         ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe19",
+                                "id": 37,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 19,
+                                "nets": [
+                                    {
+                                        "name": "ethmac_slv_cyc_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe20",
+                                "id": 38,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 20,
+                                "nets": [
+                                    {
+                                        "name": "ethmac_slv_we_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe21",
+                                "id": 39,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 21,
+                                "nets": [
+                                    {
+                                        "name": "ethmac_slv_ack_dbg",
+                                        "isBus": false
                                     }
                                 ]
                             }

@@ -927,6 +927,7 @@ u_wb_ddr3_bridge(
 (* MARK_DEBUG = "true" *) wire [2:0] wb_ddr3_br_state_dbg = wb_ddr3_br_state;
 */
 
+/*
 (* MARK_DEBUG = "true" *) wire ethmac_ram_cyc_dbg = ethmac_ram_cyc;
 (* MARK_DEBUG = "true" *) wire ethmac_ram_ack_dbg = ethmac_ram_ack;
 (* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
@@ -943,5 +944,95 @@ u_wb_ddr3_bridge(
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data1_w_dbg = zap_soc.u_phy.rd_data1_w;
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data2_w_dbg = zap_soc.u_phy.rd_data2_w;
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data3_w_dbg = zap_soc.u_phy.rd_data3_w;
+
+(* MARK_DEBUG = "true" *) wire mtx_clk_pad_dbg  = mtx_clk_pad_i;   // EthMAC MDC out
+(* MARK_DEBUG = "true" *) wire [3:0] mtxd_pad_dbg = mtxd_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mtxen_pad_dbg = mtxen_pad_o; // MDIO bidir
+
+(* MARK_DEBUG = "true" *) wire [3:0] mrxd_pad_dbg = mrxd_pad_i;
+(* MARK_DEBUG = "true" *) wire mrxdv_pad_dbg = mrxdv_pad_i;
+
+(* MARK_DEBUG = "true" *) wire ddr3_init_done_dbg = ddr3_init_done;
+(* MARK_DEBUG = "true" *) wire ethmac_irq_dbg = ethmac_irq;
+(* MARK_DEBUG = "true" *) wire [6:0] ethmac_int_dbg = zap_soc.ethmac.ethreg1.INT_SOURCEOut_1;
+
+(* MARK_DEBUG = "true" *) wire RxReady_dbg = zap_soc.ethmac.wishbone.RxReady;
+(* MARK_DEBUG = "true" *) wire RxBDReady_dbg = zap_soc.ethmac.wishbone.RxBDReady;
+(* MARK_DEBUG = "true" *) wire r_RxEn_dbg = zap_soc.ethmac.wishbone.r_RxEn;
+(* MARK_DEBUG = "true" *) wire TxEn_dbg = zap_soc.ethmac.wishbone.TxEn;
+(* MARK_DEBUG = "true" *) wire StartRxPointerRead_dbg = zap_soc.ethmac.wishbone.StartRxPointerRead;
+(* MARK_DEBUG = "true" *) wire StartRxBDRead_dbg = zap_soc.ethmac.wishbone.StartRxBDRead;
+(* MARK_DEBUG = "true" *) wire BDRead_dbg = zap_soc.ethmac.wishbone.BDRead;
+(* MARK_DEBUG = "true" *) wire TxBDRead_dbg = zap_soc.ethmac.wishbone.TxBDRead;
+(* MARK_DEBUG = "true" *) wire RxBDRead_dbg = zap_soc.ethmac.wishbone.RxBDRead;
+(* MARK_DEBUG = "true" *) wire RxPointerRead_dbg = zap_soc.ethmac.wishbone.RxPointerRead;
+(* MARK_DEBUG = "true" *) wire TxPointerRead_dbg = zap_soc.ethmac.wishbone.TxPointerRead;
+(* MARK_DEBUG = "true" *) wire [7:0] r_TxBDNum_dbg = zap_soc.ethmac.wishbone.r_TxBDNum;
+(* MARK_DEBUG = "true" *) wire ram_oe_dbg = zap_soc.ethmac.wishbone.ram_oe;
+(* MARK_DEBUG = "true" *) wire [7:0] ram_addr_dbg = zap_soc.ethmac.wishbone.ram_addr;
+
+(* MARK_DEBUG = "true" *) wire ethmac_irq_dbg = ethmac_irq;
+(* MARK_DEBUG = "true" *) wire [6:0] ethmac_int_dbg = zap_soc.ethmac.ethreg1.INT_SOURCEOut_1;
+
+//syn.tcl_3
+(* MARK_DEBUG = "true" *) wire RxBDRead_dbg = zap_soc.ethmac.wishbone.RxBDRead;
+(* MARK_DEBUG = "true" *) wire RxBDReady_dbg = zap_soc.ethmac.wishbone.RxBDReady;
+
+(* MARK_DEBUG = "true" *) wire ram_oe_dbg = zap_soc.ethmac.wishbone.ram_oe;
+(* MARK_DEBUG = "true" *) wire [7:0] ram_addr_dbg = zap_soc.ethmac.wishbone.ram_addr;
+(* MARK_DEBUG = "true" *) wire [31:0] ram_do_dbg = zap_soc.ethmac.wishbone.ram_do;
+
+(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+(* MARK_DEBUG = "true" *) wire [31:0] dfi_wrdata_dbg = dfi_wrdata;
+(* MARK_DEBUG = "true" *) wire dfi_rddata_valid_dbg = dfi_rddata_valid;
+(* MARK_DEBUG = "true" *) wire [31:0] dfi_rddata_dbg = dfi_rddata;
+
+(* MARK_DEBUG = "true" *) wire ddr3_init_done_dbg = ddr3_init_done;
+(* MARK_DEBUG = "true" *) wire ethmac_irq_dbg = ethmac_irq;
+(* MARK_DEBUG = "true" *) wire [6:0] ethmac_int_dbg = zap_soc.ethmac.ethreg1.INT_SOURCEOut_1;
+
+(* MARK_DEBUG = "true" *) wire mdc_dbg  = mdc_pad_o;   // EthMAC MDC out
+(* MARK_DEBUG = "true" *) wire mdio_i_dbg = mdio_pad_io; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mdio_o_dbg = md_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mdio_oe_dbg = md_padoe_o; // MDIO bidir
+
+(* MARK_DEBUG = "true" *) wire eth_ref_clk_dbg = eth_ref_clk_r2; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire eth_rstn_dbg = eth_rstn; // MDIO bidir
+
+(* MARK_DEBUG = "true" *) wire [3:0] mrxd_pad_dbg = mrxd_pad_i;
+(* MARK_DEBUG = "true" *) wire mrxdv_pad_dbg = mrxdv_pad_i;
+*/
+
+(* MARK_DEBUG = "true" *) wire ddr3_init_done_dbg = ddr3_init_done;
+(* MARK_DEBUG = "true" *) wire ethmac_irq_dbg = ethmac_irq;
+(* MARK_DEBUG = "true" *) wire [6:0] ethmac_int_dbg = zap_soc.ethmac.ethreg1.INT_SOURCEOut_1;
+
+(* MARK_DEBUG = "true" *) wire [3:0] mrxd_pad_dbg = mrxd_pad_i;
+(* MARK_DEBUG = "true" *) wire mrxdv_pad_dbg = mrxdv_pad_i;
+
+(* MARK_DEBUG = "true" *) wire mtx_clk_pad_dbg  = mtx_clk_pad_i;   // EthMAC MDC out
+(* MARK_DEBUG = "true" *) wire [3:0] mtxd_pad_dbg = mtxd_pad_o; // MDIO bidir
+(* MARK_DEBUG = "true" *) wire mtxen_pad_dbg = mtxen_pad_o; // MDIO bidir
+
+(* MARK_DEBUG = "true" *) wire dfi_wrdata_en_dbg = dfi_wrdata_en;
+//(* MARK_DEBUG = "true" *) wire [31:0] dfi_wrdata_dbg = dfi_wrdata;
+(* MARK_DEBUG = "true" *) wire dfi_rddata_valid_dbg = dfi_rddata_valid;
+//(* MARK_DEBUG = "true" *) wire [31:0] dfi_rddata_dbg = dfi_rddata;
+
+(* MARK_DEBUG = "true" *) wire data_wb_cyc_ethmac_ram_dbg = data_wb_cyc_ethmac_ram;
+(* MARK_DEBUG = "true" *) wire data_wb_ack_ethmac_ram_dbg = data_wb_ack_ethmac_ram;
+
+
+(* MARK_DEBUG = "true" *) wire ram_ce_dbg = zap_soc.ethmac.wishbone.bd_ram.ce;
+(* MARK_DEBUG = "true" *) wire [3:0] ram_we_dbg = zap_soc.ethmac.wishbone.bd_ram.we;
+(* MARK_DEBUG = "true" *) wire [7:0] ram_addr_dbg = zap_soc.ethmac.wishbone.bd_ram.addr;
+(* MARK_DEBUG = "true" *) wire [31:0] ram_datai_dbg = zap_soc.ethmac.wishbone.bd_ram.di;
+(* MARK_DEBUG = "true" *) wire [31:0] ram_datao_dbg = zap_soc.ethmac.wishbone.bd_ram.dato;
+
+(* MARK_DEBUG = "true" *) wire ethmac_slv_cyc_dbg = zap_soc.ethmac.wb_cyc_i;
+(* MARK_DEBUG = "true" *) wire ethmac_slv_we_dbg = zap_soc.ethmac.wb_we_i;
+(* MARK_DEBUG = "true" *) wire ethmac_slv_ack_dbg = zap_soc.ethmac.wb_ack_o;
+
+(* MARK_DEBUG = "true" *) wire [31:0] decode_pc_dbg = zap_soc.u_zap_top.u_zap_core.decode_pc_ff;
 
 endmodule // zap_soc

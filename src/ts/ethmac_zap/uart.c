@@ -62,13 +62,13 @@ int main(void)
         // Just bringup the UART TX and RX - enable interrupts and exit.
         UARTInit();
 
-#ifdef DEBUG
+#ifdef DEBUG_2
         UARTPrintBanner();
 #endif
 
         eth_demo_init();
 
-#ifdef DEBUG
+#ifdef DEBUG_2
         phy_hw_reset();
         phy_scan_all();
         phy_autoneg_and_wait();
