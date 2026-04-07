@@ -739,6 +739,78 @@ wire [   1:0] dfi_rddata_dnv;
 wire  [  3:0] ddr3_command;
 wire  [  3:0] ddr3_state_q;
 
+wire          cfg_valid_o;
+wire  [31:0]  cfg_data_o;
+
+wire  [15:0]  ddr3_calib_ram_wr;
+wire          ddr3_calib_ram_rd;
+wire  [31:0]  ddr3_calib_ram_addr;
+wire [127:0]  ddr3_calib_ram_write_data;
+wire  [15:0]  ddr3_calib_ram_req_id;
+
+wire          ddr3_calib_ram_accept;
+wire          ddr3_calib_ram_ack;
+wire          ddr3_calib_ram_error;
+wire [ 15:0]  ddr3_calib_ram_resp_id;
+wire [127:0]  ddr3_calib_ram_read_data;
+
+wire  [ 15:0] ddr3_core_ram_wr;
+wire          ddr3_core_ram_rd;
+wire  [ 31:0] ddr3_core_ram_addr;
+wire  [127:0] ddr3_core_ram_write_data;
+wire  [ 15:0] ddr3_core_ram_req_id;
+
+wire          ddr3_core_ram_accept;
+wire          ddr3_core_ram_ack;
+wire          ddr3_core_ram_error;
+wire [ 15:0]  ddr3_core_ram_resp_id;
+wire [127:0]  ddr3_core_ram_read_data;
+
+wire          calib_done;
+wire          calib_pass;
+wire  [3:0]   calib_rdsel;
+wire  [5:0]   cal_best_tap;
+wire  [31:0]  cal_pass_bitmap;
+
+wire  [3:0]   ddr3_calib_state;
+
+wire  [ 15:0] ddr3_ram_wr;
+wire          ddr3_ram_rd;
+wire  [ 31:0] ddr3_ram_addr;
+wire  [127:0] ddr3_ram_write_data;
+wire  [ 15:0] ddr3_ram_req_id;
+
+wire          ddr3_ram_accept;
+wire          ddr3_ram_ack;
+wire          ddr3_ram_error;
+wire [ 15:0]  ddr3_ram_resp_id;
+wire [127:0]  ddr3_ram_read_data;
+
+wire [2:0]    wb_ddr3_br_state;
+
+assign ddr3_ram_wr = (calib_done == 0) ? ddr3_calib_ram_wr : ddr3_core_ram_wr;
+assign ddr3_ram_rd = (calib_done == 0) ? ddr3_calib_ram_rd : ddr3_core_ram_rd;
+assign ddr3_ram_addr = (calib_done == 0) ? ddr3_calib_ram_addr : ddr3_core_ram_addr;
+assign ddr3_ram_write_data = (calib_done == 0) ? ddr3_calib_ram_write_data : ddr3_core_ram_write_data;
+assign ddr3_ram_req_id = (calib_done == 0) ? ddr3_calib_ram_req_id : ddr3_core_ram_req_id;
+
+//always @(*) if(calib_done == 0) ddr3_calib_ram_accept = ddr3_ram_accept; else ddr3_core_ram_accept = ddr3_ram_accept;
+//always @(*) if(calib_done == 0) ddr3_calib_ram_ack = ddr3_ram_ack; else ddr3_core_ram_ack = ddr3_ram_ack;
+//always @(*) if(calib_done == 0) ddr3_calib_ram_error = ddr3_ram_error; else ddr3_core_ram_error = ddr3_ram_error;
+//always @(*) if(calib_done == 0) ddr3_calib_ram_resp_id = ddr3_ram_resp_id; else ddr3_core_ram_resp_id = ddr3_ram_resp_id;
+//always @(*) if(calib_done == 0) ddr3_calib_ram_read_data = ddr3_ram_read_data; else ddr3_core_ram_read_data = ddr3_ram_read_data;
+
+assign ddr3_calib_ram_accept = ((calib_done == 0) & ddr3_ram_accept);
+assign ddr3_core_ram_accept = ((calib_done == 1) & ddr3_ram_accept);
+assign ddr3_calib_ram_ack = ((calib_done == 0) & ddr3_ram_ack);
+assign ddr3_core_ram_ack = ((calib_done == 1) & ddr3_ram_ack);
+assign ddr3_calib_ram_error = ((calib_done == 0) & ddr3_ram_error);
+assign ddr3_core_ram_error = ((calib_done == 1) & ddr3_ram_error);
+assign ddr3_calib_ram_resp_id = (calib_done == 0) ? ddr3_ram_resp_id : 'h 0;
+assign ddr3_core_ram_resp_id = (calib_done == 1) ? ddr3_ram_resp_id : 'h 0;
+assign ddr3_calib_ram_read_data = (calib_done == 0) ? ddr3_ram_read_data : 'h 0;
+assign ddr3_core_ram_read_data = (calib_done == 1) ? ddr3_ram_read_data : 'h 0;
+
 //-----------------------------------------------------------------
 // DDR PHY
 //-----------------------------------------------------------------
@@ -748,16 +820,18 @@ ddr3_dfi_phy
     ,.DQ_TAP_DELAY_INIT(0)
     ,.TPHY_RDLAT(5)
 )
-u_phy
-(
+u_phy (
      .clk_i(clk2ddr3)
     ,.clk_ddr_i(clk_ddr)
     ,.clk_ddr90_i(clk_ddr_dqs)
     ,.clk_ref_i(clk_ref)
     ,.rst_i(i_reset)
 
-    ,.cfg_valid_i(1'b 0)
-    ,.cfg_i(32'h 0)
+    //,.cfg_valid_i(1'b 0)
+    //,.cfg_i(32'h 0)
+
+    ,.cfg_valid_i(cfg_valid_o)
+    ,.cfg_i(cfg_data_o)
 
     ,.dfi_address_i(dfi_address)
     ,.dfi_bank_i(dfi_bank)
@@ -793,32 +867,18 @@ u_phy
     ,.ddr3_dqs_p_io(ddr3_dqs_p)
     ,.ddr3_dqs_n_io(ddr3_dqs_n)
     ,.ddr3_dq_io(ddr3_dq)
-);
+); //u_phy (
 
 //-----------------------------------------------------------------
 // DDR Core
 //-----------------------------------------------------------------
-wire  [ 15:0]  ddr3_ram_wr;
-wire           ddr3_ram_rd;
-wire  [ 31:0]  ddr3_ram_addr;
-wire  [127:0]  ddr3_ram_write_data;
-wire  [ 15:0]  ddr3_ram_req_id;
-wire           ddr3_ram_accept;
-wire           ddr3_ram_ack;
-wire           ddr3_ram_error;
-wire [ 15:0]   ddr3_ram_resp_id;
-wire [127:0]   ddr3_ram_read_data;
-
-wire [2:0]     wb_ddr3_br_state;
-
 ddr3_core
 #(
      .DDR_WRITE_LATENCY(4)
     ,.DDR_READ_LATENCY(4)
     ,.DDR_MHZ(100)
 )
-u_ddr_core
-(
+u_ddr_core (
      .clk_i(clk2ddr3)
     ,.rst_i(i_reset)
 
@@ -837,6 +897,7 @@ u_ddr_core
     ,.inport_addr_i(ddr3_ram_addr)
     ,.inport_write_data_i(ddr3_ram_write_data)
     ,.inport_req_id_i(ddr3_ram_req_id)
+
     ,.inport_accept_o(ddr3_ram_accept)
     ,.inport_ack_o(ddr3_ram_ack)
     ,.inport_error_o(ddr3_ram_error)
@@ -859,7 +920,7 @@ u_ddr_core
     ,.dfi_rddata_i(dfi_rddata)
     ,.dfi_rddata_valid_i(dfi_rddata_valid)
     ,.dfi_rddata_dnv_i(dfi_rddata_dnv)
-);
+); //u_ddr_core (
 
 wb_ddr3_bridge #(
     .ADR_WIDTH(32),          // Wishbone address width
@@ -868,39 +929,74 @@ wb_ddr3_bridge #(
                            // 1: adr_i is word address (adr<<2)
     .ID_INIT(16'h0000)       // starting request id
 )
-u_wb_ddr3_bridge(
+u_wb_ddr3_bridge (
     .clk_i(i_clk),
     .rst_i(i_reset),      // synchronous active-high
 
     // ---------------- Wishbone Slave ----------------
     .dat_i(ethmac_ram_dat_i),
-    .dat_o(ethmac_ram_dat_o), //HERE 1111
+    .dat_o(ethmac_ram_dat_o),
     .adr_i(ethmac_ram_adr),
     .we_i(ethmac_ram_we),
     .sel_i(ethmac_ram_sel),
     .cyc_i(ethmac_ram_cyc),
     .stb_i(ethmac_ram_stb),
     .cti_i(3'd 0), //NOT USED
-    .ack_o(ethmac_ram_ack), //HERE 1111
+    .ack_o(ethmac_ram_ack),
 
     .ethmac_rd_i(ethmac_rd_o),
 
     // ---------------- DDR3 core "inport" interface ----------------
-    .inport_wr_o(ddr3_ram_wr),        // byte strobes (16 bytes)
-    .inport_rd_o(ddr3_ram_rd),
-    .inport_addr_o(ddr3_ram_addr),      // byte address
-    .inport_write_data_o(ddr3_ram_write_data),
-    .inport_req_id_o(ddr3_ram_req_id),
-    .inport_accept_i(ddr3_ram_accept),    // 1-cycle pulse when accepted
-    .inport_ack_i(ddr3_ram_ack),       // 1-cycle pulse when completed
-    .inport_error_i(ddr3_ram_error),
-    .inport_resp_id_i(ddr3_ram_resp_id),
-    .inport_read_data_i(ddr3_ram_read_data),
+    .inport_wr_o(ddr3_core_ram_wr),        // byte strobes (16 bytes)
+    .inport_rd_o(ddr3_core_ram_rd),
+    .inport_addr_o(ddr3_core_ram_addr),      // byte address
+    .inport_write_data_o(ddr3_core_ram_write_data),
+    .inport_req_id_o(ddr3_core_ram_req_id),
+
+    .inport_accept_i(ddr3_core_ram_accept),    // 1-cycle pulse when accepted
+    .inport_ack_i(ddr3_core_ram_ack),       // 1-cycle pulse when completed
+    .inport_error_i(ddr3_core_ram_error),
+    .inport_resp_id_i(ddr3_core_ram_resp_id),
+    .inport_read_data_i(ddr3_core_ram_read_data),
 
     .init_done_i(ddr3_init_done),         // optional: tie to 1 if not used
 
     .state(wb_ddr3_br_state)
-);
+); //u_wb_ddr3_bridge (
+
+ddr3_calib_dqs_window
+u_ddr3_calib_dqs_window (
+    .clk(i_clk),
+    .rst(i_reset),
+
+    // Asserted when DDR init sequence is complete (your init_done_o)
+    .ddr_init_done_i(ddr3_init_done),
+
+    // ---------------- PHY cfg port (to ddr3_dfi_phy cfg_valid_i/cfg_i) -----------
+    .cfg_valid_o(cfg_valid_o),
+    .cfg_data_o(cfg_data_o),
+
+    // ---------------- DDR core "inport" application interface -------------------
+    .inport_wr_o(ddr3_calib_ram_wr),          // byte strobes (16 bytes)
+    .inport_rd_o(ddr3_calib_ram_rd),
+    .inport_addr_o(ddr3_calib_ram_addr),        // byte address
+    .inport_write_data_o(ddr3_calib_ram_write_data),
+    .inport_req_id_o(ddr3_calib_ram_req_id),
+
+    .inport_accept_i(ddr3_calib_ram_accept),
+    .inport_ack_i(ddr3_calib_ram_ack),
+    .inport_error_i(ddr3_calib_ram_error),
+    //.inport_resp_id_i(ddr3_calib_ram_resp_id),
+    .inport_read_data_i(ddr3_calib_ram_read_data),
+
+    // ---------------- Status -----------------------------------------------------
+    .cal_done_o(calib_done),
+    .cal_pass_o(calib_pass),
+    .cal_best_tap_o(cal_best_tap),
+    .cal_pass_bitmap_o(cal_pass_bitmap),
+
+    .state(ddr3_calib_state)
+); //u_ddr3_calib_dqs_window(
 `endif //`ifdef DDR3_CONTROLLER
 
 /*
@@ -944,4 +1040,6 @@ u_wb_ddr3_bridge(
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data2_w_dbg = zap_soc.u_phy.rd_data2_w;
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data3_w_dbg = zap_soc.u_phy.rd_data3_w;
 
+(* MARK_DEBUG = "true" *) wire calib_done_dbg = calib_done;
+(* MARK_DEBUG = "true" *) wire calib_pass_dbg = calib_pass;
 endmodule // zap_soc

@@ -1,25 +1,23 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Mon Feb  2 23:52:37 2026
+[*] Tue Mar 17 23:55:12 2026
 [*]
-[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
-[dumpfile_mtime] "Sun Feb  1 18:06:25 2026"
-[dumpfile_size] 352348042
+[dumpfile] "(null)"
 [savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_xilinx.gtkw"
-[timestart] 165096900
-[size] 1684 923
+[timestart] 0
+[size] 1651 869
 [pos] -1 -1
-*-14.808722 165164583 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-30.573940 61874583 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] zap_test.
 [treeopen] zap_test.eth_phy.
 [treeopen] zap_test.u_chip_top.
 [treeopen] zap_test.u_chip_top.ethmac.wishbone.
-[treeopen] zap_test.u_chip_top.u_ddr_core.
 [treeopen] zap_test.u_chip_top.u_phy.
+[treeopen] zap_test.u_chip_top.u_zap_top.
 [sst_width] 298
 [signals_width] 282
 [sst_expanded] 1
-[sst_vpaned_height] 582
+[sst_vpaned_height] 558
 @28
 zap_test.mrx_clk_pad_i
 zap_test.mrxdv_pad_i
@@ -42,6 +40,11 @@ zap_test.mtxerr_pad_o
 -
 @22
 zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_dcache_en
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_icache_en
+@29
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_mmu_en
 @200
 -
 @28
@@ -80,6 +83,7 @@ zap_test.u_chip_top.u_wb_ddr3_bridge.dat_i[31:0]
 zap_test.u_chip_top.u_wb_ddr3_bridge.dat_o[31:0]
 @28
 zap_test.u_chip_top.u_wb_ddr3_bridge.init_done_i
+zap_test.u_chip_top.calib_done
 @200
 -
 @22
@@ -205,7 +209,6 @@ zap_test.u_chip_top.u_ddr_core.dfi_rddata_i[31:0]
 zap_test.u_chip_top.u_phy.rd_data1_w[15:0]
 zap_test.u_chip_top.u_phy.rd_data2_w[15:0]
 zap_test.u_chip_top.u_phy.rd_data3_w[15:0]
-@23
 +{zap_test.u_chip_top.u_phy.rd_data0_w[15:0]} zap_test.u_chip_top.u_phy.rd_data0_w[15:0]
 zap_test.u_chip_top.u_phy.rd_data3_w[15:0]
 @200
@@ -247,14 +250,6 @@ zap_test.u_chip_top.u_phy.dfi_wrdata_q[31:0]
 -
 -
 @28
-zap_test.u_chip_top.u_pll.clkout0_o
-zap_test.u_chip_top.u_pll.clkout1_o
-zap_test.u_chip_top.u_pll.clkout2_o
-zap_test.u_chip_top.u_pll.clkout3_o
-@200
--
--
-@28
 zap_test.u_chip_top.u_ddr_core.clk_i
 zap_test.u_chip_top.clk2ddr3
 zap_test.u_chip_top.u_wb_ddr3_bridge.inport_rd_o
@@ -269,11 +264,24 @@ zap_test.u_chip_top.u_wb_ddr3_bridge.inport_accept_i
 @200
 -
 -
+@28
+zap_test.u_chip_top.calib_done
+zap_test.u_chip_top.calib_pass
 @22
-zap_test.u_chip_top.ddr3_ram_read_data[127:0]
+zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rddata_i[31:0]
+@28
+zap_test.u_chip_top.u_ddr_core.u_seq.dfi_rddata_valid_i
+@22
++{zap_test.u_chip_top.u_phy.rd_data0_w[15:0]} zap_test.u_chip_top.u_phy.rd_data0_w[15:0]
+zap_test.u_chip_top.u_phy.rd_data1_w[15:0]
+zap_test.u_chip_top.u_phy.rd_data2_w[15:0]
+zap_test.u_chip_top.u_phy.rd_data3_w[15:0]
 @200
 -
--
+@22
+zap_test.u_chip_top.u_wb_ddr3_bridge.inport_read_data_i[127:0]
+zap_test.u_chip_top.u_wb_ddr3_bridge.inport_write_data_o[127:0]
+@200
 -
 -
 [pattern_trace] 1

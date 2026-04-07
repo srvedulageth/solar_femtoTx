@@ -219,7 +219,7 @@ module wb_ddr3_bridge #(
                         if (inport_accept_i) begin
                             inport_rd_o         <= 1'b0;
 `ifdef SYNTHESIS
-                            inport_wr_o         <= 1'b0;
+                            inport_wr_o         <= 16'h0000;
 `endif
 
                             // accepted; bump req_id and wait for completion

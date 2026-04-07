@@ -88,6 +88,8 @@ verilog work ../ips/ram_wb/verilog/wb_ddr3_bridge.v
 verilog work ../ips/ddr3/core_ddr3_controller/examples/arty_a7/artix7_pll.v
 verilog work ../ips/ddr3/core_ddr3_controller/src_v/ddr3_dfi_seq.v
 verilog work ../ips/ddr3/core_ddr3_controller/src_v/ddr3_core.v
+//verilog work ../ips/ddr3/core_ddr3_controller/src_v/ddr3_calib_ctrl.v
+verilog work ../ips/ddr3/core_ddr3_controller/src_v/ddr3_calib_dqs_window.v
 verilog work ../ips/ddr3/core_ddr3_controller/src_v/phy/xc7/ddr3_dfi_phy.v
 verilog work $XILINX_VIVADO/data/verilog/src/glbl.v
 

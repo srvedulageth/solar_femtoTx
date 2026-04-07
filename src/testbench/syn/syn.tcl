@@ -123,6 +123,7 @@ add_files -scan_for_includes {
 ../../ips/ddr3/core_ddr3_controller/examples/arty_a7/artix7_pll.v \
 ../../ips/ddr3/core_ddr3_controller/src_v/ddr3_dfi_seq.v \
 ../../ips/ddr3/core_ddr3_controller/src_v/ddr3_core.v \
+../../ips/ddr3/core_ddr3_controller/src_v/ddr3_calib_dqs_window.v \
 ../../ips/ddr3/core_ddr3_controller/src_v/phy/xc7/ddr3_dfi_phy.v \
 ./zap_soc.v \
 }
@@ -255,6 +256,16 @@ create_debug_port u_ila_0 probe
 set_property port_width 16 [get_debug_ports u_ila_0/probe14]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe14]
 connect_debug_port u_ila_0/probe14 [get_nets {ddr3_rd_data3_w_dbg[*]}]
+
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe15]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe15]
+connect_debug_port u_ila_0/probe15 [get_nets [list calib_done_dbg ]]
+
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe16]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe16]
+connect_debug_port u_ila_0/probe16 [get_nets [list calib_pass_dbg ]]
 
 
 

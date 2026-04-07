@@ -458,6 +458,7 @@ task set_rx_packet_1;
   input  [47:0] eth_source_addr;
   input  [15:0] eth_type_len;
   input  [7:0]  eth_start_data;
+
   integer       i, sd;
   reg    [47:0] dest_addr;
   reg    [47:0] source_addr;
@@ -740,10 +741,15 @@ begin
 end
 endtask // paralel_crc_phy_rx
 
+integer no_of_txns;
 initial begin
+  no_of_txns = 0;
   #100000ns;
 
-  repeat(1) begin
+  wait(zap_test.u_chip_top.ddr3_init_done == 1);
+  wait(zap_test.u_chip_top.calib_done == 1);
+
+  repeat(15) begin
     //Start Rx ...
     $display("Rx Begin");
 
@@ -756,11 +762,18 @@ initial begin
     repeat(20000) @(posedge i_clk);
 
     //For ICMP, uncomment below 3 and comment above ARP ...
-    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'hA4_BB_6D_52_E4_53, 16'h0800, 'h 0F);
+    //set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'hA4_BB_6D_52_E4_53, 16'h0800, 'h 0F);
+    set_rx_packet_1(0, 'h 5FC, 1'b0, 48'h02_12_34_56_78_9a, 48'h64_00_6A_8B_CB_A6, 16'h0800, 'h 0F);
     append_rx_crc (0, 'd 74, 1'b0, 1'b0); //ICMP packet length 74 bytes... without CRC
     #1 eth_phy.send_rx_packet(64'h0055_5555_5555_5555, 4'h7, 8'hD5, 0, 'd 78, 1'b0); //Length = 74(ICMP Packet Length) + 4 bytes CRC ...
 
     repeat(20000) @(posedge i_clk);
+    no_of_txns = no_of_txns + 1;
+
+    if(no_of_txns%5 == 0) begin //assert reset after every 25 txns
+      i_reset = 'b 1; repeat(500) @(posedge i_clk); #1; i_reset = 'b 0;
+      #100000ns;
+    end
 
     $display("Rx Done");
   end

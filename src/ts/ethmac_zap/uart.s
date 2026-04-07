@@ -71,7 +71,7 @@ ldr sp, =FIQ_STACK_POINTER
  * Switch to user mode with interrupts enabled.
  * Set up stack pointer.
  */
-mrs r2, cpsr
+mrs r1, cpsr
 bic r1, r1, #31
 orr r1, r1, #16
 bic r1, r1, #0xC0

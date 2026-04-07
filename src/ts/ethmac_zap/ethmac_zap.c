@@ -6,6 +6,8 @@
 #include "ethmac_shared.h"
 
 volatile int rx_poll_scheduled = 0;
+volatile unsigned tx_head = TX_BD_FIRST;
+volatile unsigned rx_tail = RX_BD_FIRST;
 
 /* ------------ MII management (MDIO) ------------ */
 static inline void mdio_wait_idle(void){
@@ -135,7 +137,7 @@ void eth_rx_ring_init(void) {
 }
 
 void eth_tx_ring_init(void) {
-    //eth_writel(TX_BD_COUNT, ETH_TX_BD_NUM_REG);  // 0..3 used for TX
+    //eth_writel(TX_BD_COUNT, ETH_TX_BD_NUM_REG);  // 0..63 used for TX
 
     for (unsigned i = 0; i < TX_BD_COUNT; ++i) {
         uint32_t ptr = ETHMAC_BUF_RAM_BASE + i * TX_BUF_SIZE;
@@ -148,6 +150,8 @@ void eth_tx_ring_init(void) {
         bd[0] = ((uint32_t)TX_BUF_SIZE << 16) | flags;   // capacity
         bd[1] = ptr;
     }
+
+    tx_head = TX_BD_FIRST;
 }
 
 /* ------------ Public API ------------ */
@@ -160,7 +164,7 @@ int eth_init(const uint8_t mac[6]){
     mdio_init();
 
     // PHY bring-up
-#ifdef DEBUG
+#ifdef DEBUG_2
     (void)phy_wait_link(30);
 #endif
 
@@ -170,6 +174,7 @@ int eth_init(const uint8_t mac[6]){
 
     eth_rx_ring_init();
     eth_tx_ring_init();
+    rx_poll_scheduled = 0;
 
     //Unmask Interrupts ...
     eth_writel((ETH_INT_TXB | ETH_INT_TXE | ETH_INT_RXB | ETH_INT_RXE | ETH_INT_BUSY | ETH_INT_TXC | ETH_INT_RXC), ETH_INT_MASK);

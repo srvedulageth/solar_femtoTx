@@ -1,0 +1,363 @@
+// ddr3_calib_dqs_window.v
+// Sweep DQS IDELAY taps 0..31, build pass bitmap, choose midpoint of longest pass window.
+// Uses PHY cfg fields from ddr3_dfi_phy.v:
+//
+// `define DDR_PHY_CFG_RDSEL_R         3:0
+// `define DDR_PHY_CFG_RDLAT_R         10:8
+// `define DDR_PHY_CFG_DLY_DQS_RST_R   17:16
+// `define DDR_PHY_CFG_DLY_DQS_INC_R   19:18
+// `define DDR_PHY_CFG_DLY_DQ_RST_R    21:20   (unused here)
+// `define DDR_PHY_CFG_DLY_DQ_INC_R    23:22   (unused here)
+//
+// Notes:
+// - DQS reset uses LD to load IDELAY_VALUE (baseline). We then apply INC pulses to reach desired tap.
+// - This module increments BOTH DQS lanes together (2-bit fields). If you want lane-by-lane, tell me.
+// - It writes one known 128b pattern once, then reads back while sweeping taps.
+
+module ddr3_calib_dqs_window #(
+    parameter [3:0]  FIXED_RDSEL    = 4'd15,
+    parameter [2:0]  FIXED_RDLAT    = 3'd5,
+
+    parameter integer TAP_MIN       = 0,
+    parameter integer TAP_MAX       = 31,
+
+    // Must be 16-byte aligned for 128-bit port
+    parameter [31:0]  CAL_ADDR      = 32'h1002_0000,
+
+    // Number of successful reads required per tap (stability)
+    parameter integer READ_REPEATS  = 2
+)(
+    input  wire         clk,
+    input  wire         rst,
+
+    // Controller init done (your init_done_o)
+    input  wire         ddr_init_done_i,
+
+    // ---- PHY cfg -> ddr3_dfi_phy ----
+    output reg          cfg_valid_o,
+    output reg  [31:0]  cfg_data_o,
+
+    // ---- DDR core inport (128b app interface) ----
+    output reg  [15:0]  inport_wr_o,
+    output reg          inport_rd_o,
+    output reg  [31:0]  inport_addr_o,
+    output reg  [127:0] inport_write_data_o,
+    output reg  [15:0]  inport_req_id_o,
+
+    input  wire         inport_accept_i,
+    input  wire         inport_ack_i,
+    input  wire         inport_error_i,
+    input  wire [127:0] inport_read_data_i,
+
+    // ---- Results ----
+    output reg          cal_done_o,
+    output reg          cal_pass_o,
+    output reg  [5:0]   cal_best_tap_o,
+    output reg  [31:0]  cal_pass_bitmap_o
+);
+
+`ifndef DDR_PHY_CFG_RDSEL_R
+`error "Missing DDR PHY cfg defines. Include/compile ddr3_dfi_phy.v defines before this module."
+`endif
+
+    // Known non-trivial pattern
+    localparam [127:0] PATTERN = 128'h0123_4567_89AB_CDEF_FEDC_BA98_7654_3210;
+    localparam [15:0]  FULL_STB = 16'hFFFF;
+
+    // Build cfg word
+    function [31:0] make_cfg;
+        input [3:0] rdsel;
+        input [2:0] rdlat;
+        input [1:0] dqs_rst;
+        input [1:0] dqs_inc;
+        reg   [31:0] x;
+        begin
+            x = 32'b0;
+            x[`DDR_PHY_CFG_RDSEL_R]       = rdsel;
+            x[`DDR_PHY_CFG_RDLAT_R]       = rdlat;
+            x[`DDR_PHY_CFG_DLY_DQS_RST_R] = dqs_rst;
+            x[`DDR_PHY_CFG_DLY_DQS_INC_R] = dqs_inc;
+            // leave DQ delay controls as 0
+            make_cfg = x;
+        end
+    endfunction
+
+    // FSM
+    localparam ST_RESET        = 4'd0;
+    localparam ST_WAIT_INIT    = 4'd1;
+    localparam ST_PROG_FIXED   = 4'd2;
+
+    localparam ST_WRITE_SEND   = 4'd3;
+    localparam ST_WRITE_WAIT   = 4'd4;
+
+    localparam ST_TAP_RST      = 4'd5;
+    localparam ST_TAP_INC      = 4'd6;
+
+    localparam ST_READ_SEND    = 4'd7;
+    localparam ST_READ_WAIT    = 4'd8;
+    localparam ST_READ_CHECK   = 4'd9;
+
+    localparam ST_NEXT_TAP     = 4'd10;
+    localparam ST_ANALYZE      = 4'd11;
+    localparam ST_PROG_BEST_RST= 4'd12;
+    localparam ST_PROG_BEST_INC= 4'd13;
+    localparam ST_DONE         = 4'd14;
+
+    reg [3:0] state_q;
+
+    // Sweep counters
+    reg [5:0] tap_q;
+    reg [5:0] inc_count_q;
+    reg [$clog2((READ_REPEATS<1)?1:READ_REPEATS):0] rep_q;
+
+    // Pass bitmap and analysis
+    reg [31:0] pass_bm_q;
+
+    reg [5:0] best_start_q, best_len_q;
+    reg [5:0] cur_start_q,  cur_len_q;
+    reg [5:0] idx_q;
+
+    reg [15:0] req_id_q;
+
+    // Helpful
+    wire tap_in_range_0_31 = (tap_q <= 6'd31);
+
+    // Main sequential
+    always @(posedge clk) begin
+        if (rst) begin
+            state_q            <= ST_RESET;
+
+            cfg_valid_o        <= 1'b0;
+            cfg_data_o         <= 32'b0;
+
+            inport_wr_o        <= 16'h0000;
+            inport_rd_o        <= 1'b0;
+            inport_addr_o      <= 32'b0;
+            inport_write_data_o<= 128'b0;
+            inport_req_id_o    <= 16'b0;
+
+            cal_done_o         <= 1'b0;
+            cal_pass_o         <= 1'b0;
+            cal_best_tap_o     <= 6'd0;
+            cal_pass_bitmap_o  <= 32'b0;
+
+            tap_q              <= TAP_MIN[5:0];
+            inc_count_q        <= 6'd0;
+            rep_q              <= 'd0;
+
+            pass_bm_q          <= 32'b0;
+
+            best_start_q       <= 6'd0;
+            best_len_q         <= 6'd0;
+            cur_start_q        <= 6'd0;
+            cur_len_q          <= 6'd0;
+            idx_q              <= 6'd0;
+
+            req_id_q           <= 16'h0001;
+        end else begin
+            // one-cycle defaults
+            cfg_valid_o <= 1'b0;
+            inport_wr_o <= 16'h0000;
+            inport_rd_o <= 1'b0;
+
+            case (state_q)
+
+                ST_RESET: begin
+                    cal_done_o        <= 1'b0;
+                    cal_pass_o        <= 1'b0;
+                    cal_best_tap_o    <= 6'd0;
+                    cal_pass_bitmap_o <= 32'b0;
+
+                    pass_bm_q         <= 32'b0;
+                    tap_q             <= TAP_MIN[5:0];
+                    state_q           <= ST_WAIT_INIT;
+                end
+
+                ST_WAIT_INIT: begin
+                    if (ddr_init_done_i) begin
+                        state_q <= ST_PROG_FIXED;
+                    end
+                end
+
+                // Program fixed RDSEL/RDLAT (no inc/rst pulses)
+                ST_PROG_FIXED: begin
+                    cfg_data_o  <= make_cfg(FIXED_RDSEL, FIXED_RDLAT, 2'b00, 2'b00);
+                    cfg_valid_o <= 1'b1;
+                    state_q     <= ST_WRITE_SEND;
+                end
+
+                // Write known pattern to CAL_ADDR
+                ST_WRITE_SEND: begin
+                    inport_addr_o       <= CAL_ADDR;
+                    inport_req_id_o     <= req_id_q;
+                    inport_write_data_o <= PATTERN;
+                    inport_wr_o         <= FULL_STB;
+
+                    if (inport_accept_i) begin
+                        req_id_q <= req_id_q + 1;
+                        state_q  <= ST_WRITE_WAIT;
+                    end
+                end
+
+                ST_WRITE_WAIT: begin
+                    if (inport_ack_i) begin
+                        // start sweep
+                        tap_q     <= TAP_MIN[5:0];
+                        pass_bm_q <= 32'b0;
+                        state_q   <= ST_TAP_RST;
+                    end
+                end
+
+                // Reset DQS delay to baseline (LD)
+                ST_TAP_RST: begin
+                    cfg_data_o  <= make_cfg(FIXED_RDSEL, FIXED_RDLAT, 2'b11, 2'b00); // reset both lanes
+                    cfg_valid_o <= 1'b1;
+
+                    inc_count_q <= 6'd0;
+                    rep_q       <= 'd0;
+
+                    if (tap_q == 0) begin
+                        state_q <= ST_READ_SEND;
+                    end else begin
+                        state_q <= ST_TAP_INC;
+                    end
+                end
+
+                // INC DQS delay until inc_count_q == tap_q
+                // (we want exactly 'tap_q' increments from baseline)
+                ST_TAP_INC: begin
+                    cfg_data_o  <= make_cfg(FIXED_RDSEL, FIXED_RDLAT, 2'b00, 2'b11); // inc both lanes
+                    cfg_valid_o <= 1'b1;
+
+                    if (inc_count_q + 1 >= tap_q) begin
+                        // after this pulse, we've reached tap_q
+                        state_q <= ST_READ_SEND;
+                    end
+                    inc_count_q <= inc_count_q + 1;
+                end
+
+                // Issue read of CAL_ADDR
+                ST_READ_SEND: begin
+                    inport_addr_o   <= CAL_ADDR;
+                    inport_req_id_o <= req_id_q;
+                    inport_rd_o     <= 1'b1;
+
+                    if (inport_accept_i) begin
+                        req_id_q <= req_id_q + 1;
+                        state_q  <= ST_READ_WAIT;
+                    end
+                end
+
+                ST_READ_WAIT: begin
+                    if (inport_ack_i) begin
+                        state_q <= ST_READ_CHECK;
+                    end
+                end
+
+                ST_READ_CHECK: begin
+                    // Fail on error or mismatch
+                    if (inport_error_i || (inport_read_data_i != PATTERN)) begin
+                        if (tap_in_range_0_31)
+                            pass_bm_q[tap_q[4:0]] <= 1'b0;
+                        state_q <= ST_NEXT_TAP;
+                    end else begin
+                        // Match
+                        if (READ_REPEATS <= 1) begin
+                            if (tap_in_range_0_31)
+                                pass_bm_q[tap_q[4:0]] <= 1'b1;
+                            state_q <= ST_NEXT_TAP;
+                        end else begin
+                            if (rep_q == READ_REPEATS-1) begin
+                                if (tap_in_range_0_31)
+                                    pass_bm_q[tap_q[4:0]] <= 1'b1;
+                                state_q <= ST_NEXT_TAP;
+                            end else begin
+                                rep_q   <= rep_q + 1;
+                                state_q <= ST_READ_SEND; // re-read for stability
+                            end
+                        end
+                    end
+                end
+
+                ST_NEXT_TAP: begin
+                    if (tap_q == TAP_MAX[5:0]) begin
+                        cal_pass_bitmap_o <= pass_bm_q;
+
+                        // init analysis
+                        best_start_q <= 6'd0;
+                        best_len_q   <= 6'd0;
+                        cur_start_q  <= 6'd0;
+                        cur_len_q    <= 6'd0;
+                        idx_q        <= 6'd0;
+
+                        state_q      <= ST_ANALYZE;
+                    end else begin
+                        tap_q   <= tap_q + 1;
+                        state_q <= ST_TAP_RST;
+                    end
+                end
+
+                // Find longest contiguous run of 1s in pass_bm_q[0..31]
+                ST_ANALYZE: begin
+                    if (pass_bm_q[idx_q[4:0]]) begin
+                        if (cur_len_q == 0)
+                            cur_start_q <= idx_q;
+                        cur_len_q <= cur_len_q + 1;
+
+                        // update best if needed
+                        if ((cur_len_q + 1) > best_len_q) begin
+                            best_len_q   <= (cur_len_q + 1);
+                            best_start_q <= (cur_len_q == 0) ? idx_q : cur_start_q;
+                        end
+                    end else begin
+                        cur_len_q <= 0;
+                    end
+
+                    if (idx_q == 6'd31) begin
+                        if (best_len_q != 0) begin
+                            cal_best_tap_o <= best_start_q + (best_len_q >> 1);
+                            cal_pass_o     <= 1'b1;
+                            state_q        <= ST_PROG_BEST_RST;
+                        end else begin
+                            cal_best_tap_o <= 6'd0;
+                            cal_pass_o     <= 1'b0;
+                            state_q        <= ST_DONE;
+                        end
+                    end else begin
+                        idx_q <= idx_q + 1;
+                    end
+                end
+
+                // Program best tap: reset then inc best_tap times
+                ST_PROG_BEST_RST: begin
+                    cfg_data_o  <= make_cfg(FIXED_RDSEL, FIXED_RDLAT, 2'b11, 2'b00);
+                    cfg_valid_o <= 1'b1;
+                    inc_count_q <= 6'd0;
+
+                    if (cal_best_tap_o == 0)
+                        state_q <= ST_DONE;
+                    else
+                        state_q <= ST_PROG_BEST_INC;
+                end
+
+                ST_PROG_BEST_INC: begin
+                    cfg_data_o  <= make_cfg(FIXED_RDSEL, FIXED_RDLAT, 2'b00, 2'b11);
+                    cfg_valid_o <= 1'b1;
+
+                    if (inc_count_q + 1 >= cal_best_tap_o) begin
+                        state_q <= ST_DONE;
+                    end
+                    inc_count_q <= inc_count_q + 1;
+                end
+
+                ST_DONE: begin
+                    cal_done_o <= 1'b1;
+                    state_q    <= ST_DONE;
+                end
+
+                default: state_q <= ST_RESET;
+            endcase
+        end
+    end
+
+endmodule //module ddr3_calib_dqs_window #(

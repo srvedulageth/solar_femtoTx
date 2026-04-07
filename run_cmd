@@ -3,6 +3,7 @@
 mkdir -p obj/ts/ethmac_zap/
 
 #DEBUG_FLAGS="-DDEBUG -DDEBUG2"
+#DEBUG_FLAGS="-DDEBUG_2"
 DEBUG_FLAGS=""
 
 arm-none-eabi-as -march=armv5te -g src/ts/ethmac_zap/uart.s -o obj/ts/ethmac_zap/uart_start.o
