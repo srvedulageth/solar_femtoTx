@@ -503,14 +503,14 @@ ethmac ethmac(
 // ===============================
 
 //Processor RAM ...
-localparam RAM_ADDR_WIDTH        = 14;
+localparam RAM_ADDR_WIDTH        = 16;
 localparam RAM_DATA_WIDTH        = 32;
 localparam RAM_MEM_SIZE          = 16384;
 
 ram_wb
       #
         (
-          .adr_width(RAM_ADDR_WIDTH),
+          .adr_width(RAM_ADDR_WIDTH-2),
           .dat_width(RAM_DATA_WIDTH),
           .mem_size(RAM_MEM_SIZE),
           .MEMFILE("ethmac_zap.dump")
@@ -518,7 +518,7 @@ ram_wb
       ram_wb (
               .clk_i(i_clk),
               .rst_i(i_reset),
-              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:0]),
+              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:2]),
               .dat_i(data_wb_dout),
               .we_i(data_wb_we),
               .sel_i(data_wb_sel),

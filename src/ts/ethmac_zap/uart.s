@@ -17,9 +17,9 @@
 //  02110-1301, USA.
 //
 
-.set USER_STACK_POINTER, 0x00003DF0
-.set IRQ_STACK_POINTER,  0x00003EF0
-.set FIQ_STACK_POINTER,  0x00003FF0
+.set USER_STACK_POINTER, 0x0000F7F0
+.set IRQ_STACK_POINTER,  0x0000FBF0
+.set FIQ_STACK_POINTER,  0x0000FFF0
 .set VIC_BASE_ADDRESS,   0xFFFFFFA0
 
 .text
@@ -71,7 +71,7 @@ ldr sp, =FIQ_STACK_POINTER
  * Switch to user mode with interrupts enabled.
  * Set up stack pointer.
  */
-mrs r2, cpsr
+mrs r1, cpsr
 bic r1, r1, #31
 orr r1, r1, #16
 bic r1, r1, #0xC0
