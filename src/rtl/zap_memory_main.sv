@@ -146,14 +146,14 @@ begin
                 o_instr_abort_ff          <= 0;
                 o_und_ff                  <= 0;
                 o_mem_fault               <= 0;
-                o_alu_result_ff           <= 'x;
+                o_alu_result_ff           <= '0;
                 o_flags_ff                <= 0;
-                o_mem_srcdest_index_ff    <= 'x;
-                o_destination_index_ff    <= 'x;
-                o_pc_plus_8_ff            <= 'x;
+                o_mem_srcdest_index_ff    <= '0;
+                o_destination_index_ff    <= '0;
+                o_pc_plus_8_ff            <= '0;
                 o_instr_abort_ff          <= 0;
-                o_mem_load_ff             <= 'x;
-                mem_rd_data               <= 'x;
+                o_mem_load_ff             <= '0;
+                mem_rd_data               <= '0;
                 o_decompile               <= 0;
         end
         else if ( i_clear_from_writeback )
@@ -167,14 +167,14 @@ begin
                 o_instr_abort_ff          <= 0;
                 o_und_ff                  <= 0;
                 o_mem_fault               <= 0;
-                o_alu_result_ff           <= 'x;
+                o_alu_result_ff           <= '0;
                 o_flags_ff                <= 0;
-                o_mem_srcdest_index_ff    <= 'x;
-                o_destination_index_ff    <= 'x;
-                o_pc_plus_8_ff            <= 'x;
+                o_mem_srcdest_index_ff    <= '0;
+                o_destination_index_ff    <= '0;
+                o_pc_plus_8_ff            <= '0;
                 o_instr_abort_ff          <= 0;
-                o_mem_load_ff             <= 'x;
-                mem_rd_data               <= 'x;
+                o_mem_load_ff             <= '0;
+                mem_rd_data               <= '0;
                 o_decompile               <= 0;
         end
         else if ( i_data_stall )
@@ -292,7 +292,7 @@ begin: transform_function
                 2'd1: transform = {24'd0, data[15:8]};
                 2'd2: transform = {24'd0, data[23:16]};
                 2'd3: transform = {24'd0, data[31: 24]};
-            default : transform = 'x;
+            default : transform = '0;
                 endcase
         end
         // Signed byte. Sign extend lower byte.
@@ -304,7 +304,7 @@ begin: transform_function
                 2'd1: transform = {{24{data[15]}},data[15:8]};
                 2'd2: transform = {{24{data[23]}},data[23:16]};
                 2'd3: transform = {{24{data[31]}},data[31:24]};
-             default: transform = 'x;
+             default: transform = '0;
                 endcase
         end
         // Signed half word. Sign extend lower 16-bit.
@@ -313,7 +313,7 @@ begin: transform_function
                 case ( address[1] )
                 1'd0: transform = {{16{data[15]}},data[15:0]};
                 1'd1: transform = {{16{data[31]}},data[31:16]};
-             default: transform = 'x;
+             default: transform = '0;
                 endcase
 
                 if ( o_dav_ff && mem_load_ff2 )
@@ -328,7 +328,7 @@ begin: transform_function
                 case ( address[1] )
                 1'd0: transform = {16'd0, data[15:0]};
                 1'd1: transform = {16'd0, data[31:16]}; // address[1] = 1'd1
-             default: transform = 'x;
+             default: transform = '0;
                 endcase
 
                 if ( o_dav_ff && mem_load_ff2 )
@@ -346,7 +346,7 @@ begin: transform_function
                 2'b01: transform = {data  [7:0], data [31:8]};
                 2'b10: transform = {data [15:0], data[31:16]};
                 2'b11: transform = {data [23:0], data[31:24]};
-              default: transform = 'x;
+              default: transform = '0;
                 endcase
         end
 end

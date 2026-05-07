@@ -196,17 +196,17 @@ always_ff @ ( posedge i_clk )
 begin
         if ( i_reset )
         begin
-                // Things that are assigned to 'x on
+                // Things that are assigned to '0 on
                 // reset indicates that they do not
                 // actually need to be reset.
 
                 o_wb_cyc_ff             <= 0;
                 o_wb_stb_ff             <= 0;
-                o_wb_wen_ff             <= 'x;
-                o_wb_sel_ff             <= 'x;
-                o_wb_dat_ff             <= 'x;
+                o_wb_wen_ff             <= '0;
+                o_wb_sel_ff             <= '0;
+                o_wb_dat_ff             <= '0;
                 o_wb_cti_ff             <= CTI_EOB;
-                o_wb_adr_ff             <= 'x;
+                o_wb_adr_ff             <= '0;
                 cache_clean_req_ff      <= 0;
                 cache_inv_req_ff        <= 0;
                 adr_ctr_ff              <= 0;
@@ -603,40 +603,40 @@ begin:blk1
                 // Assigning X is OK to do and will result
                 // in better synthesis.
 
-                tmp                     = 'x;
-                state_nxt               = 'x;
-                adr_ctr_nxt             = 'x;
-                o_wb_cyc_nxt            = 'x;
-                o_wb_stb_nxt            = 'x;
-                o_wb_adr_nxt            = 'x;
-                o_wb_dat_nxt            = 'x;
-                o_wb_cti_nxt            = 'x;
-                o_wb_wen_nxt            = 'x;
-                o_wb_sel_nxt            = 'x;
-                cache_clean_req_nxt     = 'x;
-                cache_inv_req_nxt       = 'x;
-                o_fsr                   = 'x;
-                o_far                   = 'x;
-                o_cache_tag             = 'x;
-                o_cache_inv_done        = 'x;
-                o_cache_clean_done      = 'x;
-                o_cache_tag_dirty       = 'x;
-                o_cache_tag_wr_en       = 'x;
-                o_cache_line            = 'x;
-                o_cache_line_ben        = 'x;
-                o_hold                  = 'x;
-                o_ack                   = 'x;
-                o_err                   = 'x;
-                o_err2                  = 'x;
-                o_address               = 'x;
+                tmp                     = '0;
+                state_nxt               = '0;
+                adr_ctr_nxt             = '0;
+                o_wb_cyc_nxt            = '0;
+                o_wb_stb_nxt            = '0;
+                o_wb_adr_nxt            = '0;
+                o_wb_dat_nxt            = '0;
+                o_wb_cti_nxt            = '0;
+                o_wb_wen_nxt            = '0;
+                o_wb_sel_nxt            = '0;
+                cache_clean_req_nxt     = '0;
+                cache_inv_req_nxt       = '0;
+                o_fsr                   = '0;
+                o_far                   = '0;
+                o_cache_tag             = '0;
+                o_cache_inv_done        = '0;
+                o_cache_clean_done      = '0;
+                o_cache_tag_dirty       = '0;
+                o_cache_tag_wr_en       = '0;
+                o_cache_line            = '0;
+                o_cache_line_ben        = '0;
+                o_hold                  = '0;
+                o_ack                   = '0;
+                o_err                   = '0;
+                o_err2                  = '0;
+                o_address               = '0;
 
                 for(int i=0;i<CACHE_LINE/4;i++)
                 begin
-                        buf_nxt[i] = 'x;
+                        buf_nxt[i] = '0;
                 end
 
-                rhit                     = 'x;
-                whit                     = 'x;
+                rhit                     = '0;
+                whit                     = '0;
         end
         endcase
 end:blk1

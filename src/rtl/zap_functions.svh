@@ -75,7 +75,7 @@ function automatic is_cc_satisfied
         LE:     ok = (n != v) || z;
         AL:     ok = 1'd1; // Always execute.
         NV:     ok = 1'd0; // Never eXecute.
-        default:ok = 'x;   // Propagate X.
+        default:ok = '0;   // Propagate X.
         endcase
 
         return ok;
@@ -198,7 +198,7 @@ function automatic  [5:0] translate (
 
                 default:
                 begin
-                        translate = 'x;
+                        translate = '0;
                 end
         endcase
 

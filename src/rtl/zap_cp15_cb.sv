@@ -588,21 +588,21 @@ begin
 
                 default: // X propagate
                 begin
-                        state          <= 'x; //
-                        o_dcache_inv   <= 'x; //
-                        o_icache_inv   <= 'x; //
-                        o_dcache_clean <= 'x; //
-                        o_icache_clean <= 'x; //
-                        o_dtlb_inv     <= 'x; //
-                        o_itlb_inv     <= 'x; //
-                        o_reg_en       <= 'x; //
-                        o_cp_done      <= 'x; //
-                        o_reg_wr_data  <= 'x; //
-                        o_reg_wr_index <= 'x; //
-                        o_reg_rd_index <= 'x; //
+                        state          <= '0; //
+                        o_dcache_inv   <= '0; //
+                        o_icache_inv   <= '0; //
+                        o_dcache_clean <= '0; //
+                        o_icache_clean <= '0; //
+                        o_dtlb_inv     <= '0; //
+                        o_itlb_inv     <= '0; //
+                        o_reg_en       <= '0; //
+                        o_cp_done      <= '0; //
+                        o_reg_wr_data  <= '0; //
+                        o_reg_wr_index <= '0; //
+                        o_reg_rd_index <= '0; //
 
                         foreach(r[i])
-                                r[i] <= 'x;
+                                r[i] <= '0;
                 end
 
                 endcase

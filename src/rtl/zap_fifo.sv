@@ -108,10 +108,12 @@ begin
         if ( i_reset )
         begin
                 o_valid <= 1'd0;
+                o_instr <= 'h 0;
         end
         else if ( clear )
         begin
                 o_valid <= 1'd0;
+                o_instr <= 'h 0;
         end
         else if ( rd_en )
         begin

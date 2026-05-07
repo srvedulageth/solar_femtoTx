@@ -17,20 +17,20 @@ Added EthMac
 module zap_soc #(
 
 // CPU config.
-parameter DATA_SECTION_TLB_ENTRIES      = 4,
-parameter DATA_LPAGE_TLB_ENTRIES        = 8,
-parameter DATA_SPAGE_TLB_ENTRIES        = 16,
-parameter DATA_FPAGE_TLB_ENTRIES        = 32,
-parameter DATA_CACHE_SIZE               = 1024,
-parameter CODE_SECTION_TLB_ENTRIES      = 4,
-parameter CODE_LPAGE_TLB_ENTRIES        = 8,
-parameter CODE_SPAGE_TLB_ENTRIES        = 16,
-parameter CODE_FPAGE_TLB_ENTRIES        = 32,
-parameter CODE_CACHE_SIZE               = 1024,
+parameter ONLY_CORE                     = 0,
+parameter DATA_CACHE_SIZE               = 4096,
+parameter CODE_CACHE_SIZE               = 4096,
+parameter CODE_SECTION_TLB_ENTRIES      = 512,
+parameter CODE_LPAGE_TLB_ENTRIES        = 512,
+parameter CODE_FPAGE_TLB_ENTRIES        = 512,
+parameter CODE_SPAGE_TLB_ENTRIES        = 512,
+parameter DATA_SECTION_TLB_ENTRIES      = 512,
+parameter DATA_LPAGE_TLB_ENTRIES        = 512,
+parameter DATA_FPAGE_TLB_ENTRIES        = 512,
+parameter DATA_SPAGE_TLB_ENTRIES        = 512,
 parameter FIFO_DEPTH                    = 4,
 parameter BP_ENTRIES                    = 1024,
-parameter BE_32_ENABLE                  = 0,
-parameter ONLY_CORE                     = 0
+parameter BE_32_ENABLE                  = 0
 
 )(
         //Clk and rst
@@ -503,14 +503,14 @@ ethmac ethmac(
 // ===============================
 
 //Processor RAM ...
-localparam RAM_ADDR_WIDTH        = 14;
+localparam RAM_ADDR_WIDTH        = 16;
 localparam RAM_DATA_WIDTH        = 32;
 localparam RAM_MEM_SIZE          = 16384;
 
 ram_wb
       #
         (
-          .adr_width(RAM_ADDR_WIDTH),
+          .adr_width(RAM_ADDR_WIDTH-2),
           .dat_width(RAM_DATA_WIDTH),
           .mem_size(RAM_MEM_SIZE),
           .MEMFILE("ethmac_zap.dump")
@@ -518,7 +518,7 @@ ram_wb
       ram_wb (
               .clk_i(i_clk),
               .rst_i(i_reset),
-              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:0]),
+              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:2]),
               .dat_i(data_wb_dout),
               .we_i(data_wb_we),
               .sel_i(data_wb_sel),
@@ -905,4 +905,14 @@ u_ddr3_calib_dqs_window (
 ); //u_ddr3_calib_dqs_window(
 `endif //`ifdef DDR3_CONTROLLER
 
+`define DTLB_CHECK_PATH zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check
+wire dbg_dtlb_req             = `DTLB_CHECK_PATH.i_mmu_en && (`DTLB_CHECK_PATH.i_rd || `DTLB_CHECK_PATH.i_wr);
+wire dbg_dtlb_hit             = dbg_dtlb_req && (`DTLB_CHECK_PATH.match != 4'b0000);
+wire dbg_dtlb_miss            = dbg_dtlb_req && (`DTLB_CHECK_PATH.match == 4'b0000);
+wire dbg_dtlb_section_hit     = dbg_dtlb_req && `DTLB_CHECK_PATH.match[2];
+wire [3:0] dbg_dtlb_match     = `DTLB_CHECK_PATH.match;
+wire [31:0] dbg_dtlb_va       = `DTLB_CHECK_PATH.i_va;
+wire [31:0] dbg_dtlb_pa       = `DTLB_CHECK_PATH.o_phy_addr;
+wire dbg_dtlb_walk            = `DTLB_CHECK_PATH.o_walk;
+wire dbg_dtlb_cacheable       = `DTLB_CHECK_PATH.o_cacheable;
 endmodule // zap_soc

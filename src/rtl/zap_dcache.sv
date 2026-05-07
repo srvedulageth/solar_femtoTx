@@ -305,11 +305,11 @@ begin
                 state_ff <= SELECT_CCH;
                 o_wb_stb <= 1'd0;
                 o_wb_cyc <= 1'd0;
-                o_wb_adr <= 'x;
+                o_wb_adr <= '0;
                 o_wb_cti <= CTI_EOB;
-                o_wb_sel <= 'x;
-                o_wb_dat <= 'x;
-                o_wb_wen <= 'x;
+                o_wb_sel <= '0;
+                o_wb_dat <= '0;
+                o_wb_wen <= '0;
         end
         else
         begin
@@ -390,13 +390,13 @@ begin
         end
         default:
         begin
-                o_wb_stb_nxt = 'x;
-                o_wb_cyc_nxt = 'x;
-                o_wb_adr_nxt = 'x;
-                o_wb_dat_nxt = 'x;
-                o_wb_cti_nxt = 'x;
-                o_wb_sel_nxt = 'x;
-                o_wb_wen_nxt = 'x;
+                o_wb_stb_nxt = '0;
+                o_wb_cyc_nxt = '0;
+                o_wb_adr_nxt = '0;
+                o_wb_dat_nxt = '0;
+                o_wb_cti_nxt = '0;
+                o_wb_sel_nxt = '0;
+                o_wb_wen_nxt = '0;
         end
         endcase
 end

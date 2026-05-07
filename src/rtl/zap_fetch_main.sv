@@ -93,13 +93,15 @@ always_ff @ ( posedge i_clk )
 begin
         if (  i_reset )
         begin
-                o_pc_plus_8_ff  <= 'x;
-                o_pc_ff         <= 'x;
-                o_instruction   <= 'x;
+                o_pc_plus_8_ff  <= '0;
+                o_pc_ff         <= '0;
+                o_instruction   <= '0;
                 o_valid         <= 1'd0;
                 o_instr_abort   <= 1'd0;
                 sleep_ff        <= 1'd0;
-                o_pred          <= 'x; // No need to reset this - hence X.
+                o_pred          <= '0; // No need to reset this - hence X.
+
+                o_taken         <= '0;
         end
         else if(( i_clear_from_writeback )
         ||      ( i_clear_from_alu )
@@ -108,6 +110,8 @@ begin
                 o_valid         <= 1'd0;
                 o_instr_abort   <= 1'd0;
                 sleep_ff        <= 1'd0;
+
+                o_taken         <= '0;
         end
         // If unit is sleeping.
         else if ( sleep_ff && !i_code_stall )
@@ -120,6 +124,8 @@ begin
 
                 // Keep sleeping.
                 sleep_ff        <= 1'd1;
+
+                o_taken         <= '0;
         end
         // Data from memory is valid. This could also be used to signal
         // an instruction access abort.

@@ -212,7 +212,7 @@ begin
                         default:
                         begin
                                 // Synth will OPTIMIZE. OK to do for FPGA synthesis.
-                                {o_alu_operation, o_mem_srcdest_index} = 'x;
+                                {o_alu_operation, o_mem_srcdest_index} = '0;
                         end
 
                         endcase
@@ -282,7 +282,7 @@ begin
                         2'b01: o_alu_operation         = {1'd0, OP_QSUB};
                         2'b10: o_alu_operation         = {1'd0, OP_QDADD};
                         2'b11: o_alu_operation         = {1'd0, OP_QDSUB};
-                      default: o_alu_operation         = 'x; // Propagate X;
+                      default: o_alu_operation         = '0; // Propagate X;
                         endcase
 
                         // Processor does Rn - Rm.
@@ -315,7 +315,7 @@ begin
                         2'b01: o_alu_operation         = {1'd0, OP_QSUB};
                         2'b10: o_alu_operation         = {1'd0, OP_QDADD};
                         2'b11: o_alu_operation         = {1'd0, OP_QDSUB};
-                      default: o_alu_operation         = 'x; // Propagate X;
+                      default: o_alu_operation         = '0; // Propagate X;
                         endcase
 
                         // Processor does Rn - Rm.
@@ -348,7 +348,7 @@ begin
                         2'b01: o_alu_operation         = {1'd0, OP_QSUB};
                         2'b10: o_alu_operation         = {1'd0, OP_QDADD};
                         2'b11: o_alu_operation         = {1'd0, OP_QDSUB};
-                      default: o_alu_operation         = 'x; // Propagate X;
+                      default: o_alu_operation         = '0; // Propagate X;
                         endcase
 
                         // Processor does Rn - Rm.
@@ -381,7 +381,7 @@ begin
                         2'b01: o_alu_operation         = {1'd0, OP_QSUB};
                         2'b10: o_alu_operation         = {1'd0, OP_QDADD};
                         2'b11: o_alu_operation         = {1'd0, OP_QDSUB};
-                      default: o_alu_operation         = 'x; // Propagate X;
+                      default: o_alu_operation         = '0; // Propagate X;
                         endcase
 
                         // Processor does Rn - Rm.
@@ -553,7 +553,7 @@ begin
                         begin
                                 // Cannot happen. Synthesis will OPTIMIZE. OK to do for FPGA synth.
                                 {o_condition_code,o_alu_operation,o_flag_update,
-                                 o_destination_index,o_alu_source, o_mem_srcdest_index} = 'x;
+                                 o_destination_index,o_alu_source, o_mem_srcdest_index} = '0;
                         end
                         endcase
                 end
@@ -728,8 +728,8 @@ begin
 
                         default: // Propagate X.
                         begin
-                                o_alu_operation = 'x;
-                                o_mem_srcdest_index = 'x;
+                                o_alu_operation = '0;
+                                o_mem_srcdest_index = '0;
                         end
 
                         endcase

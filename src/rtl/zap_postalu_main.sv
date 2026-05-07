@@ -119,22 +119,22 @@ begin
                 o_data_wb_cyc_ff                 <= '0;
                 o_data_wb_stb_ff                 <= '0;
 
-                o_alu_result_ff                  <= 'x;
-                o_mem_srcdest_index_ff           <= 'x;
-                o_mem_srcdest_index_ff           <= 'x;
-                o_mem_load_ff                    <= 'x;
-                o_mem_unsigned_byte_enable_ff    <= 'x;
-                o_mem_signed_byte_enable_ff      <= 'x;
-                o_mem_signed_halfword_enable_ff  <= 'x;
-                o_mem_unsigned_halfword_enable_ff<= 'x;
-                o_mem_translate_ff               <= 'x;
-                o_decompile                      <= 'x;
-                o_data_wb_sel_ff                 <= 'x;
-                o_data_wb_dat_ff                 <= 'x;
-                o_data_wb_we_ff                  <= 'x;
-                o_flags_ff                       <= 'x;
-                o_pc_plus_8_ff                   <= 'x;
-                o_destination_index_ff           <= 'x;
+                o_alu_result_ff                  <= '0;
+                o_mem_srcdest_index_ff           <= '0;
+                o_mem_srcdest_index_ff           <= '0;
+                o_mem_load_ff                    <= '0;
+                o_mem_unsigned_byte_enable_ff    <= '0;
+                o_mem_signed_byte_enable_ff      <= '0;
+                o_mem_signed_halfword_enable_ff  <= '0;
+                o_mem_unsigned_halfword_enable_ff<= '0;
+                o_mem_translate_ff               <= '0;
+                o_decompile                      <= '0;
+                o_data_wb_sel_ff                 <= '0;
+                o_data_wb_dat_ff                 <= '0;
+                o_data_wb_we_ff                  <= '0;
+                o_flags_ff                       <= '0;
+                o_pc_plus_8_ff                   <= '0;
+                o_destination_index_ff           <= '0;
         end
         else if ( i_clear_from_writeback )
         begin
@@ -152,22 +152,22 @@ begin
                 o_data_wb_cyc_ff                 <= '0;
                 o_data_wb_stb_ff                 <= '0;
 
-                o_alu_result_ff                  <= 'x;
-                o_mem_srcdest_index_ff           <= 'x;
-                o_mem_srcdest_index_ff           <= 'x;
-                o_mem_load_ff                    <= 'x;
-                o_mem_unsigned_byte_enable_ff    <= 'x;
-                o_mem_signed_byte_enable_ff      <= 'x;
-                o_mem_signed_halfword_enable_ff  <= 'x;
-                o_mem_unsigned_halfword_enable_ff<= 'x;
-                o_mem_translate_ff               <= 'x;
-                o_decompile                      <= 'x;
-                o_data_wb_sel_ff                 <= 'x;
-                o_data_wb_dat_ff                 <= 'x;
-                o_data_wb_we_ff                  <= 'x;
-                o_flags_ff                       <= 'x;
-                o_pc_plus_8_ff                   <= 'x;
-                o_destination_index_ff           <= 'x;
+                o_alu_result_ff                  <= '0;
+                o_mem_srcdest_index_ff           <= '0;
+                o_mem_srcdest_index_ff           <= '0;
+                o_mem_load_ff                    <= '0;
+                o_mem_unsigned_byte_enable_ff    <= '0;
+                o_mem_signed_byte_enable_ff      <= '0;
+                o_mem_signed_halfword_enable_ff  <= '0;
+                o_mem_unsigned_halfword_enable_ff<= '0;
+                o_mem_translate_ff               <= '0;
+                o_decompile                      <= '0;
+                o_data_wb_sel_ff                 <= '0;
+                o_data_wb_dat_ff                 <= '0;
+                o_data_wb_we_ff                  <= '0;
+                o_flags_ff                       <= '0;
+                o_pc_plus_8_ff                   <= '0;
+                o_destination_index_ff           <= '0;
         end
         else if ( !i_data_stall )
         begin
@@ -188,22 +188,22 @@ begin
                         o_data_wb_cyc_ff                 <= '0;
                         o_data_wb_stb_ff                 <= '0;
 
-                        o_alu_result_ff                  <= 'x;
-                        o_mem_srcdest_index_ff           <= 'x;
-                        o_mem_srcdest_index_ff           <= 'x;
-                        o_mem_load_ff                    <= 'x;
-                        o_mem_unsigned_byte_enable_ff    <= 'x;
-                        o_mem_signed_byte_enable_ff      <= 'x;
-                        o_mem_signed_halfword_enable_ff  <= 'x;
-                        o_mem_unsigned_halfword_enable_ff<= 'x;
-                        o_mem_translate_ff               <= 'x;
-                        o_decompile                      <= 'x;
-                        o_data_wb_sel_ff                 <= 'x;
-                        o_data_wb_dat_ff                 <= 'x;
-                        o_data_wb_we_ff                  <= 'x;
-                        o_flags_ff                       <= 'x;
-                        o_pc_plus_8_ff                   <= 'x;
-                        o_destination_index_ff           <= 'x;
+                        o_alu_result_ff                  <= '0;
+                        o_mem_srcdest_index_ff           <= '0;
+                        o_mem_srcdest_index_ff           <= '0;
+                        o_mem_load_ff                    <= '0;
+                        o_mem_unsigned_byte_enable_ff    <= '0;
+                        o_mem_signed_byte_enable_ff      <= '0;
+                        o_mem_signed_halfword_enable_ff  <= '0;
+                        o_mem_unsigned_halfword_enable_ff<= '0;
+                        o_mem_translate_ff               <= '0;
+                        o_decompile                      <= '0;
+                        o_data_wb_sel_ff                 <= '0;
+                        o_data_wb_dat_ff                 <= '0;
+                        o_data_wb_we_ff                  <= '0;
+                        o_flags_ff                       <= '0;
+                        o_pc_plus_8_ff                   <= '0;
+                        o_destination_index_ff           <= '0;
                 end
                 else
                 begin

@@ -200,8 +200,8 @@ begin
         if ( i_reset )
         begin
                 o_clear_from_btb <= 1'd0;
-                o_pc_from_btb    <= {32{1'dx}};
-                o_branch_state   <= {2{1'dx}};
+                o_pc_from_btb    <= {32{1'd0}};
+                o_branch_state   <= {2{1'd0}};
         end
         else if ( !i_stall )
         begin
@@ -236,7 +236,7 @@ function automatic [1:0] compute ( input [1:0] pred, input nok );
                         WNT: return WT;  // Perhaps it is taken.
                         WT:  return WNT; // Perhaps it is not taken.
                         ST:  return WT;  // May be not so strongy taken.
-                   default:  return 'x;  // Propagate X.
+                   default:  return '0;  // Propagate X.
                         endcase
                 end
                 else // Confirm that branch was correctly predicted.
@@ -246,7 +246,7 @@ function automatic [1:0] compute ( input [1:0] pred, input nok );
                         WNT: return SNT; // Reinforce.
                         WT:  return ST;  // Reinforce.
                         ST:  return ST;  // Reinforce.
-                   default:  return 'x;  // Propagate X.
+                   default:  return '0;  // Propagate X.
                         endcase
                 end
 

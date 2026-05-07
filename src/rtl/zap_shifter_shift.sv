@@ -121,7 +121,7 @@ begin
                         // Synthesis will OPTIMIZE. OK to do for FPGA synthesis.
 
                        {o_result,
-                        o_carry} = 'x;
+                        o_carry} = '0;
                 end
         endcase
 end

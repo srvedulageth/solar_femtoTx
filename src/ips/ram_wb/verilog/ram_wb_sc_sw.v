@@ -20,6 +20,8 @@ module ram (clk, dat_i, dat_o, adr_i, we_i );
   //string filename;
   
   initial begin
+    $display("Addr Width = %d Data Width = %d Mem Size = %d", adr_width, dat_width, mem_size);
+
     if (MEMFILE != "") begin
       $display("Loading RAM from %s", MEMFILE);
       $readmemh(MEMFILE, ram);
@@ -28,10 +30,10 @@ module ram (clk, dat_i, dat_o, adr_i, we_i );
     end
   end
 
-  assign dat_o = ram[adr_i >> 2 ];
+  assign dat_o = ram[adr_i];
   always @ (posedge clk) begin 
     if (we_i) begin
-      ram[adr_i >> 2] <= dat_i;
+      ram[adr_i] <= dat_i;
     end
   end 
 endmodule // ram

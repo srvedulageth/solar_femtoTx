@@ -1,0 +1,39 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sat May  2 15:27:56 2026
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
+[dumpfile_mtime] "Sat May  2 03:45:38 2026"
+[dumpfile_size] 1094224497
+[savefile] "/home/vedulas/solar_femtoTX/src/testbench/debug_2.gtkw"
+[timestart] 140259000
+[size] 1854 899
+[pos] -1 -1
+*-15.171780 140295000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] zap_test.
+[treeopen] zap_test.u_chip_top.
+[treeopen] zap_test.u_chip_top.u_zap_top.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_tlb.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.
+[sst_width] 365
+[signals_width] 319
+[sst_expanded] 1
+[sst_vpaned_height] 386
+@22
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.i_address[31:0]
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.i_va[31:0]
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.o_phy_addr[31:0]
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.match[3:0]
+@28
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.o_walk
+@22
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.o_far[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.i_mmu_en
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.i_wr
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_tlb.u_zap_tlb_check.i_rd
+[pattern_trace] 1
+[pattern_trace] 0

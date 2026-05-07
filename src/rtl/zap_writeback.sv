@@ -618,7 +618,7 @@ zap_btb #(.BP_ENTRIES(BP_ENTRIES)) u_zap_btb (
             begin
                 if ( o_trace != trace_prev )
                 begin
-                    $display("%s", o_trace);
+                    $display($time, ": %s", o_trace);
                     trace_prev <= o_trace;
                 end
             end

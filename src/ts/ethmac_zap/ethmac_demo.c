@@ -22,11 +22,11 @@ static inline volatile uint32_t* tx_bd(void) {
 void eth_demo_init(void)
 {
     const unsigned char mac[6] = {0x02,0x12,0x34,0x56,0x78,0x9A};
-#ifdef DEBUG
+#ifdef DEBUG_2
     uart_puts("eth: init\r\n");
 #endif
     eth_init(mac);
-#ifdef DEBUG
+#ifdef DEBUG_2
     uart_puts("eth: init done\r\n");
 #endif
 }

@@ -1,0 +1,2045 @@
+These options -ffunction-sections -fdata-sections worked.
+They removed unused code. Thank you.
+
+When caches and mmu are enabled,
+this condition is not is not getting satisfied.
+
+Code snippet from net_poll_drain
+        volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + rx_tail*8u);
+        uint32_t st = bd[0];
+
+        eth_writel(0x11111111, ETH_MAC_HASH0);
+        if (st & BD_E_R)
+            break;                 // BD still owned by MAC, nothing to do
+        eth_writel(0x22222222, ETH_MAC_HASH0);
+
+as i can't see this second write to HASH0 register.
+
+
+The code snippet from object dump for net_pool_drain
+
+000003b4 <net_poll_drain>:
+ 3b4:   e92d4ff0        push    {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 3b8:   e59f9720        ldr     r9, [pc, #1824] @ ae0 <net_poll_drain+0x72c>
+ 3bc:   e59f8720        ldr     r8, [pc, #1824] @ ae4 <net_poll_drain+0x730>
+ 3c0:   e59f6720        ldr     r6, [pc, #1824] @ ae8 <net_poll_drain+0x734>
+ 3c4:   e59fa720        ldr     sl, [pc, #1824] @ aec <net_poll_drain+0x738>
+ 3c8:   e24ddf55        sub     sp, sp, #340    @ 0x154
+ 3cc:   e3a0b010        mov     fp, #16
+ 3d0:   e3e04a01        mvn     r4, #4096       @ 0x1000
+ 3d4:   e5993000        ldr     r3, [r9]
+ 3d8:   e2833202        add     r3, r3, #536870912      @ 0x20000000
+ 3dc:   e2433d0e        sub     r3, r3, #896    @ 0x380
+ 3e0:   e1a03183        lsl     r3, r3, #3
+ 3e4:   e593c000        ldr     ip, [r3] 
+ 3e8:   e5048fb7        str     r8, [r4, #-4023]        @ 0xfffff049
+ 3ec:   e21c0902        ands    r0, ip, #32768  @ 0x8000
+ 3f0:   1a000043        bne     504 <net_poll_drain+0x150>
+ 3f4:   e20c1a02        and     r1, ip, #8192   @ 0x2000
+ 3f8:   e3811302        orr     r1, r1, #134217728      @ 0x8000000
+ 3fc:   e3811903        orr     r1, r1, #49152  @ 0xc000
+ 400:   e59fe6e8        ldr     lr, [pc, #1768] @ af0 <net_poll_drain+0x73c>
+ 404:   e5046fb7        str     r6, [r4, #-4023]        @ 0xfffff049
+ 408:   e5932004        ldr     r2, [r3, #4]
+ 40c:   e504efb7        str     lr, [r4, #-4023]        @ 0xfffff049
+ 410:   e5831000        str     r1, [r3]
+ 414:   e504afb7        str     sl, [r4, #-4023]        @ 0xfffff049
+ 418:   e5991000        ldr     r1, [r9]
+ 41c:   e1a0382c        lsr     r3, ip, #16
+ 420:   e351007f        cmp     r1, #127        @ 0x7f
+ 424:   15991000        ldrne   r1, [r9]
+ 428:   03a01040        moveq   r1, #64 @ 0x40
+ 42c:   12811001        addne   r1, r1, #1
+ 430:   e353000d        cmp     r3, #13
+ 434:   e5891000        str     r1, [r9]
+ 438:   9a000024        bls     4d0 <net_poll_drain+0x11c>
+ 43c:   e5048fb7        str     r8, [r4, #-4023]        @ 0xfffff049
+ 440:   e59fe6ac        ldr     lr, [pc, #1708] @ af4 <net_poll_drain+0x740>
+ 444:   e1d2c0be        ldrh    ip, [r2, #14]
+ 448:   e5046fb3        str     r6, [r4, #-4019]        @ 0xfffff04d
+
+The code got execusted (from xsim.log)
+
+                    000003b4:<                                              STRAL R4  [DMY0],4> 21@0000f7c0 10@00000000 20000010
+                    000003b4:<                                              STRAL R5  [DMY0],4> 21@0000f7c4 10@00000000 20000010
+                    000003b4:<                                              STRAL R6  [DMY0],4> 21@0000f7c8 10@00000000 20000010
+                    000003b4:<                                              STRAL R7  [DMY0],4> 21@0000f7cc 10@00000000 20000010
+                    000003b4:<                                              STRAL R8  [DMY0],4> 21@0000f7d0 10@00000000 20000010
+                    000003b4:<                                              STRAL R9  [DMY0],4> 21@0000f7d4 10@00000000 20000010
+                    000003b4:<                                              STRAL R10 [DMY0],4> 21@0000f7d8 10@00000000 20000010
+                    000003b4:<                                              STRAL R11 [DMY0],4> 21@0000f7dc 10@0000f7ec 20000010
+                    000003b4:<                                              STRAL LR  [DMY0],4> 21@0000f7e0 10@00000c20 20000010
+                    000003b4:<                                      SUB  AL SP  ,SP  ,36 ROR 0> 0d@0000f7bc 10@20000010 20000010
+                    000003b8:<                                           LDRAL R9  [PC  ,1824]> 10@00000ae0 09@e1a08188 20000010
+                    000003bc:<                                           LDRAL R8  [PC  ,1824]> 10@00000ae4 08@11111111 20000010
+                    000003c0:<                                           LDRAL R6  [PC  ,1824]> 10@00000ae8 06@22222222 20000010
+                    000003c4:<                                           LDRAL R10 [PC  ,1824]> 10@00000aec 0a@44444444 20000010
+                    000003c8:<                                     SUB  AL SP  ,SP  ,85 ROR 15> 0d@0000f668 10@20000010 20000010
+                    000003cc:<                                      MOV  AL R11 ,R0  ,16 ROR 0> 0b@00000010 10@20000010 20000010
+                    000003d0:<                                      MVN  AL R4  ,R0  ,1 ROR 10> 04@ffffefff 10@20000010 20000010
+                    000003d4:<                                              LDRAL R3  [R9  ,0]> 10@00000d64 03@00000040 20000010
+                    000003d8:<                                       ADD  AL R3  ,R3  ,2 ROR 2> 03@20000040 10@20000010 20000010
+                    000003dc:<                                     SUB  AL R3  ,R3  ,14 ROR 13> 03@1ffffcc0 10@20000010 20000010
+                    000003e0:<                                   MOV  AL R3  ,R0  ,R3    LSL 3> 03@ffffe600 10@20000010 20000010
+                    000003e4:<                                              LDRAL R12 [R3  ,0]> 10@ffffe600 0c@00404000 20000010
+                    000003e8:<                                             STRAL R8  [R4  ,73]> 10@ffffe048 10@11111111 20000010
+                    000003ec:<                                       AND  AL R0  ,R12 ,2 ROR 9> 00@00000000 10@20000010 40000010
+                                                    000003f0:<                                                          BNE 67>*
+                    000003f4:<                                      AND  AL R1  ,R12 ,2 ROR 10> 01@00000000 10@40000010 40000010
+                    000003f8:<                                       ORR  AL R1  ,R1  ,2 ROR 3> 01@08000000 10@40000010 40000010
+                    000003fc:<                                       ORR  AL R1  ,R1  ,3 ROR 9> 01@0800c000 10@40000010 40000010
+                  000003fc:<                                       ORR  AL R1  ,R1  ,3 ROR 9> 01@0800c000 10@40000010 40000010
+                                                    00000400:<                                   AND  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000404:<                                   AND  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000408:<                                   EOR  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000040c:<                                   EOR  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000410:<                                   SUB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000414:<                                   SUB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000418:<                                   RSB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000041c:<                                   RSB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000420:<                                   ADD  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000424:<                                   ADD  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000428:<                                   ADC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000042c:<                                   ADC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000430:<                                   SBC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000434:<                                   SBC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000438:<                                   RSC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000043c:<                                   RSC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000440:<                                   TST  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000444:<                                   TST  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000448:<                                   TEQ  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000044c:<                                   TEQ  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000450:<                                   CMP  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000454:<                                   CMP  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000458:<                                   CMN  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000045c:<                                   CMN  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000460:<                                   ORR  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000464:<                                   ORR  NE R0  ,R0  ,LR    LSL 0>*
+
+
+What is happening?
+
+I can see that EthMAC changed buffer status to 0x00404000 i.e. 64 bytes received and E bit = 0 i.e. MAC filled buffer.
+This is the value CPU is reading.
+
+
+I added this and regenerated dump
+
+       // Invalidate BD entry FIRST 
+        dcache_inval_range((void*)bd, 8);
+    
+        uint32_t st = bd[0];
+
+It did not change any i.e new code is not making any difference.
+Where is this function defined?
+Looks like it is ignored.
+
+
+Can you give me code for making BD space uncacheble?
+
+#define RX_BD_FIRST    64u
+#define RX_BD_COUNT    64u
+#define RX_BUF_SIZE  2048u           // per-BD capacity (>= 1536)
+#define ETH_TX_BD_NUM_REG    ETH_REG(0x08)
+#define ETHMAC_BUF_RAM_BASE   0x10000000UL  
+#define ETHMAC_RX_BUF_RAM_BASE   (ETHMAC_BUF_RAM_BASE + 0x20000u)
+#define BD_E_R                (1u<<15)   // RX: EMPTY (1=owned by MAC), TX: READY (1=start TX)
+#define BD_IRQ                (1u<<14)
+#define BD_WRAP               (1u<<13)
+// EthMAC Wishbone slave base (your map: 0xFFFF_E000 .. 0xFFFF_EFFF)
+#define ETH_BASE            0xFFFFE000u
+
+// BD RAM base inside the same window. Two common options:
+#define ETH_BD_BASE         (ETH_BASE + 0x0400u)   // common wrapper (BDs inside 4KB)
+
+#define ETH_PACKETLEN        ETH_REG(0x06)
+
+// Choose how many RX buffers you want.
+void eth_rx_ring_init(void) {
+    // Split TX/RX ring
+    eth_writel(RX_BD_FIRST, ETH_TX_BD_NUM_REG); // 0..63 TX, 64..127 RX
+    
+    for (unsigned i = 0; i < RX_BD_COUNT; ++i) {
+        unsigned bd_idx = RX_BD_FIRST + i;
+        uint32_t ptr    = ETHMAC_RX_BUF_RAM_BASE + i*RX_BUF_SIZE;
+    
+        uint16_t flags  = BD_E_R | BD_IRQ;        // EMPTY=1 hands to MAC
+        if (i == RX_BD_COUNT - 1) flags |= BD_WRAP;
+
+        volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + bd_idx*8u);
+        bd[0] = ((uint32_t)RX_BUF_SIZE << 16) | flags;  // capacity in [31:16]
+        bd[1] = ptr;
+    }
+    
+    rx_tail = RX_BD_FIRST;
+
+    // Reasonable min/max frame
+    eth_writel((64u<<16) | 1518u, ETH_PACKETLEN);
+}
+
+Confused...
+       volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + rx_tail*8u);
+                
+        // Invalidate BD entry FIRST 
+        dcache_inval_range((void*)bd, 8);
+    
+        uint32_t st = bd[0];
+
+Here we are reading from BD Space which is inside EthMAC and which is already UNCACHED.
+right now this is NOT reading current status.
+
+DDR contains packet buffers corresponding to these buffer descriptors i.e. the received packet is written 
+to DDR and after that EthMAC updates packet status in BD Ram (which is insider EthMAC) and is already UNCACHED.
+
+How will the change (from cached and uncached) in DDR fix this issue?
+
+Could it be that the issue is wth address?
+                    000003c0:<                                           LDRAL R6  [PC  ,1824]> 10@00000ae8 06@22222222 20000010
+                    000003c4:<                                           LDRAL R10 [PC  ,1824]> 10@00000aec 0a@44444444 20000010
+                    000003c8:<                                     SUB  AL SP  ,SP  ,85 ROR 15> 0d@0000f668 10@20000010 20000010
+                    000003cc:<                                      MOV  AL R11 ,R0  ,16 ROR 0> 0b@00000010 10@20000010 20000010
+                    000003d0:<                                      MVN  AL R4  ,R0  ,1 ROR 10> 04@ffffefff 10@20000010 20000010
+                    000003d4:<                                              LDRAL R3  [R9  ,0]> 10@00000d64 03@00000040 20000010
+                    000003d8:<                                       ADD  AL R3  ,R3  ,2 ROR 2> 03@20000040 10@20000010 20000010
+                    000003dc:<                                     SUB  AL R3  ,R3  ,14 ROR 13> 03@1ffffcc0 10@20000010 20000010
+                    000003e0:<                                   MOV  AL R3  ,R0  ,R3    LSL 3> 03@ffffe600 10@20000010 20000010
+                    000003e4:<                                              LDRAL R12 [R3  ,0]> 10@ffffe600 0c@00404000 20000010
+                    000003e8:<                                             STRAL R8  [R4  ,73]> 10@ffffe048 10@11111111 20000010
+                    000003ec:<                                       AND  AL R0  ,R12 ,2 ROR 9> 00@00000000 10@20000010 40000010
+                                                    000003f0:<                                                          BNE 67>*
+                    000003f4:<                                      AND  AL R1  ,R12 ,2 ROR 10> 01@00000000 10@40000010 40000010
+                    000003f8:<                                       ORR  AL R1  ,R1  ,2 ROR 3> 01@08000000 10@40000010 40000010
+                    000003fc:<                                       ORR  AL R1  ,R1  ,3 ROR 9> 01@0800c000 10@40000010 40000010
+                                                    00000400:<                                   AND  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000404:<                                   AND  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000408:<                                   EOR  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000040c:<                                   EOR  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000410:<                                   SUB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000414:<                                   SUB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000418:<                                   RSB  NE R0  ,R0  ,LR    LSL 0>*
+
+The issue started right after address changed to 0x400. Until 0x3FC no issues?
+
+If may be so, how to confirm? I can add some dummy code if need be?
+
+
+what i need to comment to disable cache?
+
+   .set ENABLE_CP_WORD, 4100
+   mov r0, #0x4
+   ldr r1, [r0]
+   mcr p15, 0, r1, c1, c1, 0
+   
+   // Write out identitiy section mapping. Write 16KB to register 2.
+   mov r1, #1
+   mov r1, r1, lsl #14
+   mcr p15, 0, r1, c2, c0, 1
+   
+   // Set domain access control to all 1s.
+   mvn r1, #0
+   mcr p15, 0, r1, c3, c0, 0
+   
+   // Set up a section desctiptor for identity mapping that is Cachaeable.
+   mov r1, #1
+   mov r1, r1, lsl #14     // 16KB
+   mov r2, #14             // Cacheable identity descriptor.
+   str r2, [r1]            // Write identity section desctiptor to 16KB location.
+   ldr r6, [r1]            // R6 holds the descriptor.
+   mov r7, r1              // R7 holds the address.
+   
+   // Set up a section descriptor for upper 1MB of virtual address space.
+   // This is identity mapping. Uncacheable.
+   mov r1, #1
+   mov r1, r1, lsl #14     // 16KB. This is descriptor 0.
+   
+   // Go to descriptor 4095. This is the address BASE + (#DESC * 4).
+   .set DESCRIPTOR_IO_SECTION_OFFSET, 16380 // 4095 x 4
+   mov r0, #0x8
+   ldr r2,[r0]
+   add r1, r1, r2
+   
+   // Prepare a descriptor. Descriptor = 0xFFF00002 (Uncacheable section descriptor).
+   .set DESCRIPTOR_IO_SECTION, 0xFFF00002
+   mov r0, #0xC
+   ldr r2 ,[r0]
+   str r2, [r1]
+   ldr r6, [r1]
+   mov r7, r1
+   
+   // ENABLE MMU
+   .set ENABLE_MMU_CP_WORD, 4101
+   mov r0, #0x10
+   ldr r1, [r0]
+   mcr p15, 0, r1, c1, c1, 0
+
+I am sorry i pasted wrong code.
+This is the code which you gave me earlier which i am using.
+
+    // ----------------------------------------------------
+    // Enable cache (single bit enables both caches in ZAP)
+    // Uses test-case CP15 encoding
+    // ----------------------------------------------------
+    //ldr r1, =4100
+    //mcr p15, 0, r1, c1, c1, 0
+
+    // ----------------------------------------------------
+    // TTBR / translation table base = 16KB aligned
+    // Uses test-case CP15 encoding
+    // ----------------------------------------------------
+    ldr r1, =L1_TABLE_BASE
+    mcr p15, 0, r1, c2, c0, 1
+
+    // ----------------------------------------------------
+    // Domain access control = all 1s
+    // ----------------------------------------------------
+    mvn r1, #0
+    mcr p15, 0, r1, c3, c0, 0
+
+    // ----------------------------------------------------
+    // Clear all 4096 first-level descriptors
+    // ----------------------------------------------------
+//    ldr r0, =L1_TABLE_BASE
+//    mov r1, #0
+//    mov r2, #256    //#4096
+//clear_l1_loop:
+//    str r1, [r0], #4
+//    subs r2, r2, #1
+//    bne clear_l1_loop
+
+    // ----------------------------------------------------
+    // Descriptor 0: VA 0x00000000 -> PA 0x00000000
+    // Cacheable section descriptor = 0x0000000E
+    // ----------------------------------------------------
+    ldr r0, =L1_TABLE_BASE
+    ldr r1, =0x0000000E
+    str r1, [r0]                  // entry 0
+
+    // ----------------------------------------------------
+    // Map DDR: 0x10000000 - 0x1FFFFFFF (256MB)
+    // Cacheable section descriptors:
+    //   entry 0x100 = 0x1000000E
+    //   ...
+    //   entry 0x1FF = 0x1FF0000E
+    // ----------------------------------------------------
+    ldr r0, =L1_TABLE_BASE
+    ldr r1, =0x1000000E           // first DDR section descriptor
+    mov r2, #0x100                // first section index
+    mov r3, #256                  // 256 sections = 256MB
+
+ddr_map_loop:
+    str r1, [r0, r2, lsl #2]
+    add r1, r1, #0x00100000       // next physical section
+    add r2, r2, #1
+    subs r3, r3, #1
+    bne ddr_map_loop
+
+    // ----------------------------------------------------
+    // Descriptor 4095: VA 0xFFF00000 -> PA 0xFFF00000
+    // Uncacheable section descriptor = 0xFFF00002
+    // Covers UART/TIMER/VIC/ETH regs at 0xFFFFFFxx
+    // ----------------------------------------------------
+    ldr r0, =L1_TABLE_BASE
+    ldr r2, =16380                // 4095 * 4
+    add r0, r0, r2
+    ldr r1, =0xFFF00002
+    str r1, [r0]
+
+    // ----------------------------------------------------
+    // Enable MMU
+    // Uses test-case CP15 encoding
+    // ----------------------------------------------------
+    ldr r1, =4101
+    mcr p15, 0, r1, c1, c1, 0
+
+
+I commented enabling cache here. Please check.
+Same symptom.
+
+One good sign is it advanced a bit. 
+
+I could see 22222222 in the waveform.
+        eth_writel(0x11111111, ETH_MAC_HASH0);
+        if (st & BD_E_R)
+            break;                 // BD still owned by MAC, nothing to do
+        eth_writel(0x22222222, ETH_MAC_HASH0);
+
+I think issue is with this ox400.
+
+ 000003d0:<                                     SUB  AL R3  ,R3  ,14 ROR 13> 03@1ffffcc0 10@20000010 20000010
+                    000003d4:<                                   MOV  AL R3  ,R0  ,R3    LSL 3> 03@ffffe600 10@20000010 20000010
+                    000003d8:<                                              LDRAL R12 [R3  ,0]> 10@ffffe600 0c@00404000 20000010
+                    000003dc:<                                             STRAL R8  [R4  ,73]> 10@ffffe048 10@11111111 20000010
+                    000003e0:<                                       AND  AL R0  ,R12 ,2 ROR 9> 00@00000000 10@20000010 40000010
+                                                    000003e4:<                                                          BNE 67>*
+                    000003e8:<                                      AND  AL R1  ,R12 ,2 ROR 10> 01@00000000 10@40000010 40000010
+                    000003ec:<                                       ORR  AL R1  ,R1  ,2 ROR 3> 01@08000000 10@40000010 40000010
+                    000003f0:<                                       ORR  AL R1  ,R1  ,3 ROR 9> 01@0800c000 10@40000010 40000010
+                    000003f4:<                                           LDRAL LR  [PC  ,1768]> 10@00000ae4 0e@33333333 40000010
+                    000003f8:<                                             STRAL R6  [R4  ,73]> 10@ffffe048 10@22222222 40000010
+                    000003fc:<                                              LDRAL R2  [R3  ,4]> 10@ffffe604 02@10020000 40000010
+                                                    00000400:<                                   AND  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000404:<                                   AND  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000408:<                                   EOR  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000040c:<                                   EOR  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000410:<                                   SUB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000414:<                                   SUB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000418:<                                   RSB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000041c:<                                   RSB  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000420:<                                   ADD  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000424:<                                   ADD  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000428:<                                   ADC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000042c:<                                   ADC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000430:<                                   SBC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000434:<                                   SBC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000438:<                                   RSC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000043c:<                                   RSC  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000440:<                                   TST  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000444:<                                   TST  NE R0  ,R0  ,LR    LSL 0>*
+                                                    00000448:<                                   TEQ  NE R0  ,R0  ,LR    LSL 0>*
+                                                    0000044c:<                                   TEQ  NE R0  ,R0  ,LR    LSL 0>*
+
+
+
+
+The new code is
+.set USER_STACK_POINTER, 0x0000F7F0
+.set IRQ_STACK_POINTER,  0x0000FBF0
+.set FIQ_STACK_POINTER,  0x0000FFF0
+.set VIC_BASE_ADDRESS,   0xFFFFFFA0
+.set L1_TABLE_BASE,      0x00004000
+
+.text
+.global _Reset
+_Reset:
+
+_Reset   : b there
+_Undef   : b _Undef
+_Swi     : b _Swi
+_Pabt    : b _Pabt
+_Dabt    : b _Dabt
+reserved : b reserved
+irq      : b sc_call
+fiq      : b sc_call
+
+sc_call:
+    sub r14, r14, #4
+    stmfd sp!, {r0-r12, r14}
+    bl irq_handler
+    ldmfd sp!, {r0-r12, pc}^
+
+there:
+    // ----------------------------------------------------
+    // Enable cache (single bit enables both caches in ZAP)
+    // Uses test-case CP15 encoding
+    // ----------------------------------------------------
+    //ldr r1, =4100
+    //mcr p15, 0, r1, c1, c1, 0
+
+    // ----------------------------------------------------
+    // TTBR / translation table base = 16KB aligned
+    // Uses test-case CP15 encoding
+    // ----------------------------------------------------
+    ldr r1, =L1_TABLE_BASE
+    mcr p15, 0, r1, c2, c0, 1
+
+    // ----------------------------------------------------
+    // Domain access control = all 1s
+    // ----------------------------------------------------
+    mvn r1, #0
+    mcr p15, 0, r1, c3, c0, 0
+
+    // ----------------------------------------------------
+    // Clear all 4096 first-level descriptors
+    // ----------------------------------------------------
+    ldr r0, =L1_TABLE_BASE
+    mov r1, #0
+    mov r2, #4096    //#4096
+clear_l1_loop:
+    str r1, [r0], #4
+    subs r2, r2, #1
+    bne clear_l1_loop
+
+    // ----------------------------------------------------
+    // Descriptor 0: VA 0x00000000 -> PA 0x00000000
+    // Cacheable section descriptor = 0x0000000E
+    // ----------------------------------------------------
+    ldr r0, =L1_TABLE_BASE
+    ldr r1, =0x0000000E
+    str r1, [r0]                  // entry 0
+
+    // ----------------------------------------------------
+    // Map DDR: 0x10000000 - 0x1FFFFFFF (256MB)
+    // Cacheable section descriptors:
+    //   entry 0x100 = 0x1000000E
+    //   ...
+    //   entry 0x1FF = 0x1FF0000E
+    // ----------------------------------------------------
+    ldr r0, =L1_TABLE_BASE
+    ldr r1, =0x1000000E           // first DDR section descriptor
+    mov r2, #0x100                // first section index
+    mov r3, #256                  // 256 sections = 256MB
+
+ddr_map_loop:
+    str r1, [r0, r2, lsl #2]
+    add r1, r1, #0x00100000       // next physical section
+    add r2, r2, #1
+    subs r3, r3, #1
+    bne ddr_map_loop
+
+    // ----------------------------------------------------
+    // Descriptor 4095: VA 0xFFF00000 -> PA 0xFFF00000
+    // Uncacheable section descriptor = 0xFFF00002
+    // Covers UART/TIMER/VIC/ETH regs at 0xFFFFFFxx
+    // ----------------------------------------------------
+    ldr r0, =L1_TABLE_BASE
+    ldr r2, =16380                // 4095 * 4
+    add r0, r0, r2
+    ldr r1, =0xFFF00002
+    str r1, [r0]
+
+    // ----------------------------------------------------
+    // Enable MMU
+    // Uses test-case CP15 encoding
+    // ----------------------------------------------------
+    ldr r1, =4001
+    mcr p15, 0, r1, c1, c1, 0
+
+    /*
+     * Switch to IRQ mode.
+     * Set up stack pointer.
+     */
+    mrs r2, cpsr
+    bic r2, r2, #31
+    orr r2, r2, #18
+    msr cpsr_c, r2
+    ldr sp, =IRQ_STACK_POINTER
+
+    /*
+     * Switch to FIQ mode.
+     * Set up stack pointer.
+     */
+    mrs r2, cpsr
+    bic r2, r2, #31
+    orr r2, r2, #17
+    msr cpsr_c, r2
+    ldr sp, =FIQ_STACK_POINTER
+
+    /*
+     * Switch to user mode with interrupts enabled.
+     * Set up stack pointer.
+     */
+    mrs r1, cpsr
+    bic r1, r1, #31
+    orr r1, r1, #16
+    bic r1, r1, #0xC0
+    msr cpsr_c, r1
+
+    /*
+     * Unmask all interrupts in the VIC.
+     */
+    ldr r0, =VIC_BASE_ADDRESS
+    add r0, r0, #4
+    mov r1, #0
+    str r1, [r0]
+    ldr r1, [r0]
+
+    /*
+     * Then call the main function.
+     */
+    ldr sp, =USER_STACK_POINTER
+    bl main
+
+here:
+    b here
+
+
+I enabled clear_l1_loop and this runs for 4096.
+
+This is the object dump snippet
+0000001c <fiq>:
+  1c:   eaffffff        b       20 <sc_call>
+
+00000020 <sc_call>:
+  20:   e24ee004        sub     lr, lr, #4
+  24:   e92d5fff        push    {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+  28:   eb0002e8        bl      bd0 <irq_handler>
+  2c:   e8fd9fff        ldm     sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}^
+
+00000030 <there>:
+  30:   e3a01901        mov     r1, #16384      @ 0x4000
+  34:   ee021f30        mcr     15, 0, r1, cr2, cr0, {1}
+  38:   e3e01000        mvn     r1, #0
+  3c:   ee031f10        mcr     15, 0, r1, cr3, cr0, {0}
+  40:   e3a00901        mov     r0, #16384      @ 0x4000
+  44:   e3a01000        mov     r1, #0
+  48:   e3a02a01        mov     r2, #4096       @ 0x1000
+
+0000004c <clear_l1_loop>:
+  4c:   e4801004        str     r1, [r0], #4
+  50:   e2522001        subs    r2, r2, #1
+  54:   1afffffc        bne     4c <clear_l1_loop>
+  58:   e3a00901        mov     r0, #16384      @ 0x4000
+  5c:   e3a0100e        mov     r1, #14
+  60:   e5801000        str     r1, [r0]
+  64:   e3a00901        mov     r0, #16384      @ 0x4000
+
+
+This is what happening.
+
+1. Right after reset everything is fine executes normoally.
+2. Packet comes and interrupt gets generated.
+3. Processor goes to ISR.
+4. Hear the interrupt thing.
+   It started executing clear_l1_loop too which it should NOT
+
+                    00000c40:<                                             STRAL R3  [R11 ,-8]> 10@0000f7e4 10@00000002 60000010
+                    00000c44:<                                             LDRAL R3  [R11 ,-8]> 10@0000f7e4 03@00000002 60000010
+                                                                                                                  00000c48:<FIQ>
+                    0000001c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000020:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000024:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000028:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    0000002c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000030:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000034:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000038:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    0000003c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000040:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000044:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000048:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    0000004c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000050:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeffe 10@60000010 a00000d1
+                    00000054:<                                                          BNE -4> 10@0000004c 10@00000000 a00000d1
+                                                    0000004c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0>*
+                    00000050:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeffd 10@60000010 a00000d1
+                    00000054:<                                                          BNE -4> 10@0000004c 10@00000000 a00000d1
+                                                    0000004c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0>*
+
+Please note: the clear_l1_loop counter gets initialized with ffffeffe!!!
+5. What is happening?
+
+
+This did NOT work. Same issue.
+
+Object Dump
+0000001c <fiq>:
+  1c:   eaffffff        b       20 <sc_call>
+ 
+00000020 <sc_call>:
+  20:   e24ee004        sub     lr, lr, #4
+  24:   e92d5fff        push    {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+  28:   eb0002e9        bl      bd4 <irq_handler>
+  2c:   e8bd5fff        pop     {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+  30:   e25ef000        subs    pc, lr, #0
+
+
+Hex dump snipet
+ea00000b
+eafffffe
+eafffffe
+eafffffe
+eafffffe
+eafffffe
+ea000000
+eaffffff
+e24ee004
+e92d5fff
+eb0002e9
+e8bd5fff
+e25ef000
+e3a01901
+ee021f30
+e3e01000
+ee031f10
+
+Code Executed after the interrupt came
+                  00000c3c:<                                             LDRAL R3  [R11 ,-8]> 10@0000f7e4 03@00000001 60000010
+                    00000c40:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000002 10@60000010 60000010
+                    00000c44:<                                             STRAL R3  [R11 ,-8]> 10@0000f7e4 10@00000002 60000010
+                    00000c48:<                                             LDRAL R3  [R11 ,-8]> 10@0000f7e4 03@00000002 60000010
+                                                                                                                  00000c4c:<FIQ>
+                    0000001c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000020:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000024:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000028:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    0000002c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000030:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000034:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000038:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    0000003c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000040:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000044:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000048:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    0000004c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000050:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+                    00000054:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeffe 10@60000010 a00000d1
+                    00000058:<                                                          BNE -4> 10@00000050 10@00000000 a00000d1
+
+
+
+I want to put few dummy instructions after there:
+there:
+    ldr r1, =L1_TABLE_BASE
+    mcr p15, 0, r1, c2, c0, 1
+
+    mvn r1, #0
+    mcr p15, 0, r1, c3, c0, 0
+
+    ldr r0, =L1_TABLE_BASE
+    mov r1, #0
+    mov r2, #4096
+
+may be nops.
+
+What i observed was in the passing(no caches and mmu) also cpu executed few instructions inside "there:" before executing
+ISR. Since clear_l1_loop is right there with in those few instructions, it may have gone to executed loop in case if mmu and caches enabled.
+
+MAY!!! My suspetion.
+
+I want to try putting some dummy instructions 
+there:
+    <dummy>
+    ldr r1, =L1_TABLE_BASE
+
+Can you suggest what i can put?
+
+
+Here is my observation.
+
+I commented enabling caches and mmu.
+    // enable MMU only
+    //ldr r1, =4101
+    //mcr p15, 0, r1, c1, c1, 0
+
+BTW, 4101 enables both cache and mmu. 4001 enables only mmu.
+
+My thinking is SAME code, but caches and mmu not enabled. This should work right.
+No it did not.
+
+Right after FIQ came, it did execute ISR, but continued to execute other instructions and went into clear_l1_loopcommented enabling caches and mmu.
+    // enable MMU only
+    //ldr r1, =4101
+    //mcr p15, 0, r1, c1, c1, 0
+
+BTW, 4101 enables both cache and mmu. 4001 enables only mmu.
+
+My thinking is SAME code, but caches and mmu not enabled. This should work right.
+No it did not.
+
+Right after FIQ came, it did execute ISR, but continued to execute other instructions and went into clear_l1_loop with weird count.
+
+             1159610:                     00000c54:<                                             LDRAL R3  [R11 ,-8]> 10@0000f7e4 03@00000001 80000010
+             1159690:                     00000c58:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@00000000 10@80000010 60000010
+             1159710:                     00000c5c:<                                                          BLS -7> 10@00000c48 10@00000000 60000010
+             1159870:                                                                                                                   00000c48:<FIQ>
+             1160060:                     0000001c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160080:                     00000020:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160100:                     00000024:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160120:                     00000028:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160140:                     0000002c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160160:                     00000030:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160180:                     00000034:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160200:                     00000038:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160220:                     0000003c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160240:                     00000040:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160260:                     00000044:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160280:                     00000048:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160300:                     0000004c:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160320:                     00000050:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@60000010 600000d1
+             1160340:                     00000054:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeffe 10@60000010 a00000d1
+             1160360:                     00000058:<                                                          BNE -4> 10@00000050 10@00000000 a00000d1
+             1160510:                                                     00000050:<                                   AND  EQ R0  ,R0  ,R0    LSL 0>*
+             1160530:                     00000054:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeffd 10@60000010 a00000d1
+             1160550:                     00000058:<                                                          BNE -4> 10@00000050 10@00000000 a00000d1
+             1160700:                                                     00000050:<                                   AND  EQ R0  ,R0  ,R0    LSL 0>*
+             1160720:                     00000054:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeffc 10@60000010 a00000d1
+             1160740:                     00000058:<                                                          BNE -4> 10@00000050 10@00000000 a00000d1
+             1160890:                                                     00000050:<                                   AND  EQ R0  ,R0  ,R0    LSL 0>*
+             1160910:                     00000054:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeffb 10@60000010 a00000d1
+             1160930:                     00000058:<                                                          BNE -4> 10@00000050 10@00000000 a00000d1
+             1161080:                                                     00000050:<                                   AND  EQ R0  ,R0  ,R0    LSL 0>*
+             1161100:                     00000054:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeffa 10@60000010 a00000d1
+             1161120:                     00000058:<                                                          BNE -4> 10@00000050 10@00000000 a00000d1
+             1161270:                                                     00000050:<                                   AND  EQ R0  ,R0  ,R0    LSL 0>*
+             1161290:                     00000054:<                                       SUB  AL R2  ,R2  ,1 ROR 0> 02@ffffeff9 10@60000010 a00000d1
+
+
+This is the object dump with mmu and caches disabled.
+00000020 <sc_call>:
+  20:   e24ee004        sub     lr, lr, #4
+  24:   e92d5fff        push    {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+  28:   eb0002ec        bl      be0 <irq_handler>
+  2c:   e8bd5fff        pop     {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+  30:   e25ef000        subs    pc, lr, #0
+
+00000034 <there>:
+  34:   e3a01901        mov     r1, #16384      @ 0x4000
+  38:   ee021f30        mcr     15, 0, r1, cr2, cr0, {1}
+  3c:   e3e01000        mvn     r1, #0
+  40:   ee031f10        mcr     15, 0, r1, cr3, cr0, {0}
+  44:   e3a00901        mov     r0, #16384      @ 0x4000
+  48:   e3a01000        mov     r1, #0
+  4c:   e3a02a01        mov     r2, #4096       @ 0x1000
+
+00000050 <clear_l1_loop>:
+  50:   e4801004        str     r1, [r0], #4
+  54:   e2522001        subs    r2, r2, #1
+  58:   1afffffc        bne     50 <clear_l1_loop>
+  5c:   e3a00901        mov     r0, #16384      @ 0x4000
+  60:   e3a01002        mov     r1, #2
+  64:   e5801000        str     r1, [r0]
+  68:   e3a00901        mov     r0, #16384      @ 0x4000
+  6c:   e3a01221        mov     r1, #268435458  @ 0x10000002
+  70:   e3a02c01        mov     r2, #256        @ 0x100
+  74:   e3a03c01        mov     r3, #256        @ 0x100
+
+
+00000020 <sc_call>:
+  20:   e24ee004        sub     lr, lr, #4
+  24:   e92d5fff        push    {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+  28:   eb0002ec        bl      be0 <irq_handler>
+  2c:   e8bd5fff        pop     {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+  30:   e25ef000        subs    pc, lr, #0
+
+00000034 <there>:
+  34:   e3a01901        mov     r1, #16384      @ 0x4000
+  38:   ee021f30        mcr     15, 0, r1, cr2, cr0, {1}
+  3c:   e3e01000        mvn     r1, #0
+  40:   ee031f10        mcr     15, 0, r1, cr3, cr0, {0}
+  44:   e3a00901        mov     r0, #16384      @ 0x4000
+  48:   e3a01000        mov     r1, #0
+  4c:   e3a02a01        mov     r2, #4096       @ 0x1000
+
+00000050 <clear_l1_loop>:
+  50:   e4801004        str     r1, [r0], #4
+  54:   e2522001        subs    r2, r2, #1
+  58:   1afffffc        bne     50 <clear_l1_loop>
+  5c:   e3a00901        mov     r0, #16384      @ 0x4000
+  60:   e3a01002        mov     r1, #2
+  64:   e5801000        str     r1, [r0]
+  68:   e3a00901        mov     r0, #16384      @ 0x4000
+  6c:   e3a01221        mov     r1, #268435458  @ 0x10000002
+  70:   e3a02c01        mov     r2, #256        @ 0x100
+  74:   e3a03c01        mov     r3, #256        @ 0x100
+
+I think there is something wrong with this new code OR i can't comment only that enabling part.
+
+Can you help?
+
+
+The culprit seems to be this clear_l1_loop
+//    ldr r0, =L1_TABLE_BASE
+//    mov r1, #0
+//    mov r2, #4096
+//clear_l1_loop:
+//    str r1, [r0], #4
+//    subs r2, r2, #1
+//    bne clear_l1_loop
+
+I commented this and test PASSED without caches and MMU enabled.
+
+After this i enabled caches and MMU and i am hotting the earlier issue.
+ISR serviced.
+
+Code enters ISR when it reads the very first BD address issue (reading from 0x400)
+
+Object dump snippet
+3c4:   e92d4ff0        push    {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 3c8:   e59f9720        ldr     r9, [pc, #1824] @ af0 <net_poll_drain+0x72c>
+ 3cc:   e59f8720        ldr     r8, [pc, #1824] @ af4 <net_poll_drain+0x730>
+ 3d0:   e59f6720        ldr     r6, [pc, #1824] @ af8 <net_poll_drain+0x734>
+ 3d4:   e59fa720        ldr     sl, [pc, #1824] @ afc <net_poll_drain+0x738>
+ 3d8:   e24ddf55        sub     sp, sp, #340    @ 0x154
+ 3dc:   e3a0b010        mov     fp, #16
+ 3e0:   e3e04a01        mvn     r4, #4096       @ 0x1000
+ 3e4:   e5993000        ldr     r3, [r9]
+ 3e8:   e2833202        add     r3, r3, #536870912      @ 0x20000000
+ 3ec:   e2433d0e        sub     r3, r3, #896    @ 0x380
+ 3f0:   e1a03183        lsl     r3, r3, #3
+ 3f4:   e593c000        ldr     ip, [r3]
+ 3f8:   e5048fb7        str     r8, [r4, #-4023]        @ 0xfffff049
+ 3fc:   e21c0902        ands    r0, ip, #32768  @ 0x8000
+ 400:   1a000043        bne     514 <net_poll_drain+0x150>
+ 404:   e20c1a02        and     r1, ip, #8192   @ 0x2000
+ 408:   e3811302        orr     r1, r1, #134217728      @ 0x8000000
+ 40c:   e3811903        orr     r1, r1, #49152  @ 0xc000
+ 410:   e59fe6e8        ldr     lr, [pc, #1768] @ b00 <net_poll_drain+0x73c>
+ 414:   e5046fb7        str     r6, [r4, #-4023]        @ 0xfffff049
+ 418:   e5932004        ldr     r2, [r3, #4]
+ 41c:   e504efb7        str     lr, [r4, #-4023]        @ 0xfffff049
+ 420:   e5831000        str     r1, [r3]
+
+
+Executed Code
+             1166000:                     000003d0:<                                           LDRAL R6  [PC  ,1824]> 10@00000af8 06@22222222 20000010
+             1166040:                     000003d4:<                                           LDRAL R10 [PC  ,1824]> 10@00000afc 0a@44444444 20000010
+             1166050:                     000003d8:<                                     SUB  AL SP  ,SP  ,85 ROR 15> 0d@0000f668 10@20000010 20000010
+             1166060:                     000003dc:<                                      MOV  AL R11 ,R0  ,16 ROR 0> 0b@00000010 10@20000010 20000010
+             1166070:                     000003e0:<                                      MVN  AL R4  ,R0  ,1 ROR 10> 04@ffffefff 10@20000010 20000010
+             1166110:                     000003e4:<                                              LDRAL R3  [R9  ,0]> 10@00000d74 03@00000040 20000010
+             1166190:                     000003e8:<                                       ADD  AL R3  ,R3  ,2 ROR 2> 03@20000040 10@20000010 20000010
+             1166200:                     000003ec:<                                     SUB  AL R3  ,R3  ,14 ROR 13> 03@1ffffcc0 10@20000010 20000010
+             1166220:                     000003f0:<                                   MOV  AL R3  ,R0  ,R3    LSL 3> 03@ffffe600 10@20000010 20000010
+             1166320:                     000003f4:<                                              LDRAL R12 [R3  ,0]> 10@ffffe600 0c@00404000 20000010
+             1166360:                     000003f8:<                                             STRAL R8  [R4  ,73]> 10@ffffe048 10@11111111 20000010
+             1166420:                     000003fc:<                                       AND  AL R0  ,R12 ,2 ROR 9> 00@00000000 10@20000010 40000010
+             1166430:                                                     00000400:<                                   AND  NE R0  ,R0  ,R2    LSL 0>*
+             1166440:                                                     00000404:<                                   AND  NE R0  ,R0  ,R2    LSL 0>*
+             1166450:                                                     00000408:<                                   EOR  NE R0  ,R0  ,R2    LSL 0>*
+             1166460:                                                     0000040c:<                                   EOR  NE R0  ,R0  ,R2    LSL 0>*
+             1166470:                                                     00000410:<                                   SUB  NE R0  ,R0  ,R2    LSL 0>*
+             1166480:                                                     00000414:<                                   SUB  NE R0  ,R0  ,R2    LSL 0>*
+             1166490:                                                     00000418:<                                   RSB  NE R0  ,R0  ,R2    LSL 0>*
+             1166500:                                                     0000041c:<                                   RSB  NE R0  ,R0  ,R2    LSL 0>*
+             1166510:                                                     00000420:<                                   ADD  NE R0  ,R0  ,R2    LSL 0>*
+             1166540:                                                     00000424:<                                   ADD  NE R0  ,R0  ,R2    LSL 0>*
+             1166570:                                                     00000428:<                                   ADC  NE R0  ,R0  ,R2    LSL 0>*
+             1166600:                                                     0000042c:<                                   ADC  NE R0  ,R0  ,R2    LSL 0>*
+             1166630:                                                     00000430:<                                   SBC  NE R0  ,R0  ,R2    LSL 0>*
+             1166660:                                                     00000434:<                                   SBC  NE R0  ,R0  ,R2    LSL 0>*
+             1166690:                                                     00000438:<                                   RSC  NE R0  ,R0  ,R2    LSL 0>*
+             1166720:                                                     0000043c:<                                   RSC  NE R0  ,R0  ,R2    LSL 0>*
+             1166750:                                                     00000440:<                                   TST  NE R0  ,R0  ,R2    LSL 0>*
+             1166780:                                                     00000444:<                                   TST  NE R0  ,R0  ,R2    LSL 0>*
+             1166810:                                                     00000448:<                                   TEQ  NE R0  ,R0  ,R2    LSL 0>*
+             1166840:                                                     0000044c:<                                   TEQ  NE R0  ,R0  ,R2    LSL 0>*
+             1166870:                                                     00000450:<                                   CMP  NE R0  ,R0  ,R2    LSL 0>*
+             1166900:                                                     00000454:<                                   CMP  NE R0  ,R0  ,R2    LSL 0>*
+             1166930:                                                     00000458:<                                   CMN  NE R0  ,R0  ,R2    LSL 0>*
+             1166960:                                                     0000045c:<                                   CMN  NE R0  ,R0  ,R2    LSL 0>*
+             1166990:                                                     00000460:<                                   ORR  NE R0  ,R0  ,R2    LSL 0>*
+             1167020:                                                     00000464:<                                   ORR  NE R0  ,R0  ,R2    LSL 0>*
+             1167050:                                                     00000468:<                                   MOV  NE R0  ,R0  ,R2    LSL 0>*
+             1167080:                                                     0000046c:<                                   MOV  NE R0  ,R0  ,R2    LSL 0>*
+             1167110:                                                     00000470:<                                   BIC  NE R0  ,R0  ,R2    LSL 0>*
+             1167140:                                                     00000474:<                                   BIC  NE R0  ,R0  ,R2    LSL 0>*
+             1167170:                                                     00000478:<                                   MVN  NE R0  ,R0  ,R2    LSL 0>*
+             1167200:                                                     0000047c:<                                   MVN  NE R0  ,R0  ,R2    LSL 0>*
+             1167230:                                                     00000480:<                                       AND  NE R0  ,R0  ,2 ROR 0>*
+             1167260:                                                     00000484:<                                       AND  NE R0  ,R0  ,2 ROR 0>*
+             1167290:                                                     00000488:<                                       EOR  NE R0  ,R0  ,2 ROR 0>*
+             1167320:                                                     0000048c:<                                       EOR  NE R0  ,R0  ,2 ROR 0>*
+             1167350:                                                     00000490:<                                       SUB  NE R0  ,R0  ,2 ROR 0>*
+             1167380:                                                     00000494:<                                       SUB  NE R0  ,R0  ,2 ROR 0>*
+             1167410:                                                     00000498:<                                       RSB  NE R0  ,R0  ,2 ROR 0>*
+             1167440:                                                     0000049c:<                                       RSB  NE R0  ,R0  ,2 ROR 0>*
+             1167470:                                                     000004a0:<                                       ADD  NE R0  ,R0  ,2 ROR 0>*
+             1167500:                                                     000004a4:<                                       ADD  NE R0  ,R0  ,2 ROR 0>*
+             1167530:                                                     000004a8:<                                       ADC  NE R0  ,R0  ,2 ROR 0>*
+             1167560:                                                     000004ac:<                                       ADC  NE R0  ,R0  ,2 ROR 0>*
+             1167590:                                                     000004b0:<                                       SBC  NE R0  ,R0  ,2 ROR 0>*
+             1167620:                                                     000004b4:<                                       SBC  NE R0  ,R0  ,2 ROR 0>*
+             1167650:                                                     000004b8:<                                       RSC  NE R0  ,R0  ,2 ROR 0>*
+             1167680:                                                     000004bc:<                                       RSC  NE R0  ,R0  ,2 ROR 0>*
+             1167710:                                                     000004c0:<                                       TST  NE R0  ,R0  ,2 ROR 0>*
+             1167740:                                                     000004c4:<                                       TST  NE R0  ,R0  ,2 ROR 0>*
+             1167770:                                                     000004c8:<                                       TEQ  NE R0  ,R0  ,2 ROR 0>*
+             1167800:                                                     000004cc:<                                       TEQ  NE R0  ,R0  ,2 ROR 0>*
+             1167830:                                                     000004d0:<                                       CMP  NE R0  ,R0  ,2 ROR 0>*
+             1167860:                                                     000004d4:<                                       CMP  NE R0  ,R0  ,2 ROR 0>*
+             1167890:                                                     000004d8:<                                       CMN  NE R0  ,R0  ,2 ROR 0>*
+             1167920:                                                     000004dc:<                                       CMN  NE R0  ,R0  ,2 ROR 0>*
+             1167950:                                                     000004e0:<                                       ORR  NE R0  ,R0  ,2 ROR 0>*
+             1167980:                                                     000004e4:<                                       ORR  NE R0  ,R0  ,2 ROR 0>*
+             1168010:                                                     000004e8:<                                       MOV  NE R0  ,R0  ,2 ROR 0>*
+             1168040:                                                     000004ec:<                                       MOV  NE R0  ,R0  ,2 ROR 0>*
+             1168070:                                                     000004f0:<                                       BIC  NE R0  ,R0  ,2 ROR 0>*
+             1168100:                                                     000004f4:<                                       BIC  NE R0  ,R0  ,2 ROR 0>*
+             1168130:                                                     000004f8:<                                       MVN  NE R0  ,R0  ,2 ROR 0>*
+             1168160:                                                     000004fc:<                                       MVN  NE R0  ,R0  ,2 ROR 0>*
+             1168190:                                                     00000500:<                                             STRNE R0  [R0  ],-2>*
+             1168220:                                                     00000504:<                                             LDRNE R0  [R0  ],-2>*
+             1168250:                                                     00000508:<                                            STRNE TR0  [R0  ],-2>*
+             1168280:                                                     0000050c:<                                            LDRNE TR0  [R0  ],-2>*
+             1168310:                                                     00000510:<                                            STRNEB R0  [R0  ],-2>*
+             1168340:                                                     00000514:<                                            LDRNEB R0  [R0  ],-2>*
+             1168370:                                                     00000518:<                                           STRNEB TR0  [R0  ],-2>*
+             1168400:                                                     0000051c:<                                           LDRNEB TR0  [R0  ],-2>*
+             1168430:                                                     00000520:<                                              STRNE R0  [R0  ],2>*
+             1168460:                                                     00000524:<                                              LDRNE R0  [R0  ],2>*
+             1168490:                                                     00000528:<                                             STRNE TR0  [R0  ],2>*
+             1168520:                                                     0000052c:<                                             LDRNE TR0  [R0  ],2>*
+             1168550:                                                     00000530:<                                             STRNEB R0  [R0  ],2>*
+             1168580:                                                     00000534:<                                             LDRNEB R0  [R0  ],2>*
+             1168610:                                                     00000538:<                                            STRNEB TR0  [R0  ],2>*
+             1168640:                                                     0000053c:<                                            LDRNEB TR0  [R0  ],2>*
+             1168670:                                                     00000540:<                                             STRNE R0  [R0  ,-2]>*
+             1168700:                                                     00000544:<                                             LDRNE R0  [R0  ,-2]>*
+             1168730:                                                     00000548:<                                            STRNE R0  [R0  ,-2]!>*
+             1168760:                                                     0000054c:<                                            LDRNE R0  [R0  ,-2]!>*
+             1168790:                                                     00000550:<                                            STRNEB R0  [R0  ,-2]>*
+             1168820:                                                     00000554:<                                            LDRNEB R0  [R0  ,-2]>*
+             1168850:                                                     00000558:<                                           STRNEB R0  [R0  ,-2]!>*
+             1168880:                                                     0000055c:<                                           LDRNEB R0  [R0  ,-2]!>*
+             1168910:                                                     00000560:<                                              STRNE R0  [R0  ,2]>*
+             1168940:                                                     00000564:<                                              LDRNE R0  [R0  ,2]>*
+             1168970:                                                     00000568:<                                             STRNE R0  [R0  ,2]!>*
+             1169000:                                                     0000056c:<                                             LDRNE R0  [R0  ,2]!>*
+             1169030:                                                     00000570:<                                             STRNEB R0  [R0  ,2]>*
+             1169060:                                                     00000574:<                                             LDRNEB R0  [R0  ,2]>*
+             1169090:                                                     00000578:<                                            STRNEB R0  [R0  ,2]!>*
+             1169120:                                                     0000057c:<                                            LDRNEB R0  [R0  ,2]!>*
+             1169150:                                                     00000580:<          STRNE  R0  [U=0 R0  ],                      R2   LSL 0>*
+             1169180:                                                     00000584:<          LDRNE  R0  [U=0 R0  ],                      R2   LSL 0>*
+             1169210:                                                     00000588:<          STRNE TR0  [U=0 R0  ],                      R2   LSL 0>*
+             1169240:                                                     0000058c:<          LDRNE TR0  [U=0 R0  ],                      R2   LSL 0>*
+             1169270:                                                     00000590:<         STRNEB  R0  [U=0 R0  ],                      R2   LSL 0>*
+             1169300:                                                     00000594:<         LDRNEB  R0  [U=0 R0  ],                      R2   LSL 0>*
+             1169330:                                                     00000598:<         STRNEB TR0  [U=0 R0  ],                      R2   LSL 0>*
+             1169360:                                                     0000059c:<         LDRNEB TR0  [U=0 R0  ],                      R2   LSL 0>*
+             1169390:                                                     000005a0:<          STRNE  R0  [U=1 R0  ],                      R2   LSL 0>*
+             1169420:                                                     000005a4:<          LDRNE  R0  [U=1 R0  ],                      R2   LSL 0>*
+             1169450:                                                     000005a8:<          STRNE TR0  [U=1 R0  ],                      R2   LSL 0>*
+             1169480:                                                     000005ac:<          LDRNE TR0  [U=1 R0  ],                      R2   LSL 0>*
+             1169510:                                                     000005b0:<         STRNEB  R0  [U=1 R0  ],                      R2   LSL 0>*
+             1169540:                                                     000005b4:<         LDRNEB  R0  [U=1 R0  ],                      R2   LSL 0>*
+             1169570:                                                     000005b8:<         STRNEB TR0  [U=1 R0  ],                      R2   LSL 0>*
+             1169600:                                                     000005bc:<         LDRNEB TR0  [U=1 R0  ],                      R2   LSL 0>*
+             1169630:                                                     000005c0:<          STRNE  R0  [U=0 R0  ,                      R2   LSL 0]>*
+             1169660:                                                     000005c4:<          LDRNE  R0  [U=0 R0  ,                      R2   LSL 0]>*
+             1169690:                                                     000005c8:<         STRNE  R0  [U=0 R0  ,                      R2   LSL 0]!>*
+             1169720:                                                     000005cc:<         LDRNE  R0  [U=0 R0  ,                      R2   LSL 0]!>*
+             1169750:                                                     000005d0:<         STRNEB  R0  [U=0 R0  ,                      R2   LSL 0]>*
+             1169780:                                                     000005d4:<         LDRNEB  R0  [U=0 R0  ,                      R2   LSL 0]>*
+             1169810:                                                     000005d8:<        STRNEB  R0  [U=0 R0  ,                      R2   LSL 0]!>*
+             1169840:                                                     000005dc:<        LDRNEB  R0  [U=0 R0  ,                      R2   LSL 0]!>*
+             1169870:                                                     000005e0:<          STRNE  R0  [U=1 R0  ,                      R2   LSL 0]>*
+             1169900:                                                     000005e4:<          LDRNE  R0  [U=1 R0  ,                      R2   LSL 0]>*
+             1169930:                                                     000005e8:<         STRNE  R0  [U=1 R0  ,                      R2   LSL 0]!>*
+             1169960:                                                     000005ec:<         LDRNE  R0  [U=1 R0  ,                      R2   LSL 0]!>*
+             1169990:                                                     000005f0:<         STRNEB  R0  [U=1 R0  ,                      R2   LSL 0]>*
+             1170020:                                                     000005f4:<         LDRNEB  R0  [U=1 R0  ,                      R2   LSL 0]>*
+             1170050:                                                     000005f8:<        STRNEB  R0  [U=1 R0  ,                      R2   LSL 0]!>*
+             1170080:                                                     000005fc:<        LDRNEB  R0  [U=1 R0  ,                      R2   LSL 0]!>*
+             1170110:                                                     00000600:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170120:                                                     00000600:<                                             STRNE R1  [DMY0,4]!>*
+             1170130:                     00000600:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170140:                                                     00000604:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170150:                                                     00000604:<                                             LDRNE R1  [DMY0,4]!>*
+             1170160:                     00000604:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170170:                                                     00000608:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170180:                                                     00000608:<                                             STRNE R1  [DMY0,4]!>*
+             1170190:                                                     00000608:<                                       SUB  NE R0  ,R0  ,4 ROR 0>*
+             1170200:                                                     0000060c:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170210:                                                     0000060c:<                                             LDRNE R1  [DMY0,4]!>*
+             1170220:                                                     0000060c:<                                       SUB  NE R0  ,R0  ,4 ROR 0>*
+             1170230:                                                     00000610:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170240:                                                     00000610:<                                             STRNE R1  [DMY0,4]!>*
+             1170250:                     00000610:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170260:                                                     00000614:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170270:                                                     00000614:<                                             LDRNE R1  [DMY0,4]!>*
+             1170280:                     00000614:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170290:                                                     00000618:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170300:                                                     00000618:<                                             STRNE R1  [DMY0,4]!>*
+             1170310:                                                     00000618:<                                       SUB  NE R0  ,R0  ,4 ROR 0>*
+             1170320:                                                     0000061c:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170330:                                                     0000061c:<                                             LDRNE R1  [DMY0,4]!>*
+             1170340:                                                     0000061c:<                                       SUB  NE R0  ,R0  ,4 ROR 0>*
+             1170350:                                                     00000620:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170360:                                                     00000620:<                                              STRNE R1  [DMY0],4>*
+             1170370:                     00000620:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170380:                                                     00000624:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170390:                                                     00000624:<                                              LDRNE R1  [DMY0],4>*
+             1170400:                     00000624:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170410:                                                     00000628:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170420:                                                     00000628:<                                              STRNE R1  [DMY0],4>*
+             1170430:                                                     00000628:<                                   MOV  NE R0  ,R0  ,DMY0  LSL 0>*
+             1170440:                                                     0000062c:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170450:                                                     0000062c:<                                              LDRNE R1  [DMY0],4>*
+             1170460:                                                     0000062c:<                                   MOV  NE R0  ,R0  ,DMY0  LSL 0>*
+             1170470:                                                     00000630:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170480:                                                     00000630:<                                              STRNE R1  [DMY0],4>*
+             1170490:                     00000630:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170500:                                                     00000634:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170510:                                                     00000634:<                                              LDRNE R1  [DMY0],4>*
+             1170520:                     00000634:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170530:                                                     00000638:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170540:                                                     00000638:<                                              STRNE R1  [DMY0],4>*
+             1170550:                                                     00000638:<                                   MOV  NE R0  ,R0  ,DMY0  LSL 0>*
+             1170560:                                                     0000063c:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170570:                                                     0000063c:<                                              LDRNE R1  [DMY0],4>*
+             1170580:                                                     0000063c:<                                   MOV  NE R0  ,R0  ,DMY0  LSL 0>*
+             1170590:                                                     00000640:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170600:                                                     00000640:<                                              STRNE R1  [DMY0],4>*
+             1170610:                     00000640:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170620:                                                     00000644:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170630:                                                     00000644:<                                              LDRNE R1  [DMY0],4>*
+             1170640:                     00000644:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170650:                                                     00000648:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170660:                                                     00000648:<                                              STRNE R1  [DMY0],4>*
+             1170670:                                                     00000648:<                                       SUB  NE R0  ,R0  ,4 ROR 0>*
+             1170680:                                                     0000064c:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170690:                                                     0000064c:<                                              LDRNE R1  [DMY0],4>*
+             1170700:                                                     0000064c:<                                       SUB  NE R0  ,R0  ,4 ROR 0>*
+             1170710:                                                     00000650:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170720:                                                     00000650:<                                              STRNE R1  [DMY0],4>*
+             1170730:                     00000650:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170740:                                                     00000654:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170750:                                                     00000654:<                                              LDRNE R1  [DMY0],4>*
+             1170760:                     00000654:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170770:                                                     00000658:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170780:                                                     00000658:<                                              STRNE R1  [DMY0],4>*
+             1170790:                                                     00000658:<                                       SUB  NE R0  ,R0  ,4 ROR 0>*
+             1170800:                                                     0000065c:<                                       SUB  NE DMY0,R0  ,4 ROR 0>*
+             1170810:                                                     0000065c:<                                              LDRNE R1  [DMY0],4>*
+             1170820:                                                     0000065c:<                                       SUB  NE R0  ,R0  ,4 ROR 0>*
+             1170830:                                                     00000660:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170840:                                                     00000660:<                                             STRNE R1  [DMY0,4]!>*
+             1170850:                     00000660:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170860:                                                     00000664:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170870:                                                     00000664:<                                             LDRNE R1  [DMY0,4]!>*
+             1170880:                     00000664:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1170890:                                                     00000668:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170900:                                                     00000668:<                                             STRNE R1  [DMY0,4]!>*
+             1170910:                                                     00000668:<                                   MOV  NE R0  ,R0  ,DMY0  LSL 0>*
+             1170920:                                                     0000066c:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170930:                                                     0000066c:<                                             LDRNE R1  [DMY0,4]!>*
+             1170940:                                                     0000066c:<                                   MOV  NE R0  ,R0  ,DMY0  LSL 0>*
+             1170950:                                                     00000670:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170960:                                                     00000670:<                                             STRNE R1  [DMY0,4]!>*
+             1170970:                     00000670:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+zap_test.u_ram.cmd_task: at time 1170979583.0 ps INFO: Refresh  
+             1170980:                                                     00000674:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1170990:                                                     00000674:<                                             LDRNE R1  [DMY0,4]!>*
+             1171000:                     00000674:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@00000000 10@40000010 40000010
+             1171010:                                                     00000678:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1171020:                                                     00000678:<                                             STRNE R1  [DMY0,4]!>*
+             1171030:                                                     00000678:<                                   MOV  NE R0  ,R0  ,DMY0  LSL 0>*
+             1171040:                                                     0000067c:<                                   MOV  NE DMY0,R0  ,R0    LSL 0>*
+             1171050:                                                     0000067c:<                                             LDRNE R1  [DMY0,4]!>*
+             1171060:                                                     0000067c:<                                   MOV  NE R0  ,R0  ,DMY0  LSL 0>*
+             1171070:                                                     00000680:<                                                           BNE 2>*
+             1171100:                                                     00000684:<                                                     BNE 1048578>*
+             1171130:                                                     00000688:<                                                     BNE 2097154>*
+             1171160:                                                     0000068c:<                                                     BNE 3145730>*
+             1171190:                                                     00000690:<                                                     BNE 4194306>*
+             1171220:                                                     00000694:<                                                     BNE 5242882>*
+             1171250:                                                     00000698:<                                                     BNE 6291458>*
+             1171280:                                                     0000069c:<                                                     BNE 7340034>*
+             1171310:                                                     000006a0:<                                                    BNE -8388606>*
+             1171340:                                                     000006a4:<                                                    BNE -7340030>*
+             1171370:                                                     000006a8:<                                                    BNE -6291454>*
+             1171400:                                                     000006ac:<                                                    BNE -5242878>*
+             1171430:                                                     000006b0:<                                                    BNE -4194302>*
+             1171460:                                                     000006b4:<                                                    BNE -3145726>*
+             1171490:                                                     000006b8:<                                                    BNE -2097150>*
+             1171520:                                                     000006bc:<                                                    BNE -1048574>*
+             1171550:                                                     000006c0:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171560:                                                     000006c0:<                                                           BNE 2>*
+             1171580:                                                     000006c4:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171590:                                                     000006c4:<                                                     BNE 1048578>*
+             1171610:                                                     000006c8:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171620:                                                     000006c8:<                                                     BNE 2097154>*
+             1171640:                                                     000006cc:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171650:                                                     000006cc:<                                                     BNE 3145730>*
+             1171670:                                                     000006d0:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171680:                                                     000006d0:<                                                     BNE 4194306>*
+             1171700:                                                     000006d4:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171710:                                                     000006d4:<                                                     BNE 5242882>*
+             1171730:                                                     000006d8:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171740:                                                     000006d8:<                                                     BNE 6291458>*
+             1171760:                                                     000006dc:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171770:                                                     000006dc:<                                                     BNE 7340034>*
+             1171790:                                                     000006e0:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171800:                                                     000006e0:<                                                    BNE -8388606>*
+             1171820:                                                     000006e4:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171830:                                                     000006e4:<                                                    BNE -7340030>*
+             1171850:                                                     000006e8:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171860:                                                     000006e8:<                                                    BNE -6291454>*
+             1171880:                                                     000006ec:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171890:                                                     000006ec:<                                                    BNE -5242878>*
+             1171910:                                                     000006f0:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171920:                                                     000006f0:<                                                    BNE -4194302>*
+             1171940:                                                     000006f4:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171950:                                                     000006f4:<                                                    BNE -3145726>*
+             1171970:                                                     000006f8:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1171980:                                                     000006f8:<                                                    BNE -2097150>*
+             1172000:                                                     000006fc:<                                       SUB  NE LR  ,PC  ,4 ROR 0>*
+             1172010:                                                     000006fc:<                                                    BNE -1048574>*
+             1173470:                                                     000007c0:<                                                  SWIAL 16777218>*
+             1173500:                                                     000007c4:<                                                  SWIAL 17825794>*
+             1173530:                                                     000007c8:<                                                  SWIAL 18874370>*
+             1173560:                                                     000007cc:<                                                  SWIAL 19922946>*
+             1173590:                                                     000007d0:<                                                  SWIAL 20971522>*
+             1173620:                                                     000007d4:<                                                  SWIAL 22020098>*
+             1173650:                                                     000007d8:<                                                  SWIAL 23068674>*
+             1173680:                                                     000007dc:<                                                  SWIAL 24117250>*
+             1173710:                                                     000007e0:<                                                  SWIAL 25165826>*
+             1173740:                                                     000007e4:<                                                  SWIAL 26214402>*
+             1173770:                                                     000007e8:<                                                  SWIAL 27262978>*
+             1173800:                                                     000007ec:<                                                  SWIAL 28311554>*
+             1173830:                                                     000007f0:<                                                  SWIAL 29360130>*
+             1173860:                                                     000007f4:<                                                  SWIAL 30408706>*
+             1173890:                                                     000007f8:<                                                  SWIAL 31457282>*
+             1173920:                                                     000007fc:<                                                  SWIAL 32505858>*
+             1173950:                     00000800:<                                   ADD  AL R3  ,SP  ,R3    LSL 0> 03@0000dc68 10@40000010 40000010
+             1174010:                     00000804:<                                          STRALB R1  [R3  ,-256]> 10@0000db68 10@ffffffff 40000010
+             1174080:                     00000808:<                                             LDRAL R3  [SP  ,40]> 10@0000f690 03@00000000 40000010
+             1174160:                     0000080c:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000001 10@40000010 40000010
+             1174210:                     00000810:<                                             STRAL R3  [SP  ,40]> 10@0000f690 10@00000001 40000010
+             1174250:                     00000814:<                                             LDRAL R3  [SP  ,40]> 10@0000f690 03@00000001 40000010
+             1174330:                     00000818:<                                       CMP  AL R0  ,R3  ,5 ROR 0> 10@fffffffc 10@40000010 80000010
+             1174350:                     0000081c:<                                                         BLS -15> 10@000007e8 10@00000000 80000010
+             1174530:                                                                                                                   000007e8:<SWI>
+             1174740:                     00000008:<                                                          BAL -2> 10@00000008 10@00000000 80000093
+
+
+
+What is going on here?
+We have to find a solution without clear_l1_loop.
+
+
+src/ts/ethmac_zap/uart_mmu_5_patched.s: Assembler messages:
+src/ts/ethmac_zap/uart_mmu_5_patched.s:88: Error: invalid constant (101) after fixup
+   82     /*
+   83      * Map remaining DDR 0x10100000 - 0x1FFFFFFF as CACHEABLE.
+   84      * If this causes any instability, comment this loop out and run all-DDR-uncached.
+   85      */
+   86     ldr r0, =L1_TABLE_BASE
+   87     ldr r1, =0x1010000E         /* descriptor for 0x10100000 cacheable */
+   88     mov r2, #0x101              /* first cacheable DDR section index */
+   89     mov r3, #255          
+
+
+I think this loop is not terminating.
+
+Assembly Code
+    ldr r0, =L1_TABLE_BASE      /* r0 = L1 table base */
+    mov r1, #0                  /* r1 = section index, 0..4095 */
+    ldr r3, =4096               /* r3 = loop limit */
+
+identity_map_loop:
+    mov r2, r1, lsl #20         /* r2 = physical section base */
+    orr r2, r2, #0x02           /* uncached section descriptor */
+    str r2, [r0, r1, lsl #2]    /* table[index] = descriptor */
+    add r1, r1, #1
+    cmp r1, r3
+    bne identity_map_loop
+
+Corresponding Object Dump
+00000034 <there>:
+  34:   e3a01901        mov     r1, #16384      @ 0x4000
+  38:   ee021f30        mcr     15, 0, r1, cr2, cr0, {1}
+  3c:   e3e01000        mvn     r1, #0
+  40:   ee031f10        mcr     15, 0, r1, cr3, cr0, {0}
+  44:   e3a00901        mov     r0, #16384      @ 0x4000
+  48:   e3a01000        mov     r1, #0
+  4c:   e3a03a01        mov     r3, #4096       @ 0x1000
+
+00000050 <identity_map_loop>:
+  50:   e1a02a01        lsl     r2, r1, #20
+  54:   e3822002        orr     r2, r2, #2
+  58:   e7802101        str     r2, [r0, r1, lsl #2]
+  5c:   e2811001        add     r1, r1, #1
+  60:   e1510003        cmp     r1, r3
+  64:   1afffff9        bne     50 <identity_map_loop>
+
+Executed Code
+                1140:                     00000044:<                                       MOV  AL R0  ,R0  ,1 ROR 9> 00@00004000 10@00000000 000000d3
+                1150:                     00000048:<                                       MOV  AL R1  ,R0  ,0 ROR 0> 01@00000000 10@00000000 000000d3
+                1160:                     0000004c:<                                      MOV  AL R3  ,R0  ,1 ROR 10> 03@00001000 10@00000000 000000d3
+
+                1170:                     00000050:<                                  MOV  AL R2  ,R0  ,R1    LSL 20> 02@00000000 10@00000000 000000d3
+                1180:                     00000054:<                                       ORR  AL R2  ,R2  ,2 ROR 0> 02@00000002 10@00000000 000000d3
+                1230:                     00000058:<          STRAL  R2  [U=1 R0  ,                      R1   LSL 2]> 10@00004000 10@00000002 000000d3
+                1240:                     0000005c:<                                       ADD  AL R1  ,R1  ,1 ROR 0> 01@00000001 10@00000000 000000d3
+                1250:                     00000060:<                                   CMP  AL R0  ,R1  ,R3    LSL 0> 10@fffff001 10@00000000 800000d3
+                1270:                     00000064:<                                                          BNE -7> 10@00000050 10@00000000 800000d3
+
+                1430:                     00000050:<                                  MOV  AL R2  ,R0  ,R1    LSL 20> 02@00100000 10@00000000 800000d3
+                1450:                     00000054:<                                       ORR  AL R2  ,R2  ,2 ROR 0> 02@00100002 10@00000000 800000d3
+                1500:                     00000058:<          STRAL  R2  [U=1 R0  ,                      R1   LSL 2]> 10@00004004 10@00100002 800000d3
+                1520:                     0000005c:<                                       ADD  AL R1  ,R1  ,1 ROR 0> 01@00000002 10@00000000 800000d3
+                1540:                     00000060:<                                   CMP  AL R0  ,R1  ,R3    LSL 0> 10@fffff002 10@00000000 800000d3
+                1560:                     00000064:<                                                          BNE -7> 10@00000050 10@00000000 800000d3
+
+
+I think I THINK this compariosn is wrong.
+What do you say?
+
+
+Uninitialized DRAM access causing X's which is causing hang later.
+
+The code is doing eth_demo_init
+000003e0 <eth_demo_init>:
+ 3e0:   e59f3020        ldr     r3, [pc, #32]   @ 408 <eth_demo_init+0x28>
+ 3e4:   e52de004        push    {lr}            @ (str lr, [sp, #-4]!)
+ 3e8:   e8930003        ldm     r3, {r0, r1}
+ 3ec:   e24dd00c        sub     sp, sp, #12
+ 3f0:   e58d0000        str     r0, [sp]
+ 3f4:   e1a0000d        mov     r0, sp
+ 3f8:   e1cd10b4        strh    r1, [sp, #4]
+ 3fc:   ebffff58        bl      164 <eth_init>
+ 400:   e28dd00c        add     sp, sp, #12
+ 404:   e49df004        pop     {pc}            @ (ldr pc, [sp], #4)
+ 408:   00000dac        .word   0x00000dac
+
+Instruction at 3e0, 3e8: is does a read.
+
+At this stage we are only initilizig BD rigngs i.e. inside this code
+int eth_init(const uint8_t mac[6]){
+    
+    // Disable MAC
+    eth_writel(0, ETH_MODER);
+    
+    // MDIO
+    mdio_init();
+
+    // PHY bring-up
+#ifdef DEBUG_2
+    (void)phy_wait_link(30);
+#endif
+    
+    // Program MAC + BDs
+    eth_set_mac(mac);
+    eth_config_defaults();
+    
+    eth_rx_ring_init();
+    eth_tx_ring_init();
+    rx_poll_scheduled = 0;
+
+The code should not be reading DRAM. But i can see that code is reading DRAM which is NOT initialized.
+
+Executed Code
+               73640:                     00000d04:<                                              LDRAL DMY1[DMY0],4> 21@0000f7e0 22@00000c60 60000010
+               73650:                     00000d04:<                                   MOV  AL SP  ,R0  ,DMY0  LSL 0> 0d@0000f7e0 10@60000010 60000010
+               73720:                     00000d04:<                                   MOV  AL PC  ,R0  ,DMY1  LSL 0> 10@00000c60 10@60000010 60000010
+               73750:                     00000c60:<                                       SUB  AL LR  ,PC  ,4 ROR 0> 0e@00000c64 10@60000010 60000010
+               73760:                     00000c60:<                                                        BAL -546> 10@000003e0 10@00000000 60000010
+               73910:                     000003e0:<                                             LDRAL R3  [PC  ,32]> 10@00000408 03@1020000e 60000010
+               73950:                     000003e4:<                                            STRAL LR  [SP  ,-4]!> 0d@0000f7dc 10@00000c64 60000010
+zap_test.u_ram.cmd_task: at time 73999583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               74010:                     000003e8:<                                   MOV  AL DMY0,R0  ,R3    LSL 0> 21@1020000e 10@60000010 60000010
+
+
+Later
+               78930:                     000003e8:<                                              LDRAL R0  [DMY0],4> 21@10200012 00@e433XXXX 60000010
+
+zap_test.u_ram.data_task: at time 79014583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000008 data = 41bX
+This lind of Xs
+
+These LDRAL(from 3e0) are reading DRAM address 0x10200000C and 0x10200010. This should not happen.
+Because at this stage still we are initilizing MAC and there is NO RX traffic(i can confirm this).
+
+So far this never happend.
+Can you review your code and see why this is happening?
+
+
+This change did not work
+.set USER_STACK_POINTER, 0x0000B7F0
+.set IRQ_STACK_POINTER,  0x0000BBF0
+.set FIQ_STACK_POINTER,  0x0000BFF0
+.set UND_STACK_POINTER,  0x0000B3F0
+.set VIC_BASE_ADDRESS,   0xFFFFFFA0
+.set L1_TABLE_BASE,      0x0000C000
+
+Same Symptom
+
+               73910:                     000003e0:<                                             LDRAL R3  [PC  ,32]> 10@00000408 03@1020000e 60000010
+
+The object code is
+00000138 <here>:
+ 138:   eafffffe        b       138 <here>
+ 13c:   0000bbf0        .word   0x0000bbf0
+ 140:   0000bff0        .word   0x0000bff0
+ 144:   0000b3f0        .word   0x0000b3f0
+ 148:   0000b7f0        .word   0x0000b7f0
+ 14c:   00001004        .word   0x00001004
+ 150:   1010000e        .word   0x1010000e
+ 154:   00000101        .word   0x00000101
+ 158:   00003ffc        .word   0x00003ffc
+ 15c:   fff00002        .word   0xfff00002
+ 160:   00001005        .word   0x00001005
+
+has this new data.
+
+What is linker code? common.ld????
+
+This has this code
+ENTRY(_Reset)                   /* _Reset is the entry point. This is the entry point in the bootstrap assembler */
+
+/* Define how sections of the program are organized. */
+SECTIONS
+{
+ . = 0x00000;
+ .text : { *(.text) }
+ .data : { *(.data) }
+ .bss  : { *(.bss) *(COMMON) }
+
+ /* stop allocating stack here */
+}
+
+YES this is NOT causing overlap and i don't see that dram read access. No X's. Thank you.
+
+But this new common.ld is generating unused code which was NOT getting generated as we used -ffunction-sections -fdata-sections
+
+I can confirm this as i had saved previous object dump and in that all that phy_hw_reset mdio_burner etc. are NNOT there and in the
+current dump they all are there.
+
+Why?
+
+The new change to linker did remove all the unused code. I used this.
+  .text :
+  {
+    KEEP(obj/ts/ethmac_zap/uart_start.o(.text*))
+    *(.text*)
+    *(.rodata*)
+  } > BRAM
+
+We are back to overlap problem!!!
+i               74110:                     000003e4:<                                             LDRAL R3  [PC  ,32]> 10@0000040c 03@1030000e 60000010
+               74150:                     000003e8:<                                            STRAL LR  [SP  ,-4]!> 0d@0000b7dc 10@00000c68 60000010
+zap_test.u_ram.cmd_task: at time 74179583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               74210:                     000003ec:<                                   MOV  AL DMY0,R0  ,R3    LSL 0> 21@1030000e 10@60000010 60000010
+
+
+               78930:                     000003ec:<                                              LDRAL R0  [DMY0],4> 21@10300012 00@b029XXXX 60000010
+zap_test.u_ram.cmd_task: at time 78969583.0 ps INFO: Read      bank 0 col 008, auto precharge 0
+zap_test.u_ram.data_task: at time 79014583.0 ps INFO: READ @ DQS= bank = 0 row = 00c0 col = 00000008 data = 021X
+zap_test.u_ram.data_task: at time 79019583.0 ps INFO: READ @ DQS= bank = 0 row = 00c0 col = 00000009 data = 833b
+zap_test.u_ram.data_task: at time 79024583.0 ps INFO: READ @ DQS= bank = 0 row = 00c0 col = 0000000a data = 0000
+zap_test.u_ram.data_task: at time 79029583.0 ps INFO: READ @ DQS= bank = 0 row = 00c0 col = 0000000b data = 0000
+zap_test.u_ram.data_task: at time 79034583.0 ps INFO: READ @ DQS= bank = 0 row = 00c0 col = 0000000c data = XXXZ
+zap_test.u_ram.data_task: at time 79039583.0 ps INFO: READ @ DQS= bank = 0 row = 00c0 col = 0000000d data = b02d
+zap_test.u_ram.data_task: at time 79044583.0 ps INFO: READ @ DQS= bank = 0 row = 00c0 col = 0000000e data = XZXZ
+zap_test.u_ram.data_task: at time 79049583.0 ps INFO: READ @ DQS= bank = 0 row = 00c0 col = 0000000f data = b01e
+               79120:                     000003ec:<                                              LDRAL R1  [DMY0],4> 21@10300016 01@833b021X 60000010
+               79180:                     000003ec:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@b029XXXX 10@60000010 60000010
+               79190:                     000003f0:<                                      SUB  AL SP  ,SP  ,12 ROR 0> 0d@0000b7d0 10@60000010 60000010
+               79230:                     000003f4:<                                              STRAL R0  [SP  ,0]> 10@0000b7d0 10@b029XXXX 60000010
+               79240:                     000003f8:<                                   MOV  AL R0  ,R0  ,SP    LSL 0> 00@0000b7d0 10@60000010 60000010
+
+The address now it is reading is 0x1030000C
+
+Please help
+
+I commented 
+    //.set ENABLE_CACHE_CP_WORD, 4100
+    //ldr r1, =ENABLE_CACHE_CP_WORD
+    //mcr p15, 0, r1, c1, c1, 0
+
+rebuilt and reran.
+
+Now i am seeing couple of X's early 
+
+                 800:                     00000058:<                                                 MRSAL R2  ,CPSR> 02@000000d3 10@00000000 000000d3
+                 820:                     0000005c:<                                      BIC  AL R2  ,R2  ,31 ROR 0> 02@000000c0 10@00000000 000000d3
+                 840:                     00000060:<                                      ORR  AL R2  ,R2  ,18 ROR 0> 02@000000d2 10@00000000 000000d3
+                 860:                     00000064:<                                                 MSRAL CPSR,R2  > 10@xxxxxxxx 10@00000000 000000d2
+                1040:                     00000068:<                                            LDRAL SP  [PC  ,196]> 10@00000134 19@0000bbf0 000000d2
+                1060:                     0000006c:<                                                 MRSAL R2  ,CPSR> 02@000000d2 10@00000000 000000d2
+                1080:                     00000070:<                                      BIC  AL R2  ,R2  ,31 ROR 0> 02@000000c0 10@00000000 000000d2
+                1100:                     00000074:<                                      ORR  AL R2  ,R2  ,17 ROR 0> 02@000000d1 10@00000000 000000d2
+                1120:                     00000078:<                                                 MSRAL CPSR,R2  > 10@xxxxxxxx 10@00000000 000000d1
+                1310:                     0000007c:<                                            LDRAL SP  [PC  ,180]> 10@00000138 17@0000bff0 000000d1
+                1330:                     00000080:<                                                 MRSAL R2  ,CPSR> 02@000000d1 10@00000000 000000d1
+                1350:                     00000084:<                                      BIC  AL R2  ,R2  ,31 ROR 0> 02@000000c0 10@00000000 000000d1
+                1370:                     00000088:<                                      ORR  AL R2  ,R2  ,27 ROR 0> 02@000000db 10@00000000 000000d1
+                1390:                     0000008c:<                                                 MSRAL CPSR,R2  > 10@xxxxxxxx 10@00000000 000000db
+                1580:                     00000090:<                                            LDRAL SP  [PC  ,164]> 10@0000013c 1d@0000b3f0 000000db
+                1600:                     00000094:<                                                 MRSAL R1  ,CPSR> 01@000000db 10@00000000 000000db
+                1620:                     00000098:<                                      BIC  AL R1  ,R1  ,31 ROR 0> 01@000000c0 10@00000000 000000db
+                1640:                     0000009c:<                                      ORR  AL R1  ,R1  ,16 ROR 0> 01@000000d0 10@00000000 000000db
+                1660:                     000000a0:<                                     BIC  AL R1  ,R1  ,192 ROR 0> 01@00000010 10@00000000 000000db
+                1670:                     000000a4:<                                                 MSRAL CPSR,R1  > 10@xxxxxxxx 10@00000000 00000010
+                1850:                     000000a8:<                                            LDRAL SP  [PC  ,144]> 10@00000140 0d@0000b7f0 00000010
+
+
+The object code corresponding to this is
+000058 <there>:
+  58:   e10f2000        mrs     r2, CPSR
+  5c:   e3c2201f        bic     r2, r2, #31
+  60:   e3822012        orr     r2, r2, #18
+  64:   e121f002        msr     CPSR_c, r2
+  68:   e59fd0c4        ldr     sp, [pc, #196]  @ 134 <here+0x4>
+  6c:   e10f2000        mrs     r2, CPSR
+  70:   e3c2201f        bic     r2, r2, #31
+  74:   e3822011        orr     r2, r2, #17
+  78:   e121f002        msr     CPSR_c, r2
+  7c:   e59fd0b4        ldr     sp, [pc, #180]  @ 138 <here+0x8>
+  80:   e10f2000        mrs     r2, CPSR
+  84:   e3c2201f        bic     r2, r2, #31
+  88:   e382201b        orr     r2, r2, #27
+  8c:   e121f002        msr     CPSR_c, r2
+
+THERE ARE ONLY 4 MSR INSTRUCTIONS AND ALL THOSE 4 ARE GETTING X's.
+
+And later now it is reading from 0x10000000 and getting X's.
+ap_test.u_ram.cmd_task: at time 73999583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               74030:                     000003d8:<                                             LDRAL R3  [PC  ,32]> 10@00000400 03@10000002 60000010
+zap_test.u_ram.data_task: at time 74044583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 74049583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 74054583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 74059583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 74064583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 74069583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+               74070:                     000003dc:<                                            STRAL LR  [SP  ,-4]!> 0d@0000b7dc 10@00000c5c 60000010
+zap_test.u_ram.data_task: at time 74074583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 74079583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               74130:                     000003e0:<                                   MOV  AL DMY0,R0  ,R3    LSL 0> 21@10000002 10@60000010 60000010
+zap_test.u_ram.cmd_task: at time 74179583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+
+zap_test.u_ram.cmd_task: at time 78779583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 78824583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000000 data = xxxx
+zap_test.u_ram.data_task: at time 78829583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000001 data = xxxx
+zap_test.u_ram.data_task: at time 78834583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000002 data = xxxx
+zap_test.u_ram.data_task: at time 78839583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000003 data = xxxx
+zap_test.u_ram.data_task: at time 78844583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000004 data = xxxx
+zap_test.u_ram.data_task: at time 78849583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000005 data = xxxx
+zap_test.u_ram.data_task: at time 78854583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000006 data = xxxx
+zap_test.u_ram.data_task: at time 78859583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000007 data = xxxx
+               78930:                     000003e0:<                                              LDRAL R0  [DMY0],4> 21@10000006 00@xxxxxxxx 60000010
+zap_test.u_ram.cmd_task: at time 78969583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 79014583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000000 data = xxxx
+zap_test.u_ram.data_task: at time 79019583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000001 data = xxxx
+zap_test.u_ram.data_task: at time 79024583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000002 data = xxxx
+zap_test.u_ram.data_task: at time 79029583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000003 data = xxxx
+zap_test.u_ram.data_task: at time 79034583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000004 data = xxxx
+zap_test.u_ram.data_task: at time 79039583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000005 data = xxxx
+zap_test.u_ram.data_task: at time 79044583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000006 data = xxxx
+zap_test.u_ram.data_task: at time 79049583.0 ps INFO: READ @ DQS= bank = 0 row = 0000 col = 00000007 data = xxxx
+               79120:                     000003e0:<                                              LDRAL R1  [DMY0],4> 21@1000000a 01@xxxxxxxx 60000010
+               79180:                     000003e0:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@xxxxxxxx 10@60000010 60000010
+
+
+Now the X's are gone. But caches and MMU are not getting enabled. The code is repeatdly executing main.
+
+               65540:                     000000e0:<                                              STRAL R2  [R6  ],4> 06@0000c7fc 10@1fe0000e 20000010
+               65560:                     000000e4:<                                       ADD  AL R2  ,R2  ,1 ROR 6> 02@1ff0000e 10@20000010 20000010
+zap_test.u_ram.data_task: at time 65574583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 65579583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+               65580:                     000000e8:<                                       SUB  AL R4  ,R4  ,1 ROR 0> 04@00000001 10@20000010 20000010
+zap_test.u_ram.data_task: at time 65584583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 65589583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 65594583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 65599583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+               65600:                     000000ec:<                                                          BNE -5> 10@000000e0 10@00000000 20000010
+zap_test.u_ram.data_task: at time 65604583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 65609583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               65790:                     000000e0:<                                              STRAL R2  [R6  ],4> 06@0000c800 10@1ff0000e 20000010
+               65810:                     000000e4:<                                       ADD  AL R2  ,R2  ,1 ROR 6> 02@2000000e 10@20000010 20000010
+               65830:                     000000e8:<                                       SUB  AL R4  ,R4  ,1 ROR 0> 04@00000000 10@20000010 60000010
+zap_test.u_ram.cmd_task: at time 65839583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               65850:                                                     000000ec:<                                                          BNE -5>*
+zap_test.u_ram.data_task: at time 65884583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 65889583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+               65890:                     000000f0:<                                             LDRAL R6  [PC  ,68]> 10@0000013c 06@00003ffc 60000010
+zap_test.u_ram.data_task: at time 65894583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 65899583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 65904583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 65909583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 65914583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 65919583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               65970:                     000000f4:<                                   ADD  AL R6  ,R5  ,R6    LSL 0> 06@0000fffc 10@60000010 60000010
+               66010:                     000000f8:<                                             LDRAL R2  [PC  ,64]> 10@00000140 02@fff00002 60000010
+zap_test.u_ram.cmd_task: at time 66019583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 66064583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 66069583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 66074583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 66079583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 66084583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 66089583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 66094583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 66099583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               66110:                     000000fc:<                                              STRAL R2  [R6  ,0]> 10@0000fffc 10@fff00002 60000010
+               66150:                     00000100:<                                             LDRAL R1  [PC  ,60]> 10@00000144 01@00001005 60000010
+               66170:                     00000108:<                                      MVN  AL R0  ,R0  ,95 ROR 0> 00@ffffffa0 10@60000010 60000010
+               66180:                     0000010c:<                                       ADD  AL R0  ,R0  ,4 ROR 0> 00@ffffffa4 10@60000010 60000010
+               66190:                     00000110:<                                       MOV  AL R1  ,R0  ,0 ROR 0> 01@00000000 10@60000010 60000010
+               66280:                     00000114:<                                              STRAL R1  [R0  ,0]> 10@ffffffa4 10@00000000 60000010
+               66330:                     00000118:<                                              LDRAL R1  [R0  ,0]> 10@ffffffa4 01@00000004 60000010
+zap_test.u_ram.cmd_task: at time 66339583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               66340:                     0000011c:<                                       SUB  AL LR  ,PC  ,4 ROR 0> 0e@00000120 10@60000010 60000010
+               66350:                     0000011c:<                                                         BAL 708> 10@00000c34 10@00000000 60000010
+zap_test.u_ram.data_task: at time 66384583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 66389583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 66394583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 66399583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 66404583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 66409583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+               66410:                     00000c34:<                                       SUB  AL DMY0,SP  ,8 ROR 0> 21@0000b7e8 10@60000010 60000010
+zap_test.u_ram.data_task: at time 66414583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 66419583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               66440:                     00000c34:<                                              STRAL R11 [DMY0],4> 21@0000b7ec 10@00000000 60000010
+               66480:                     00000c34:<                                              STRAL LR  [DMY0],4> 21@0000b7f0 10@00000120 60000010
+               66490:                     00000c34:<                                       SUB  AL SP  ,SP  ,8 ROR 0> 0d@0000b7e8 10@60000010 60000010
+               66500:                     00000c38:<                                       ADD  AL R11 ,SP  ,4 ROR 0> 0b@0000b7ec 10@60000010 60000010
+zap_test.u_ram.cmd_task: at time 66519583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               66520:                     00000c3c:<                                       SUB  AL SP  ,SP  ,8 ROR 0> 0d@0000b7e0 10@60000010 60000010
+               66540:                     00000c40:<                                       SUB  AL LR  ,PC  ,4 ROR 0> 0e@00000c44 10@60000010 60000010
+               66550:                     00000c40:<                                                          BAL 16> 10@00000c88 10@00000000 60000010
+
+I can see that main is getting executed repeatdly. But caches and mmu did not get enabled.
+
+              460690:                     00000c7c:<                                                          BLS -7> 10@00000c68 10@00000000 60000010
+              460880:                     00000c68:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000001 60000010
+              460960:                     00000c6c:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000002 10@60000010 60000010
+              460990:                     00000c70:<                                             STRAL R3  [R11 ,-8]> 10@0000b7e4 10@00000002 60000010
+              461010:                     00000c74:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000002 60000010
+              461090:                     00000c78:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@00000001 10@60000010 20000010
+              461110:                                                     00000c7c:<                                                          BLS -7>*
+              461130:                     00000c80:<                                                         BAL -16> 10@00000c48 10@00000000 20000010
+              461250:                     00000c48:<                                             LDRAL R3  [PC  ,52]> 10@00000c84 03@00000da8 20000010
+              461350:                     00000c4c:<                                              LDRAL R3  [R3  ,0]> 10@00000da8 03@00000000 20000010
+              461430:                     00000c50:<                                       CMP  AL R0  ,R3  ,0 ROR 0> 10@00000000 10@20000010 60000010
+              461450:                     00000c54:<                                                           BEQ 0> 10@00000c5c 10@00000000 60000010
+              461600:                     00000c5c:<                                       MOV  AL R3  ,R0  ,0 ROR 0> 03@00000000 10@60000010 60000010
+              461640:                     00000c60:<                                             STRAL R3  [R11 ,-8]> 10@0000b7e4 10@00000000 60000010
+              461660:                     00000c64:<                                                           BAL 2> 10@00000c74 10@00000000 60000010
+              461800:                     00000c74:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000000 60000010
+              461880:                     00000c78:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@ffffffff 10@60000010 80000010
+              461900:                     00000c7c:<                                                          BLS -7> 10@00000c68 10@00000000 80000010
+              462080:                     00000c68:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000000 80000010
+              462160:                     00000c6c:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000001 10@80000010 80000010
+              462190:                     00000c70:<                                             STRAL R3  [R11 ,-8]> 10@0000b7e4 10@00000001 80000010
+              462210:                     00000c74:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000001 80000010
+              462290:                     00000c78:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@00000000 10@80000010 60000010
+              462310:                     00000c7c:<                                                          BLS -7> 10@00000c68 10@00000000 60000010
+              462500:                     00000c68:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000001 60000010
+              462580:                     00000c6c:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000002 10@60000010 60000010
+              462610:                     00000c70:<                                             STRAL R3  [R11 ,-8]> 10@0000b7e4 10@00000002 60000010
+              462630:                     00000c74:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000002 60000010
+              462710:                     00000c78:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@00000001 10@60000010 20000010
+              462730:                                                     00000c7c:<                                                          BLS -7>*
+              462750:                     00000c80:<                                                         BAL -16> 10@00000c48 10@00000000 20000010
+              462870:                     00000c48:<                                             LDRAL R3  [PC  ,52]> 10@00000c84 03@00000da8 20000010
+              462970:                     00000c4c:<                                              LDRAL R3  [R3  ,0]> 10@00000da8 03@00000000 20000010
+              463050:                     00000c50:<                                       CMP  AL R0  ,R3  ,0 ROR 0> 10@00000000 10@20000010 60000010
+              463070:                     00000c54:<                                                           BEQ 0> 10@00000c5c 10@00000000 60000010
+              463220:                     00000c5c:<                                       MOV  AL R3  ,R0  ,0 ROR 0> 03@00000000 10@60000010 60000010
+              463260:                     00000c60:<                                             STRAL R3  [R11 ,-8]> 10@0000b7e4 10@00000000 60000010
+              463280:                     00000c64:<                                                           BAL 2> 10@00000c74 10@00000000 60000010
+              463420:                     00000c74:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000000 60000010
+              463500:                     00000c78:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@ffffffff 10@60000010 80000010
+              463520:                     00000c7c:<                                                          BLS -7> 10@00000c68 10@00000000 80000010
+              463700:                     00000c68:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000000 80000010
+              463780:                     00000c6c:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000001 10@80000010 80000010
+              463810:                     00000c70:<                                             STRAL R3  [R11 ,-8]> 10@0000b7e4 10@00000001 80000010
+              463830:                     00000c74:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000001 80000010
+              463910:                     00000c78:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@00000000 10@80000010 60000010
+              463930:                     00000c7c:<                                                          BLS -7> 10@00000c68 10@00000000 60000010
+
+1. main gets repeated as it is waiting for RX or TX interrupt. Until this comes code stays in main.
+   After an interrupt comes the code goes to net_poll_drain. So main repeation is not an issue.
+2. Could you please update uart_mmu_5_factorial_style_ptr.s
+   you may use     mcr p15, 0, r0, c7, c5, 4   @ Flush prefetch buffer (if supported)
+
+This is what happening.
+1. The unexpected read to DRAM is back.
+
+Object Code
+000003e0 <eth_demo_init>:
+ 3e0:   e59f3020        ldr     r3, [pc, #32]   @ 408 <eth_demo_init+0x28>
+ 3e4:   e52de004        push    {lr}            @ (str lr, [sp, #-4]!)
+ 3e8:   e8930003        ldm     r3, {r0, r1}
+
+
+Executed Code
+              68640:                     00000c60:<                                       SUB  AL LR  ,PC  ,4 ROR 0> 0e@00000c64 10@60000010 60000010
+               68650:                     00000c60:<                                                        BAL -546> 10@000003e0 10@00000000 60000010
+zap_test.u_ram.cmd_task: at time 68659583.0 ps INFO: Activate  bank 0 row 0008 
+zap_test.u_ram.cmd_task: at time 68689583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 68734583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 68739583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 68744583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 68749583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 68754583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 68759583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 68764583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 68769583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               68800:                     000003e0:<                                             LDRAL R3  [PC  ,32]> 10@00000408 03@1020000e 60000010
+               68840:                     000003e4:<                                            STRAL LR  [SP  ,-4]!> 0d@0000b7dc 10@00000c64 60000010
+zap_test.u_ram.cmd_task: at time 68869583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               68900:                     000003e8:<                                   MOV  AL DMY0,R0  ,R3    LSL 0> 21@1020000e 10@60000010 60000010
+
+----
+ap_test.u_ram.data_task: at time 78824583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000000 data = 834X
+zap_test.u_ram.data_task: at time 78829583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000001 data = 3bb1
+zap_test.u_ram.data_task: at time 78834583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000002 data = 0000
+zap_test.u_ram.data_task: at time 78839583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000003 data = 0000
+zap_test.u_ram.data_task: at time 78844583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000004 data = XZXZ
+zap_test.u_ram.data_task: at time 78849583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000005 data = 1839
+zap_test.u_ram.data_task: at time 78854583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000006 data = XXXZ
+zap_test.u_ram.data_task: at time 78859583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000007 data = 182e
+               78930:                     000003e8:<                                              LDRAL R0  [DMY0],4> 21@10200012 00@182eXXXX 60000010
+zap_test.u_ram.cmd_task: at time 78969583.0 ps INFO: Read      bank 0 col 008, auto precharge 0
+zap_test.u_ram.data_task: at time 79014583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000008 data = 83eX
+zap_test.u_ram.data_task: at time 79019583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 00000009 data = 3bb1
+zap_test.u_ram.data_task: at time 79024583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 0000000a data = 0000
+zap_test.u_ram.data_task: at time 79029583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 0000000b data = 0000
+zap_test.u_ram.data_task: at time 79034583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 0000000c data = XXXZ
+zap_test.u_ram.data_task: at time 79039583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 0000000d data = 183d
+zap_test.u_ram.data_task: at time 79044583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 0000000e data = XXXZ
+zap_test.u_ram.data_task: at time 79049583.0 ps INFO: READ @ DQS= bank = 0 row = 0080 col = 0000000f data = 183c
+               79120:                     000003e8:<                                              LDRAL R1  [DMY0],4> 21@10200016 01@3bb183eX 60000010
+               79180:                     000003e8:<                                   AND  EQ R0  ,R0  ,R0    LSL 0> 00@182eXXXX 10@60000010 60000010
+
+This is with Flush.
+
+Without Flush, mmu and caches are NOT getting enabled i.e. i don't see them going to 1'b 1 in the waveform.
+
+So the obervation is
+With uart_mmu_5_factorial_style_ptr.s, NO X's and NO Enabling cache and mmus.
+With uart_mmu_5_factorial_style_ptr_flush.s X's and NO Enabling cache and mmus.
+
+I think we have to focus on this.
+
+
+We went on a wild goose chase!!!!
+
+Now what i see is many undefined instructions.
+
+Error: Undefined instruction detected at address=00000124 CPSR=60000010
+Error: Undefined instruction detected at address=00000004 CPSR=6000009b
+               73750:                                                                                                                   00000004:<UND>
+Error: Undefined instruction detected at address=00000004 CPSR=6000009b
+
+...
+I don't see X's on DDR interface
+            70750:                     000000d8:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@000001ff 10@00000000 200000db
+               70770:                     000000dc:<                                       SUB  AL R4  ,R4  ,1 ROR 0> 04@00000001 10@00000000 200000db
+               70790:                     000000e0:<                                                          BNE -6> 10@000000d0 10@00000000 200000db
+zap_test.u_ram.cmd_task: at time 70949583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               70980:                     000000d0:<          STRAL  R2  [U=1 R1  ,                      R3   LSL 2]> 10@0000c7fc 10@1ff0000e 200000db
+zap_test.u_ram.data_task: at time 70994583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 70999583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+               71000:                     000000d4:<                                       ADD  AL R2  ,R2  ,1 ROR 6> 02@2000000e 10@00000000 200000db
+zap_test.u_ram.data_task: at time 71004583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 71009583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 71014583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 71019583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+               71020:                     000000d8:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000200 10@00000000 200000db
+zap_test.u_ram.data_task: at time 71024583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 71029583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               71040:                     000000dc:<                                       SUB  AL R4  ,R4  ,1 ROR 0> 04@00000000 10@00000000 600000db
+               71060:                                                     000000e0:<                                                          BNE -6>*
+               71100:                     000000e4:<                                             LDRAL R1  [PC  ,84]> 10@00000140 01@0000c000 600000db
+zap_test.u_ram.cmd_task: at time 71129583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               71140:                     000000e8:<                                             LDRAL R2  [PC  ,92]> 10@0000014c 02@00003ffc 600000db
+zap_test.u_ram.data_task: at time 71174583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 71179583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 71184583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 71189583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 71194583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 71199583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 71204583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 71209583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               71220:                     000000ec:<                                   ADD  AL R1  ,R1  ,R2    LSL 0> 01@0000fffc 10@00000000 600000db
+               71260:                     000000f0:<                                             LDRAL R2  [PC  ,88]> 10@00000150 02@fff00002 600000db
+               71360:                     000000f4:<                                              STRAL R2  [R1  ,0]> 10@0000fffc 10@fff00002 600000db
+               71400:                     000000f8:<                                             LDRAL R1  [PC  ,84]> 10@00000154 01@00001005 600000db
+               71440:                                                                                           CP15_ASYNC_UPDATE:idx=10 data=00000000
+zap_test.u_ram.cmd_task: at time 71539583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+               71570:                     00000100:<                                                 MRSAL R1  ,CPSR> 01@600000db 10@00000000 600000db
+               71580:                     00000104:<                                      BIC  AL R1  ,R1  ,31 ROR 0> 01@600000c0 10@00000000 600000db
+zap_test.u_ram.data_task: at time 71584583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 71589583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+               71590:                     00000108:<                                      ORR  AL R1  ,R1  ,16 ROR 0> 01@600000d0 10@00000000 600000db
+zap_test.u_ram.data_task: at time 71594583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 71599583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+               71600:                     0000010c:<                                     BIC  AL R1  ,R1  ,192 ROR 0> 01@60000010 10@00000000 600000db
+zap_test.u_ram.data_task: at time 71604583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 71609583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+               71610:                     00000110:<                                                 MSRAL CPSR,R1  > 10@xxxxxxxx 10@00000000 60000010
+zap_test.u_ram.data_task: at time 71614583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 71619583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+zap_test.u_ram.cmd_task: at time 71719583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 71764583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 71769583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 71774583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 71779583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 71784583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 71789583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 71794583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 71799583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+zap_test.u_ram.cmd_task: at time 72139583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 72184583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 72189583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 72194583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 72199583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 72204583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 72209583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 72214583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 72219583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+zap_test.u_ram.cmd_task: at time 72319583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 72364583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 72369583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 72374583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 72379583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 72384583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 72389583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 72394583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 72399583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               72550:                     00000114:<                                             LDRAL SP  [PC  ,60]> 10@00000158 0d@xxxxxxxx 60000010
+               72560:                     00000118:<                                      MVN  AL R0  ,R0  ,95 ROR 0> 00@ffffffa0 10@60000010 60000010
+               72570:                     0000011c:<                                       ADD  AL R0  ,R0  ,4 ROR 0> 00@ffffffa4 10@60000010 60000010
+               72580:                     00000120:<                                       MOV  AL R1  ,R0  ,0 ROR 0> 01@00000000 10@60000010 60000010
+
+But i see some xxxxxxxxin registers
+I am using uart_mmu_5_factorial_style_privcp15.s
+
+What is happening?
+
+mov r2, #2 this caused dram X's.
+So tried with
+mov r2, #14 and Dram X's are there.
+
+But the same previous problem
+
+               71220:                     000000ec:<                                   ADD  AL R1  ,R1  ,R2    LSL 0> 01@0000fffc 10@00000000 600000db
+               71260:                     000000f0:<                                             LDRAL R2  [PC  ,96]> 10@00000158 02@fff00002 600000db
+               71360:                     000000f4:<                                              STRAL R2  [R1  ,0]> 10@0000fffc 10@fff00002 600000db
+               71400:                     000000f8:<                                             LDRAL R7  [PC  ,92]> 10@0000015c 07@0000b7f0 600000db
+               71440:                     000000fc:<                                             LDRAL R1  [PC  ,92]> 10@00000160 01@00001005 600000db
+               71480:                                                                                           CP15_ASYNC_UPDATE:idx=10 data=00000000
+zap_test.u_ram.cmd_task: at time 71539583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 71584583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 71589583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 71594583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 71599583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 71604583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 71609583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+               71610:                     00000104:<                                                 MRSAL R1  ,CPSR> 01@600000db 10@00000000 600000db
+zap_test.u_ram.data_task: at time 71614583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 71619583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               71620:                     00000108:<                                      BIC  AL R1  ,R1  ,31 ROR 0> 01@600000c0 10@00000000 600000db
+               71630:                     0000010c:<                                      ORR  AL R1  ,R1  ,16 ROR 0> 01@600000d0 10@00000000 600000db
+               71640:                     00000110:<                                     BIC  AL R1  ,R1  ,192 ROR 0> 01@60000010 10@00000000 600000db
+               71650:                     00000114:<                                                 MSRAL CPSR,R1  > 10@xxxxxxxx 10@00000000 60000010
+zap_test.u_ram.cmd_task: at time 71719583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 71764583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 71769583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 71774583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 71779583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 71784583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 71789583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 71794583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 71799583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+zap_test.u_ram.cmd_task: at time 72139583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 72184583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 72189583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 72194583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 72199583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 72204583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 72209583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 72214583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 72219583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+zap_test.u_ram.cmd_task: at time 72319583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 72364583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 72369583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 72374583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 72379583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 72384583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 72389583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 72394583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 72399583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+               72590:                     00000118:<                                             LDRAL SP  [PC  ,60]> 10@0000015c 0d@xxxxxxxx 60000010
+               72600:                     0000011c:<                                   MOV  AL SP  ,R0  ,R7    LSL 0> 0d@0000b7f0 10@60000010 60000010
+               72610:                     00000120:<                                      MVN  AL R0  ,R0  ,95 ROR 0> 00@ffffffa0 10@60000010 60000010
+               72620:                     00000124:<                                       ADD  AL R0  ,R0  ,4 ROR 0> 00@ffffffa4 10@60000010 60000010
+               72630:                     00000128:<                                       MOV  AL R1  ,R0  ,0 ROR 0> 01@00000000 10@60000010 60000010
+zap_test.u_ram.cmd_task: at time 72749583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 72794583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 72799583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 72804583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 72809583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 72814583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 72819583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 72824583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 72829583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+zap_test.u_ram.cmd_task: at time 72929583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 72974583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 72979583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 72984583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 72989583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 72994583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 72999583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 73004583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 73009583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+zap_test.u_ram.cmd_task: at time 73369583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 73414583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 73419583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 73424583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 73429583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 73434583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 73439583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 73444583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 73449583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+zap_test.u_ram.cmd_task: at time 73549583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+Error: Undefined instruction detected at address=0000012c CPSR=60000010
+               73590:                                                                                                                   0000012c:<UND>
+zap_test.u_ram.data_task: at time 73594583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+zap_test.u_ram.data_task: at time 73599583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000001 data = 7654
+zap_test.u_ram.data_task: at time 73604583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000002 data = ba98
+zap_test.u_ram.data_task: at time 73609583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000003 data = fedc
+zap_test.u_ram.data_task: at time 73614583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000004 data = cdef
+zap_test.u_ram.data_task: at time 73619583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000005 data = 89ab
+zap_test.u_ram.data_task: at time 73624583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000006 data = 4567
+zap_test.u_ram.data_task: at time 73629583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000007 data = 0123
+Error: Undefined instruction detected at address=00000004 CPSR=6000009b
+               73800:                                                                                                                   00000004:<UND>
+Error: Undefined instruction detected at address=00000004 CPSR=6000009b
+zap_test.u_ram.cmd_task: at time 73999583.0 ps INFO: Read      bank 0 col 000, auto precharge 0
+zap_test.u_ram.data_task: at time 74044583.0 ps INFO: READ @ DQS= bank = 0 row = 0008 col = 00000000 data = 3210
+
+
+Please see the patch i had done.
+
+Please help
+
+
+All MSRAL instructions reading xxxxxxxs
+                860:                      00000064:<                                                 MSRAL CPSR,R2  > 10@xxxxxxxx 10@00000000 000000d2
+                1120:                     00000078:<                                                 MSRAL CPSR,R2  > 10@xxxxxxxx 10@00000000 000000d1
+                1390:                     0000008c:<                                                 MSRAL CPSR,R2  > 10@xxxxxxxx 10@00000000 000000db
+               71650:                     00000114:<                                                 MSRAL CPSR,R1  > 10@xxxxxxxx 10@00000000 60000010
+
+               72590:                     00000118:<                                             LDRAL SP  [PC  ,60]> 10@0000015c 0d@xxxxxxxx 60000010
+
+Error: Undefined instruction detected at address=0000012c CPSR=60000010
+               73590:                                                                                                                   0000012c:<UND>
+
+Object code
+ 10c:   e3811010        orr     r1, r1, #16
+ 110:   e3c110c0        bic     r1, r1, #192    @ 0xc0
+ 114:   e121f001        msr     CPSR_c, r1
+ 118:   e59fd03c        ldr     sp, [pc, #60]   @ 15c <here+0x24>
+ 11c:   e1a0d007        mov     sp, r7
+ 120:   e3e0005f        mvn     r0, #95 @ 0x5f
+ 124:   e2800004        add     r0, r0, #4
+ 128:   e3a01000        mov     r1, #0
+ 12c:   e5801000        str     r1, [r0]
+ 130:   e5901000        ldr     r1, [r0]
+ 134:   eb0002c5        bl      c50 <main>
+
+@12c str uses r1 which is causing Error: Undefined ...
+
+Why all these MSRAL instructions getting xxxxxs
+
+I am sorry i accedentally used uart_mmu_5_factorial_style_privcp15.s instead of uart_mmu_5_corrected_uncached.s.
+I ran with uart_mmu_5_corrected_uncached.s, NOT uart_mmu_5_corrected_uncached_v2.s
+
+MMU is enabled.  NO xxxxS on DRAM and interrupt came. After that code got corrupted.
+
+Object Code
+0000001c <fiq>:
+  1c:   ea000007        b       40 <FIQ>
+
+00000020 <UNDEF>:
+  20:   eafffffe        b       20 <UNDEF>
+
+00000024 <SWI>:
+  24:   eafffffe        b       24 <SWI>
+
+00000028 <PABT>:
+  28:   eafffffe        b       28 <PABT>
+
+0000002c <DABT>:
+  2c:   eafffffe        b       2c <DABT>
+
+00000030 <IRQ>:
+  30:   e24ee004        sub     lr, lr, #4
+  34:   e92d5fff        push    {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+  38:   eb0002eb        bl      bec <irq_handler>
+  3c:   e8fd9fff        ldm     sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}^
+
+00000040 <FIQ>:
+  40:   e24ee004        sub     lr, lr, #4
+  44:   e92d40ff        push    {r0, r1, r2, r3, r4, r5, r6, r7, lr}
+  48:   eb0002e7        bl      bec <irq_handler>
+  4c:   e8fd80ff        ldm     sp!, {r0, r1, r2, r3, r4, r5, r6, r7, pc}^
+
+00000050 <there>:
+  50:   e10f2000        mrs     r2, CPSR
+
+
+Executed Code
+            1258640:                     00000c54:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000000 80000010
+             1258720:                     00000c58:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000001 10@80000010 80000010
+             1258750:                     00000c5c:<                                             STRAL R3  [R11 ,-8]> 10@0000b7e4 10@00000001 80000010
+             1258770:                     00000c60:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000001 80000010
+             1258850:                     00000c64:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@00000000 10@80000010 60000010
+             1258870:                     00000c68:<                                                          BLS -7> 10@00000c54 10@00000000 60000010
+             1259060:                     00000c54:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000001 60000010
+             1259140:                     00000c58:<                                       ADD  AL R3  ,R3  ,1 ROR 0> 03@00000002 10@60000010 60000010
+             1259170:                     00000c5c:<                                             STRAL R3  [R11 ,-8]> 10@0000b7e4 10@00000002 60000010
+             1259190:                     00000c60:<                                             LDRAL R3  [R11 ,-8]> 10@0000b7e4 03@00000002 60000010
+             1259270:                     00000c64:<                                       CMP  AL R0  ,R3  ,1 ROR 0> 10@00000001 10@60000010 20000010
+             1259290:                                                     00000c68:<                                                          BLS -7>*
+             1259310:                     00000c6c:<                                                         BAL -16> 10@00000c34 10@00000000 20000010
+             1259430:                     00000c34:<                                             LDRAL R3  [PC  ,52]> 10@00000c70 03@00000d94 20000010
+zap_test.u_ram.cmd_task: at time 1259499583.0 ps INFO: Activate  bank 0 row 0008
+zap_test.u_ram.cmd_task: at time 1259529583.0 ps INFO: Write     bank 0 col 018, auto precharge 0
+             1259530:                     00000c38:<                                              LDRAL R3  [R3  ,0]> 10@00000d94 03@00000000 20000010
+zap_test.u_ram.data_task: at time 1259594583.0 ps INFO: WRITE @ DQS= bank = 0 row = 0008 col = 00000018 data = 0000
+zap_test.u_ram.data_task: at time 1259599583.0 ps INFO: WRITE @ DQS= bank = 0 row = 0008 col = 00000019 data = 0000
+zap_test.u_ram.data_task: at time 1259604583.0 ps INFO: WRITE @ DQS= bank = 0 row = 0008 col = 0000001a data = 0000
+zap_test.u_ram.data_task: at time 1259609583.0 ps INFO: WRITE @ DQS= bank = 0 row = 0008 col = 0000001b data = 0000
+             1259610:                     00000c3c:<                                       CMP  AL R0  ,R3  ,0 ROR 0> 10@00000000 10@20000010 60000010
+zap_test.u_ram.data_task: at time 1259614583.0 ps INFO: WRITE @ DQS= bank = 0 row = 0008 col = 0000001c data = 0000
+zap_test.u_ram.data_task: at time 1259619583.0 ps INFO: WRITE @ DQS= bank = 0 row = 0008 col = 0000001d data = 0000
+zap_test.u_ram.data_task: at time 1259624583.0 ps INFO: WRITE @ DQS= bank = 0 row = 0008 col = 0000001e data = c784
+zap_test.u_ram.data_task: at time 1259629583.0 ps INFO: WRITE @ DQS= bank = 0 row = 0008 col = 0000001f data = ace5
+             1259630:                     00000c40:<                                                           BEQ 0> 10@00000c48 10@00000000 60000010
+             1259780:                                                                                                                   00000c48:<FIQ>
+             1259980:                     0000001c:<                                   RSB  EQ R0  ,R0  ,R2    LSL 0> 00@ffffefff 10@60000010 a00000d1
+             1260000:                                                     00000020:<                                   ADD  EQ R0  ,R0  ,R2    LSL 0>*
+             1260020:                                                     00000024:<                                   ADD  EQ R0  ,R0  ,R2    LSL 0>*
+             1260040:                                                     00000028:<                                   ADC  EQ R0  ,R0  ,R2    LSL 0>*
+             1260060:                                                     0000002c:<                                   ADC  EQ R0  ,R0  ,R2    LSL 0>*
+             1260080:                                                     00000030:<                                   SBC  EQ R0  ,R0  ,R2    LSL 0>*
+             1260100:                                                     00000034:<                                   SBC  EQ R0  ,R0  ,R2    LSL 0>*
+
+
+What is going on?
+
+OK this is what is happening. 
+
+The total RAM (CPU Code memory) is 64KB and is 32 bit wide i.e. we only need 14([13:0]) address bits right?
+There are some write to address starting at 0xC000, 0xC004 ... 0xC098 happening
+and data written is 0x000000E, 0x0010000E, ...0x0250000E
+
+0000001c <fiq>:
+  1c:   eaffffff        b       20 <sc_call>
+
+Later When interrupt came and ISR is executed, the code reads from 0x001C which is same as 0xC01C as
+bits 14 and 15 are NOT connected. 
+
+When ISR reads from 0x001C it gets 0x0070000E ... from 0x0020 it gets 0x0080000E and so on
+
+which is not a valid instruction.
+
+This is corrupting data.
+
+What is going on?
+
+I am using uart_mmu_5_corrected_uncached_1.s which i attached
+
+
+FINALLY FINALLY FINALLY the test WORKED with mmu enabled!!!
+That RTL fix fixed the issue. Thank you.
+
+1. How do i check if MMU is really working? i mean i want to see if there is a TLB hit something like that
+   Right now appears PA = VA. That is what i see in the waveform in zap_tlb block.
+
+
+Right after enabling caches, instructions becoming UNDEFINED i.e. xxxxs
+I debugged a bit.
+1. This is coming from zap_writeback.sv
+2. Another module by name zap_btb.sv (BTB = Branch Target Buffer) is instantiated.
+3. There is an output from this module o_pc_from_btb which is X from the begining and hence PC has become X.
+4. There is a SRAM instantiated inside this zap_btb.sv module and i think these X's are coming from here.
+
+What is happining?
+
+
+The issue is simulator. Verilator treats xxxS as 0 and hence xxxS never got propagted and factorial worked.
+Xilinx xsim treats xxxS as 'X' unknown and this caused the issue. After fixing this, the test worked!!! 
+Now both mmu and caches enabled the test PASSED!!! I can see cache 'hit' signals.
+
+I renamed earlier used to .s file to uart_mmu_cache.s. I am attaching this.
+I think we need to enable DRAM caching etc. Right?
+
+Please note: DRAM is written by EthMAC which doesn't know caching.
+
+What id the next to prove that caches and mmu are working just fine. 

@@ -190,82 +190,27 @@ connect_debug_port u_ila_0/probe0 [get_nets [list clk2ddr3 ]]
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe1]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-connect_debug_port u_ila_0/probe1 [get_nets [list ethmac_ram_cyc_dbg ]]
+connect_debug_port u_ila_0/probe1 [get_nets [list calib_done_dbg ]]
 
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe2]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
-connect_debug_port u_ila_0/probe2 [get_nets [list ethmac_ram_ack_dbg ]]
+connect_debug_port u_ila_0/probe2 [get_nets [list calib_pass_dbg ]]
 
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe3]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
-connect_debug_port u_ila_0/probe3 [get_nets [list dfi_wrdata_en_dbg ]]
+connect_debug_port u_ila_0/probe3 [get_nets [list mmu_en_dbg ]]
 
 create_debug_port u_ila_0 probe
-set_property port_width 32 [get_debug_ports u_ila_0/probe4]
+set_property port_width 1 [get_debug_ports u_ila_0/probe4]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
-connect_debug_port u_ila_0/probe4 [get_nets {dfi_wrdata_dbg[*]}]
+connect_debug_port u_ila_0/probe4 [get_nets [list dc_en_dbg ]]
 
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe5]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
-connect_debug_port u_ila_0/probe5 [get_nets [list dfi_rddata_valid_dbg ]]
-
-create_debug_port u_ila_0 probe
-set_property port_width 32 [get_debug_ports u_ila_0/probe6]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
-connect_debug_port u_ila_0/probe6 [get_nets {dfi_rddata_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 16 [get_debug_ports u_ila_0/probe7]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
-connect_debug_port u_ila_0/probe7 [get_nets {ddr3_ram_wr_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe8]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
-connect_debug_port u_ila_0/probe8 [get_nets [list ddr3_ram_accept_dbg ]]
-
-create_debug_port u_ila_0 probe
-set_property port_width 3 [get_debug_ports u_ila_0/probe9]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
-connect_debug_port u_ila_0/probe9 [get_nets {wb_ddr3_br_state_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 4 [get_debug_ports u_ila_0/probe10]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
-connect_debug_port u_ila_0/probe10 [get_nets {ddr3_state_q_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 16 [get_debug_ports u_ila_0/probe11]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
-connect_debug_port u_ila_0/probe11 [get_nets {ddr3_rd_data0_w_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 16 [get_debug_ports u_ila_0/probe12]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
-connect_debug_port u_ila_0/probe12 [get_nets {ddr3_rd_data1_w_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 16 [get_debug_ports u_ila_0/probe13]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe13]
-connect_debug_port u_ila_0/probe13 [get_nets {ddr3_rd_data2_w_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 16 [get_debug_ports u_ila_0/probe14]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe14]
-connect_debug_port u_ila_0/probe14 [get_nets {ddr3_rd_data3_w_dbg[*]}]
-
-create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe15]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe15]
-connect_debug_port u_ila_0/probe15 [get_nets [list calib_done_dbg ]]
-
-create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe16]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe16]
-connect_debug_port u_ila_0/probe16 [get_nets [list calib_pass_dbg ]]
+connect_debug_port u_ila_0/probe5 [get_nets [list ic_en_dbg ]]
 
 
 

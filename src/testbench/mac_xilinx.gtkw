@@ -1,23 +1,27 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Tue Mar 17 23:55:12 2026
+[*] Sun Apr 19 21:49:28 2026
 [*]
-[dumpfile] "(null)"
+[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
+[dumpfile_mtime] "Sun Apr 19 17:33:46 2026"
+[dumpfile_size] 622105929
 [savefile] "/home/vedulas/solar_femtoTX/src/testbench/mac_xilinx.gtkw"
-[timestart] 0
-[size] 1651 869
+[timestart] 570001700
+[size] 1843 925
 [pos] -1 -1
-*-30.573940 61874583 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-14.316263 570065000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] zap_test.
 [treeopen] zap_test.eth_phy.
 [treeopen] zap_test.u_chip_top.
+[treeopen] zap_test.u_chip_top.ethmac.
+[treeopen] zap_test.u_chip_top.ethmac.rxethmac1.
 [treeopen] zap_test.u_chip_top.ethmac.wishbone.
 [treeopen] zap_test.u_chip_top.u_phy.
-[treeopen] zap_test.u_chip_top.u_zap_top.
+[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.
 [sst_width] 298
 [signals_width] 282
 [sst_expanded] 1
-[sst_vpaned_height] 558
+[sst_vpaned_height] 588
 @28
 zap_test.mrx_clk_pad_i
 zap_test.mrxdv_pad_i
@@ -26,6 +30,21 @@ zap_test.mrxd_pad_i[3:0]
 @28
 zap_test.mrxerr_pad_i
 zap_test.u_chip_top.ethmac.rxethmac1.RxValid
+zap_test.u_chip_top.ethmac.rxethmac1.rxaddrcheck1.RxAbort
+zap_test.u_chip_top.ethmac.wishbone.bd_ram.oe
+@22
+zap_test.u_chip_top.ethmac.wishbone.bd_ram.raddr[7:0]
+zap_test.u_chip_top.ethmac.wishbone.bd_ram.dato[31:0]
+zap_test.u_chip_top.ethmac.wishbone.bd_ram.we[3:0]
+zap_test.u_chip_top.ethmac.wishbone.bd_ram.di[31:0]
+zap_test.u_chip_top.ethmac.wb_adr_i[11:2]
+zap_test.u_chip_top.data_wb_adr[31:0]
+@28
+zap_test.u_chip_top.data_wb_cyc_ethmac
+zap_test.u_chip_top.data_wb_ack_ethmac
+@22
+zap_test.u_chip_top.data_wb_din_ethmac[31:0]
+@28
 zap_test.u_chip_top.ethmac.rxethmac1.RxAbort
 @200
 -
@@ -43,8 +62,13 @@ zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
 @28
 zap_test.u_chip_top.u_zap_top.u_zap_core.o_dcache_en
 zap_test.u_chip_top.u_zap_top.u_zap_core.o_icache_en
-@29
 zap_test.u_chip_top.u_zap_top.u_zap_core.o_mmu_en
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_cp15_cb.r1[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wen
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wr_addr_a[5:0]
 @200
 -
 @28

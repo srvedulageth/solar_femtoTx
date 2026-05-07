@@ -55,6 +55,13 @@ module zap_ram_simple_nopipe #(
 logic [WIDTH-1:0] mem [DEPTH-1:0];
 logic [WIDTH-1:0] mem_rd_data;
 
+`ifndef SYNTHESIS
+integer i;
+initial begin
+  for(i = 0; i < DEPTH; i = i + 1) mem[i] = 'h 0;
+end
+`endif
+
 always_ff @ (posedge i_clk) if ( i_rd_en ) mem_rd_data <= mem [ i_rd_addr ];
 always_ff @ (posedge i_clk) if ( i_wr_en ) mem [ i_wr_addr ] <= i_wr_data;
 
@@ -80,7 +87,7 @@ begin
 end
 
 // Buffer the write data in case of hazard.
-assign buffer_nxt = hazard_nxt ? i_wr_data : {WIDTH{1'dx}};
+assign buffer_nxt = hazard_nxt ? i_wr_data : {WIDTH{1'd0}};
 
 always_ff @ ( posedge i_clk )
 begin

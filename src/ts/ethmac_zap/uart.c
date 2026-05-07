@@ -82,6 +82,8 @@ int main(void)
         //net_init();
         //UARTWrite("Net up. Try: ping 192.168.1.20\r\n");
 
+        volatile uint32_t x = *(volatile uint32_t*)0x20000000; //FOR MMU Testing ....
+
         // Respond to ARP + PING forever
         for (;;) {
             if (rx_poll_scheduled) {

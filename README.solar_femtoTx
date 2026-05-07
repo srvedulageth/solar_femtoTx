@@ -6,6 +6,8 @@ Milestone 1 (Recreate ZAP environment with Vivado tools)
    b. https://github.com/srvedulageth/solar_femtoTx.git
    c. cd solar_femtoTx
    d. make runsim TC=uart
+      **** THE Config.cfg needs to be modified. #%Config = ( TO return { FOR SOME TESTS. Refer uart test case ***
+
    e. make syn 
 
 2. Changing Address Ranges

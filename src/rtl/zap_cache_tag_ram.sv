@@ -233,11 +233,11 @@ begin
         begin
                 o_wb_cyc_ff             <= 0;
                 o_wb_stb_ff             <= 0;
-                o_wb_wen_ff             <= 'x;
-                o_wb_sel_ff             <= 'x;
-                o_wb_dat_ff             <= 'x;
+                o_wb_wen_ff             <= '0;
+                o_wb_sel_ff             <= '0;
+                o_wb_dat_ff             <= '0;
                 o_wb_cti_ff             <= CTI_EOB;
-                o_wb_adr_ff             <= 'x;
+                o_wb_adr_ff             <= '0;
                 adr_ctr_ff              <= 0;
                 blk_ctr_ff              <= 0;
                 cache_clean_done_ff     <= 0;
@@ -432,30 +432,30 @@ begin:blk1
         begin
                 // Assigning X here can simplify synthesis.
 
-                line_dummy              = 'x;
-                shamt                   = 'x;
-                data                    = 'x;
-                pa                      = 'x;
-                dummy                   = 'x;
+                line_dummy              = '0;
+                shamt                   = '0;
+                data                    = '0;
+                pa                      = '0;
+                dummy                   = '0;
                 state_nxt               = XX;
-                tag_ram_rd_addr_nxt     = 'x;
-                tag_ram_wr_addr         = 'x;
-                tag_ram_wr_en           = 'x;
-                tag_ram_clear           = 'x;
-                tag_ram_clean           = 'x;
-                adr_ctr_nxt             = 'x;
-                blk_ctr_nxt             = 'x;
-                cache_clean_done_nxt    = 'x;
-                o_cache_inv_done        = 'x;
-                o_wb_cyc_nxt            = 'x;
-                o_wb_stb_nxt            = 'x;
-                o_wb_adr_nxt            = 'x;
-                o_wb_dat_nxt            = 'x;
-                o_wb_sel_nxt            = 'x;
-                o_wb_wen_nxt            = 'x;
-                o_wb_cti_nxt            = 'x;
-                tag_ram_wr_data         = 'x;
-                o_cache_clean_done      = 'x;
+                tag_ram_rd_addr_nxt     = '0;
+                tag_ram_wr_addr         = '0;
+                tag_ram_wr_en           = '0;
+                tag_ram_clear           = '0;
+                tag_ram_clean           = '0;
+                adr_ctr_nxt             = '0;
+                blk_ctr_nxt             = '0;
+                cache_clean_done_nxt    = '0;
+                o_cache_inv_done        = '0;
+                o_wb_cyc_nxt            = '0;
+                o_wb_stb_nxt            = '0;
+                o_wb_adr_nxt            = '0;
+                o_wb_dat_nxt            = '0;
+                o_wb_sel_nxt            = '0;
+                o_wb_wen_nxt            = '0;
+                o_wb_cti_nxt            = '0;
+                tag_ram_wr_data         = '0;
+                o_cache_clean_done      = '0;
         end
         endcase
 end:blk1

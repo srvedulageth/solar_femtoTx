@@ -744,10 +744,13 @@ endtask // paralel_crc_phy_rx
 integer no_of_txns;
 initial begin
   no_of_txns = 0;
-  #100000ns;
+  #1000ns;
 
+  wait(zap_test.u_chip_top.u_zap_top.cpu_mmu_en == 1);
   wait(zap_test.u_chip_top.ddr3_init_done == 1);
   wait(zap_test.u_chip_top.calib_done == 1);
+
+  #50000ns;
 
   repeat(15) begin
     //Start Rx ...
@@ -770,9 +773,15 @@ initial begin
     repeat(20000) @(posedge i_clk);
     no_of_txns = no_of_txns + 1;
 
-    if(no_of_txns%5 == 0) begin //assert reset after every 25 txns
+    if(no_of_txns%5 == 0) begin //assert reset after every 10 txns
       i_reset = 'b 1; repeat(500) @(posedge i_clk); #1; i_reset = 'b 0;
-      #100000ns;
+      #1000ns;
+
+      wait(zap_test.u_chip_top.u_zap_top.cpu_mmu_en == 1);
+      wait(zap_test.u_chip_top.ddr3_init_done == 1);
+      wait(zap_test.u_chip_top.calib_done == 1);
+
+      #50000ns;
     end
 
     $display("Rx Done");

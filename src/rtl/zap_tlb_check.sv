@@ -203,11 +203,11 @@ begin
                                 // OK to assign X. Never happens. Synthsis wil
                                 // OPTIMIZE. OK to do for FPGA synthesis.
                                 //
-                                o_fsr       <= 'X;
-                                o_phy_addr  <= 'X;
-                                o_walk      <= 'X;
-                                o_far       <= 'X;
-                                o_cacheable <= 'X;
+                                o_fsr       <= '0;
+                                o_phy_addr  <= '0;
+                                o_walk      <= '0;
+                                o_far       <= '0;
+                                o_cacheable <= '0;
                         end
                         endcase
 

@@ -73,6 +73,13 @@ assign full_nxt  =   i_clear ? 1'd0 :
                      (( wptr_nxt[PTR_WDT-2:0] == rptr_nxt[PTR_WDT-2:0] ) &
                       ( wptr_nxt[PTR_WDT-1]   != rptr_nxt[PTR_WDT-1]   ));
 
+`ifndef SYNTHESIS
+integer i;
+initial begin
+  for(i = 0; i < DEPTH; i = i + 1) mem[i] = 'h 0;
+end
+`endif
+
 always_ff @ ( posedge i_clk )
 begin
         if ( i_reset )

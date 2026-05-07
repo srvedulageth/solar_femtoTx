@@ -137,7 +137,7 @@ begin
                                 end
                                 default:
                                 begin
-                                        o_instruction[31:0] = 'x;
+                                        o_instruction[31:0] = '0;
                                 end
                                 endcase
                         end
@@ -234,9 +234,9 @@ begin
                                         end
                                         default:
                                         begin
-                                                o_instruction = 'x;
-                                                o_irq         = 'x;
-                                                o_fiq         = 'x;
+                                                o_instruction = '0;
+                                                o_irq         = '0;
+                                                o_fiq         = '0;
                                         end
                                 endcase
                         end
@@ -294,7 +294,7 @@ begin
                                         end
                                         default:
                                         begin
-                                                o_instruction[31:0] = 'x;
+                                                o_instruction[31:0] = '0;
                                         end
                                 endcase
                         end
@@ -328,7 +328,7 @@ begin
                                 4'd13:     o_instruction[31:0] = {AL, 4'b0000,  3'b000, 1'd1, rd, 4'd0, rd, 4'b1001, rs};          // MULS Rd, Rs, Rd
                                 4'd14:     o_instruction[31:0] = {AL, 2'b00, 1'b0, BIC, 1'd1, rd, rd, 8'd0, rs};                   // BICS rd, rd, rs
                                 4'd15:     o_instruction[31:0] = {AL, 2'b00, 1'b0, MVN, 1'd1, rd, rd, 8'd0, rs};                   // MVNS rd, rd, rs(op==15)
-                              default:     o_instruction[31:0] = 'x;
+                              default:     o_instruction[31:0] = '0;
                                 endcase
                         end
 
@@ -352,7 +352,7 @@ begin
                                 2'd2: o_instruction[31:0] = {AL, 2'b00, 1'b0, MOV, 1'b0, rd, rd, 8'd0, rs}; // MOV Rd, Rs
                                 default:
                                 begin
-                                        o_instruction = 'X;
+                                        o_instruction = '0;
 
                                         assert(1'd0) else
                                         $fatal(2, "Unexpected case way in decode_alu_hi().");
@@ -456,7 +456,7 @@ begin
                               2'd1: o_instruction[34:0] = {3'd0, AL, 3'b011, 1'd1, 1'd1, 1'd1, 1'd0, 1'd0, base, srcdest, offset};// STRB
                               2'd2: o_instruction[34:0] = {3'd0, AL, 3'b011, 1'd1, 1'd1, 1'd0, 1'd0, 1'd1, base, srcdest, offset};// LDR
                               2'd3: o_instruction[34:0] = {3'd0, AL, 3'b011, 1'd1, 1'd1, 1'd1, 1'd0, 1'd1, base, srcdest, offset};// LDRB(SH=2'd3)
-                              default: o_instruction[34:0] = 'x;
+                              default: o_instruction[34:0] = '0;
                               endcase
                             end
                             else
@@ -467,7 +467,7 @@ begin
                               2'd1: o_instruction[34:0] = {3'd0, AL, 3'b000, 1'd1, 1'd1, 1'd0, 1'd0, 1'd1, base, srcdest, 4'd0, 1'd1, 2'b01, 1'd1, offset[3:0]};// LDRH
                               2'd2: o_instruction[34:0] = {3'd0, AL, 3'b000, 1'd1, 1'd1, 1'd0, 1'd0, 1'd1, base, srcdest, 4'd0, 1'd1, 2'b10, 1'd1, offset[3:0]};// LDSB
                               2'd3: o_instruction[34:0] = {3'd0, AL, 3'b000, 1'd1, 1'd1, 1'd0, 1'd0, 1'd1, base, srcdest, 4'd0, 1'd1, 2'b11, 1'd1, offset[3:0]};// LDSH(SH=2'd3)
-                              default: o_instruction[34:0] = 'x;
+                              default: o_instruction[34:0] = '0;
                               endcase
                             end
 

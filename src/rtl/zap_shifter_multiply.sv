@@ -406,14 +406,14 @@ begin
 
                 default:
                 begin
-                        old_nozero_nxt = 'x;
-                        o_nozero       = 'x;
-                        o_busy         = 'x;
-                        o_rd           = 'x;
+                        old_nozero_nxt = '0;
+                        o_nozero       = '0;
+                        o_busy         = '0;
+                        o_rd           = '0;
                         state_nxt      = XX;
-                        x_nxt          = 'x;
-                        o_sat          = 'x;
-                        tmp_sat        = 'x;
+                        x_nxt          = '0;
+                        o_sat          = '0;
+                        tmp_sat        = '0;
                 end
         endcase
 end

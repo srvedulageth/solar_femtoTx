@@ -1,0 +1,106 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Fri May  1 19:12:32 2026
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
+[dumpfile_mtime] "Fri May  1 16:13:46 2026"
+[dumpfile_size] 881099387
+[savefile] "/home/vedulas/solar_femtoTX/src/testbench/debug_1.gtkw"
+[timestart] 1259794700
+[size] 1849 928
+[pos] -1 -1
+*-14.891041 1259875000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] zap_test.
+[treeopen] zap_test.eth_phy.
+[treeopen] zap_test.u_chip_top.
+[treeopen] zap_test.u_chip_top.ethmac.rxethmac1.
+[treeopen] zap_test.u_chip_top.u_phy.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.
+[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.
+[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.
+[sst_width] 447
+[signals_width] 324
+[sst_expanded] 1
+[sst_vpaned_height] 585
+@28
+zap_test.mrx_clk_pad_i
+zap_test.mrxdv_pad_i
+@22
+zap_test.mrxd_pad_i[3:0]
+@28
+zap_test.mrxerr_pad_i
+zap_test.u_chip_top.ethmac.rxethmac1.RxValid
+zap_test.u_chip_top.ethmac.rxethmac1.rxaddrcheck1.RxAbort
+@200
+-
+@28
+zap_test.mtx_clk_pad_i
+@22
+zap_test.mtxd_pad_o[3:0]
+@28
+zap_test.mtxen_pad_o
+zap_test.mtxerr_pad_o
+@200
+-
+@22
+zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_dcache_en
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_icache_en
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_mmu_en
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_cp15_cb.r1[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wen
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wr_addr_a[5:0]
+@200
+-
+@28
+zap_test.u_chip_top.SYS_CLK
+@22
+zap_test.u_chip_top.ethmac.ethreg1.HASH0Out[31:0]
+zap_test.u_chip_top.ethmac.ethreg1.HASH1Out[31:0]
+@200
+-
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.i_fiq
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_valid
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_pc_ff[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_instruction[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.i_instr_wb_dat[31:0]
+@200
+-
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.o_valid
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.o_pc_ff[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.o_instruction[31:0]
+@200
+-
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_instr_wb_cyc
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_instr_wb_adr[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.i_instr_wb_ack
+@22
+zap_test.u_chip_top.u_zap_top.ic_data[31:0]
+zap_test.u_chip_top.u_zap_top.i_wb_dat[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.o_wb_cyc
+@22
+zap_test.u_chip_top.u_zap_top.o_wb_adr[31:0]
+zap_test.u_chip_top.ram_wb.dat_o[31:0]
+@23
+zap_test.u_chip_top.ram_wb.adr_i[13:0]
+@28
+zap_test.u_chip_top.ram_wb.we_i
+@22
+zap_test.u_chip_top.ram_wb.dat_i[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.i_instr_wb_dat[31:0]
+@200
+-
+[pattern_trace] 1
+[pattern_trace] 0

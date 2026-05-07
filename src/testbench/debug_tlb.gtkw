@@ -1,0 +1,33 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sat May  2 17:04:03 2026
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
+[dumpfile_mtime] "Sat May  2 16:52:01 2026"
+[dumpfile_size] 1096156638
+[savefile] "/home/vedulas/solar_femtoTX/src/testbench/debug_tlb.gtkw"
+[timestart] 1160782030
+[size] 1663 786
+[pos] -1 -1
+*-14.201080 1160835000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] zap_test.
+[sst_width] 278
+[signals_width] 238
+[sst_expanded] 1
+[sst_vpaned_height] 222
+@28
+zap_test.u_chip_top.dbg_dtlb_req
+zap_test.u_chip_top.dbg_dtlb_cacheable
+zap_test.u_chip_top.dbg_dtlb_hit
+zap_test.u_chip_top.dbg_dtlb_miss
+@22
+zap_test.u_chip_top.dbg_dtlb_match[3:0]
+@23
+zap_test.u_chip_top.dbg_dtlb_va[31:0]
+@22
+zap_test.u_chip_top.dbg_dtlb_pa[31:0]
+@28
+zap_test.u_chip_top.dbg_dtlb_section_hit
+zap_test.u_chip_top.dbg_dtlb_walk
+[pattern_trace] 1
+[pattern_trace] 0

@@ -540,22 +540,22 @@ begin
                 o_mem_load_ff                    <= 0;
                 o_force32align_ff                <= 0;
 
-                o_alt_result_ff                  <= 'x; //
-                o_alu_result_ff                  <= 'x; //
-                o_pc_plus_8_ff                   <= 'x; //
-                o_destination_index_ff           <= 'x; //
-                o_mem_srcdest_index_ff           <= 'x; //
-                o_mem_srcdest_index_ff           <= 'x; //
-                o_mem_unsigned_byte_enable_ff    <= 'x; //
-                o_mem_signed_byte_enable_ff      <= 'x; //
-                o_mem_signed_halfword_enable_ff  <= 'x; //
-                o_mem_unsigned_halfword_enable_ff<= 'x; //
-                o_mem_translate_ff               <= 'x; //
-                w_pc_from_alu_btarget            <= 'x; //
-                w_pc_from_alu_resync             <= 'x; //
-                o_decompile                      <= 'x; //
-                o_taken_ff                       <= 'x; //
-                o_confirm_from_alu               <= 'x; //
+                o_alt_result_ff                  <= '0; //
+                o_alu_result_ff                  <= '0; //
+                o_pc_plus_8_ff                   <= '0; //
+                o_destination_index_ff           <= '0; //
+                o_mem_srcdest_index_ff           <= '0; //
+                o_mem_srcdest_index_ff           <= '0; //
+                o_mem_unsigned_byte_enable_ff    <= '0; //
+                o_mem_signed_byte_enable_ff      <= '0; //
+                o_mem_signed_halfword_enable_ff  <= '0; //
+                o_mem_unsigned_halfword_enable_ff<= '0; //
+                o_mem_translate_ff               <= '0; //
+                w_pc_from_alu_btarget            <= '0; //
+                w_pc_from_alu_resync             <= '0; //
+                o_decompile                      <= '0; //
+                o_taken_ff                       <= '0; //
+                o_confirm_from_alu               <= '0; //
         end
         else if ( i_clear_from_writeback )
         begin
@@ -575,22 +575,22 @@ begin
                 o_mem_load_ff                    <= 0;
                 o_force32align_ff                <= 0;
 
-                o_alt_result_ff                  <= 'x; //
-                o_alu_result_ff                  <= 'x; //
-                o_pc_plus_8_ff                   <= 'x; //
-                o_destination_index_ff           <= 'x; //
-                o_mem_srcdest_index_ff           <= 'x; //
-                o_mem_srcdest_index_ff           <= 'x; //
-                o_mem_unsigned_byte_enable_ff    <= 'x; //
-                o_mem_signed_byte_enable_ff      <= 'x; //
-                o_mem_signed_halfword_enable_ff  <= 'x; //
-                o_mem_unsigned_halfword_enable_ff<= 'x; //
-                o_mem_translate_ff               <= 'x; //
-                w_pc_from_alu_btarget            <= 'x; //
-                w_pc_from_alu_resync             <= 'x; //
-                o_decompile                      <= 'x; //
-                o_taken_ff                       <= 'x; //
-                o_confirm_from_alu               <= 'x; //
+                o_alt_result_ff                  <= '0; //
+                o_alu_result_ff                  <= '0; //
+                o_pc_plus_8_ff                   <= '0; //
+                o_destination_index_ff           <= '0; //
+                o_mem_srcdest_index_ff           <= '0; //
+                o_mem_srcdest_index_ff           <= '0; //
+                o_mem_unsigned_byte_enable_ff    <= '0; //
+                o_mem_signed_byte_enable_ff      <= '0; //
+                o_mem_signed_halfword_enable_ff  <= '0; //
+                o_mem_unsigned_halfword_enable_ff<= '0; //
+                o_mem_translate_ff               <= '0; //
+                w_pc_from_alu_btarget            <= '0; //
+                w_pc_from_alu_resync             <= '0; //
+                o_decompile                      <= '0; //
+                o_taken_ff                       <= '0; //
+                o_confirm_from_alu               <= '0; //
         end
         else if ( (i_data_mem_fault || sleep_ff) && !i_data_stall )
         begin
@@ -681,7 +681,7 @@ begin
         case ( r_clear_from_alu )
         BRANCH_TARGET     : o_pc_from_alu = w_pc_from_alu_btarget;
         NEXT_INSTR_RESYNC : o_pc_from_alu = w_pc_from_alu_resync;
-        default:            o_pc_from_alu = 'dx; // Synthesis will OPTIMIZE.
+        default:            o_pc_from_alu = 'd0; // Synthesis will OPTIMIZE.
                                                  // OK to do for FPGA synthesis.
         endcase
 end
@@ -803,7 +803,7 @@ begin:pre_post_index_address_generator
         end
         else
         begin
-                mad = 'x;
+                mad = '0;
         end
 end
 
@@ -880,7 +880,7 @@ begin: alu_result
                             end
                             default:
                             begin
-                                {tmp_flags[i], tmp_sum[i]} = {2{1'bx}}; // Never happens.
+                                {tmp_flags[i], tmp_sum[i]} = {2{1'b0}}; // Never happens.
                             end
                         endcase
                 end
@@ -1154,7 +1154,7 @@ function automatic [35:0] process_logical_instructions
         {2'd0, ORR}: rd = RN |   RM;
         {2'd0, TST}: rd = RN &   RM; // Target is not written.
         {2'd0, TEQ}: rd = RN ^   RM; // Target is not written.
-        default:     rd = 'x;
+        default:     rd = '0;
         endcase
 
         // Assign values to the flags only if an update is requested. Note that V
@@ -1243,7 +1243,7 @@ function automatic [3:0] generate_ben (
                 2'd1: x = 4'b0010;
                 2'd2: x = 4'b0100;
                 2'd3: x = 4'b1000;
-             default: x = 'x;
+             default: x = '0;
                 endcase
         end
         else if ( uh || sh ) // Halfword. A word = 2 half words.
@@ -1251,7 +1251,7 @@ function automatic [3:0] generate_ben (
                 case ( addr[1] )
                 1'd0: x = 4'b0011;
                 1'd1: x = 4'b1100;
-            default : x = 'x;
+            default : x = '0;
                 endcase
         end
         else

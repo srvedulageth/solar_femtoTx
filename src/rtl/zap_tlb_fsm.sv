@@ -371,11 +371,11 @@ begin
 
         default:
         begin
-                wb_stb_nxt      = 'x;
-                wb_cyc_nxt      = 'x;
-                wb_adr_nxt      = 'x;
-                wb_sel_nxt      = 'x;
-                state_nxt       = 'x;
+                wb_stb_nxt      = '0;
+                wb_cyc_nxt      = '0;
+                wb_adr_nxt      = '0;
+                wb_sel_nxt      = '0;
+                state_nxt       = '0;
         end
 
         endcase

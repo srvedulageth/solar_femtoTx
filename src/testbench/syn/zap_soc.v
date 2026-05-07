@@ -17,20 +17,20 @@ Added EthMac
 module zap_soc #(
 
 // CPU config.
-parameter DATA_SECTION_TLB_ENTRIES      = 4,
-parameter DATA_LPAGE_TLB_ENTRIES        = 8,
-parameter DATA_SPAGE_TLB_ENTRIES        = 16,
-parameter DATA_FPAGE_TLB_ENTRIES        = 32,
-parameter DATA_CACHE_SIZE               = 1024,
-parameter CODE_SECTION_TLB_ENTRIES      = 4,
-parameter CODE_LPAGE_TLB_ENTRIES        = 8,
-parameter CODE_SPAGE_TLB_ENTRIES        = 16,
-parameter CODE_FPAGE_TLB_ENTRIES        = 32,
-parameter CODE_CACHE_SIZE               = 1024,
+parameter ONLY_CORE                     = 0,
+parameter DATA_CACHE_SIZE               = 4096,
+parameter CODE_CACHE_SIZE               = 4096,
+parameter CODE_SECTION_TLB_ENTRIES      = 512,
+parameter CODE_LPAGE_TLB_ENTRIES        = 512,
+parameter CODE_FPAGE_TLB_ENTRIES        = 512,
+parameter CODE_SPAGE_TLB_ENTRIES        = 512,
+parameter DATA_SECTION_TLB_ENTRIES      = 512,
+parameter DATA_LPAGE_TLB_ENTRIES        = 512,
+parameter DATA_FPAGE_TLB_ENTRIES        = 512,
+parameter DATA_SPAGE_TLB_ENTRIES        = 512,
 parameter FIFO_DEPTH                    = 4,
 parameter BP_ENTRIES                    = 1024,
-parameter BE_32_ENABLE                  = 0,
-parameter ONLY_CORE                     = 0
+parameter BE_32_ENABLE                  = 0
 
 )(
         //Clk and rst
@@ -591,14 +591,14 @@ ethmac ethmac(
 // ===============================
 
 //Processor RAM ...
-localparam RAM_ADDR_WIDTH        = 14;
+localparam RAM_ADDR_WIDTH        = 16;
 localparam RAM_DATA_WIDTH        = 32;
 localparam RAM_MEM_SIZE          = 16384;
 
 ram_wb
       #
         (
-          .adr_width(RAM_ADDR_WIDTH),
+          .adr_width(RAM_ADDR_WIDTH-2),
           .dat_width(RAM_DATA_WIDTH),
           .mem_size(RAM_MEM_SIZE),
           .MEMFILE("ethmac_zap.dump")
@@ -606,7 +606,7 @@ ram_wb
       ram_wb (
               .clk_i(i_clk),
               .rst_i(i_reset),
-              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:0]),
+              .adr_i(data_wb_adr[RAM_ADDR_WIDTH-1:2]),
               .dat_i(data_wb_dout),
               .we_i(data_wb_we),
               .sel_i(data_wb_sel),
@@ -1021,7 +1021,6 @@ u_ddr3_calib_dqs_window (
 (* MARK_DEBUG = "true" *) wire ddr3_ram_accept_dbg = ddr3_ram_accept;
 (* MARK_DEBUG = "true" *) wire wb_ddr3_ram_ack_dbg = ddr3_ram_ack;
 (* MARK_DEBUG = "true" *) wire [2:0] wb_ddr3_br_state_dbg = wb_ddr3_br_state;
-*/
 
 (* MARK_DEBUG = "true" *) wire ethmac_ram_cyc_dbg = ethmac_ram_cyc;
 (* MARK_DEBUG = "true" *) wire ethmac_ram_ack_dbg = ethmac_ram_ack;
@@ -1039,7 +1038,13 @@ u_ddr3_calib_dqs_window (
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data1_w_dbg = zap_soc.u_phy.rd_data1_w;
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data2_w_dbg = zap_soc.u_phy.rd_data2_w;
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data3_w_dbg = zap_soc.u_phy.rd_data3_w;
+*/
 
+(* MARK_DEBUG = "true" *) wire ddr3_init_done_dbg = ddr3_init_done;
 (* MARK_DEBUG = "true" *) wire calib_done_dbg = calib_done;
 (* MARK_DEBUG = "true" *) wire calib_pass_dbg = calib_pass;
+(* MARK_DEBUG = "true" *) wire mmu_en_dbg = zap_soc.u_zap_top.cpu_mmu_en;
+(* MARK_DEBUG = "true" *) wire dc_en_dbg = zap_soc.u_zap_top.cpu_dc_en;
+(* MARK_DEBUG = "true" *) wire ic_en_dbg = zap_soc.u_zap_top.cpu_ic_en;
+
 endmodule // zap_soc

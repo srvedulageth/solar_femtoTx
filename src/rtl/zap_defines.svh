@@ -123,7 +123,7 @@
 `define ZAP_FPAGE_TLB_WDT         (32 + (32-$clog2(FPAGE_TLB_ENTRIES)-10))
 
 // Misc.
-`define ZAP_DEFAULT_XX            XX = 'X
+`define ZAP_DEFAULT_XX            XX = '0
 
 // Common decoding macros.
 

@@ -132,6 +132,7 @@ begin
                 o_fiq                   <= 0;
                 o_und                   <= 0;
                 o_iabort                <= 0;
+                o_pc_plus_8_ff          <= '0;
         end
         else if(( i_clear_from_writeback )
         ||      ( i_clear_from_alu && !i_data_stall )
@@ -142,11 +143,12 @@ begin
                 o_fiq <= 0;
                 o_und <= 0;
                 o_iabort <= 0;
-                o_force32_align <= 'x;
-                o_pred <= 'x;
-                o_pc_ff <= 'x;
-                o_instruction <= 'x;
-                o_taken_ff <= 'x;
+                o_force32_align <= '0;
+                o_pred <= '0;
+                o_pc_ff <= '0;
+                o_instruction <= '0;
+                o_taken_ff <= '0;
+                o_pc_plus_8_ff <= '0;
         end
         else if ( !stall )
         begin

@@ -43,8 +43,8 @@ my $BP                          = $Config{'BP_DEPTH'};
 my $FIFO                        = $Config{'INSTR_FIFO_DEPTH'};
 my $REG_HIER                    = "u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file";
 
-my $IVL_OPTIONS  = " -I/home/vedulas/Xilinx_Test/ZAP/src/rtl ";
-   $IVL_OPTIONS .= "   /home/vedulas/Xilinx_Test/ZAP/src/rtl/*.sv ";
+my $IVL_OPTIONS  = " -I/home/vedulas/solar_femtoTX/src/rtl ";
+   $IVL_OPTIONS .= "   /home/vedulas/solar_femtoTX/src/rtl/*.sv ";
    $IVL_OPTIONS .= " -Iobj/ts/$TEST ";
    $IVL_OPTIONS .= " -Isrc/testbench/temp ";
    $IVL_OPTIONS .= "   src/testbench/temp/uart_org.v ";

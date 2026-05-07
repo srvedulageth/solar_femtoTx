@@ -79,6 +79,13 @@ logic [WIDTH/8-1:0][1:0]  sel_st1;
 logic [WIDTH/8-1:0][2:0]  sel_st2;
 logic [$clog2(DEPTH)-1:0] rd_addr_st1, rd_addr_st2;
 
+`ifndef SYNTHESIS
+integer i;
+initial begin
+  for(i = 0; i < DEPTH; i = i + 1) mem[i] = 'h 0;
+end
+`endif
+
 // ----------------------------------------------------------------------------
 // High speed RAM logic
 // ----------------------------------------------------------------------------

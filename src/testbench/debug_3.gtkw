@@ -1,0 +1,192 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon May  4 23:19:10 2026
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX/src/testbench/zap.vcd"
+[dumpfile_mtime] "Mon May  4 19:18:52 2026"
+[dumpfile_size] 1188149387
+[savefile] "/home/vedulas/solar_femtoTX/src/testbench/debug_3.gtkw"
+[timestart] 768850000
+[size] 1851 975
+[pos] -1 -1
+*-22.268257 782415000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] zap_test.
+[treeopen] zap_test.eth_phy.
+[treeopen] zap_test.u_chip_top.
+[treeopen] zap_test.u_chip_top.ethmac.rxethmac1.
+[treeopen] zap_test.u_chip_top.u_phy.
+[treeopen] zap_test.u_chip_top.u_zap_top.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_cache_tag_ram.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.
+[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.
+[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.
+[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.
+[sst_width] 431
+[signals_width] 324
+[sst_expanded] 1
+[sst_vpaned_height] 625
+@28
+zap_test.mrx_clk_pad_i
+zap_test.mrxdv_pad_i
+@22
+zap_test.mrxd_pad_i[3:0]
+@28
+zap_test.mrxerr_pad_i
+zap_test.u_chip_top.ethmac.rxethmac1.RxValid
+zap_test.u_chip_top.ethmac.rxethmac1.rxaddrcheck1.RxAbort
+@200
+-
+@28
+zap_test.mtx_clk_pad_i
+@22
+zap_test.mtxd_pad_o[3:0]
+@28
+zap_test.mtxen_pad_o
+zap_test.mtxerr_pad_o
+@200
+-
+@22
+zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_dcache_en
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_icache_en
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_mmu_en
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_cp15_cb.r1[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wen
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wr_addr_a[5:0]
+@200
+-
+@22
+zap_test.u_chip_top.ethmac.ethreg1.HASH0Out[31:0]
+zap_test.u_chip_top.ethmac.ethreg1.HASH1Out[31:0]
+@200
+-
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_plus_8_ff[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.decode_irq_ff
+zap_test.u_chip_top.u_zap_top.u_zap_core.i_fiq
+zap_test.u_chip_top.u_zap_top.u_zap_core.fifo_valid
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.alu_flags_ff[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.decode_pc_ff[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.pc_ff[32:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_mode16_decoder.i_pc_ff[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.o_flags_ff[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.flags_ff[31:0]
+@c00022
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+@28
+(0)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(1)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(2)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(3)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(4)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(5)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(6)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(7)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(8)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(9)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(10)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(11)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(12)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(13)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(14)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(15)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(16)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(17)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(18)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(19)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(20)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(21)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(22)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(23)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(24)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(25)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(26)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(27)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(28)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(29)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(30)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+(31)zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_cpsr_nxt[31:0]
+@1401200
+-group_end
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.o_dav_nxt
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_alu_main.i_clear_from_writeback
+@200
+-
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.mode16_valid
+zap_test.u_chip_top.u_zap_top.u_zap_core.mode16_irq
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_mode16_decoder.i_fiq
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_mode16_decoder.o_fiq
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_instruction[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.i_valid
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.i_decompile_valid
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wen
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wr_data_a[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wr_data_b[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wr_data_c[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_instr_abort
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_pc_ff[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_valid
+@22
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.i_cpsr[4:0]
+@28
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.o_cache_inv_done
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.tlb_busy
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.tlb_cacheable
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.tr_cache_tag_valid
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.tr_cache_tag_valid
+@22
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_cache_fsm.cache_line[511:0]
+@28
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_cache_fsm.i_busy
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_cache_fsm.i_cacheable
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_cache_fsm.i_cache_tag_valid
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_cache_fsm.rhit
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_cache_fsm.whit
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_cache_fsm.whit
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_cache_fsm.rhit
+@29
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.u_zap_cache_fsm.i_cache_tag_valid
+@200
+-
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.i_und
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_code_stall
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.shelve_ff
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.i_clear_from_icache
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.i_clear_btb
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.i_clear_from_alu
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.i_instruction[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.i_instr_wb_dat[31:0]
+zap_test.u_chip_top.u_zap_top.ic_data[31:0]
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.o_dat[31:0]
+zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.i_address_check[31:0]
+zap_test.u_chip_top.u_zap_top.cpu_iaddr_check[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.o_pc_check[31:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.pc_del2_ff[32:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.pc_del2_nxt[32:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.pc_del_ff[32:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.pc_ff[32:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.pc_nxt[32:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.pc_nxt_tmp[32:0]
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.i_pc_from_alu[31:0]
+@200
+-
+-
+[pattern_trace] 1
+[pattern_trace] 0
