@@ -17,3 +17,7 @@ DDR3
 xsim -R zap_test
 gtkwave zap.vcd &
 mac_xilinx.gtkw
+
+Misc
+----
+\rm -rf eth_tb_phy.log zap.vcd zap_test.wdb xsim.* xelab.*
