@@ -135,8 +135,11 @@
 //
 
 // synopsys translate_off
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 // synopsys translate_on
+
 `include "uart_defines.v"
  
 module uart_wb (clk, wb_rst_i, 
@@ -281,7 +284,7 @@ begin
 		default : wb_dat8_i = wb_dat_is[7:0];
 	endcase // case(wb_sel_i)
 
-  `ifdef LITLE_ENDIAN
+  `ifdef LITTLE_ENDIAN
 	case (wb_sel_is)
 		4'b0001 : wb_adr_int_lsb = 2'h0;
 		4'b0010 : wb_adr_int_lsb = 2'h1;

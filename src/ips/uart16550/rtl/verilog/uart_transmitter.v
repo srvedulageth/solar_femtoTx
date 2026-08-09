@@ -146,7 +146,9 @@
 //
 
 // synopsys translate_off
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 // synopsys translate_on
 
 `include "uart_defines.v"
@@ -311,7 +313,7 @@ begin
 				else
 				if (counter == 5'b00001)
 				begin
-					counter <= #1 4'b0;
+					counter <= #1 5'b0;
 					tstate <= #1 s_send_stop;
 				end
 				else
@@ -321,8 +323,10 @@ begin
 	s_send_stop :  begin
 				if (~|counter)
 				  begin
-						casex ({lcr[`UART_LC_SB],lcr[`UART_LC_BITS]})
-  						3'b0xx:	  counter <= #1 5'b01101;     // 1 stop bit ok igor
+						//casex ({lcr[`UART_LC_SB],lcr[`UART_LC_BITS]})
+  						//3'b0xx:	  counter <= #1 5'b01101;     // 1 stop bit ok igor
+						case ({lcr[`UART_LC_SB],lcr[`UART_LC_BITS]})
+  						3'b000, 3'b001, 3'b010, 3'b011:	  counter <= #1 5'b01101;     // 1 stop bit ok igor
   						3'b100:	  counter <= #1 5'b10101;     // 1.5 stop bit
   						default:	  counter <= #1 5'b11101;     // 2 stop bits
 						endcase

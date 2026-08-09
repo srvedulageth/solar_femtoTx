@@ -1,0 +1,159 @@
+WARNING: [Common 17-576] 'retiming' is deprecated. Please use -global_retiming option
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/rtl/zap_fetch_main.sv:184]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/rtl/zap_mode16_decoder_main.sv:171]
+WARNING: [Synth 8-6014] Unused sequential element UNUSED_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/timer.v:167]
+WARNING: [Synth 8-6014] Unused sequential element dummy_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/rtl/zap_tlb_check.sv:78]
+WARNING: [Synth 8-6014] Unused sequential element UNUSED_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/vic.v:134]
+WARNING: [Synth 8-6014] Unused sequential element wr_accept_q_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/ips/ddr3/core_ddr3_controller/src_v/ddr3_dfi_seq.v:157]
+WARNING: [Synth 8-7129] Port cti_i[2] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cti_i[1] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cti_i[0] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_error_i in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[15] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[14] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[13] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[12] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[11] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[10] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[9] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[8] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[7] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[6] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[5] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[4] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[3] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[2] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[1] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_resp_id_i[0] in module wb_ddr3_bridge is either unconnected or has no load
+WARNING: [Synth 8-7129] Port dfi_rddata_dnv_i[1] in module ddr3_dfi_seq is either unconnected or has no load
+WARNING: [Synth 8-7129] Port dfi_rddata_dnv_i[0] in module ddr3_dfi_seq is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[31] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[30] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[29] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[28] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[27] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[26] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[25] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[24] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_data_i[23] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_addr_i[31] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_addr_i[30] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_addr_i[29] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_addr_i[3] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_addr_i[2] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_addr_i[1] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inport_addr_i[0] in module ddr3_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[31] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[30] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[29] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[28] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[27] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[26] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[25] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[24] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[15] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[14] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[13] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[12] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[11] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[7] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[6] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[5] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port cfg_i[4] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port dfi_address_i[14] in module ddr3_dfi_phy is either unconnected or has no load
+WARNING: [Synth 8-7129] Port RxByteCntGreat2 in module eth_macstatus is either unconnected or has no load
+WARNING: [Synth 8-7129] Port TxUsedData in module eth_macstatus is either unconnected or has no load
+WARNING: [Synth 8-7129] Port rst in module eth_spram_256x32 is either unconnected or has no load
+WARNING: [Synth 8-7129] Port r_TxBDNum[7] in module eth_wishbone is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ByteCntEq0 in module eth_rxstatem is either unconnected or has no load
+WARNING: [Synth 8-7129] Port ByteCntGreat2 in module eth_rxstatem is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[15] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[14] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[13] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[12] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[11] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[10] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[9] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[8] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port NibCnt[7] in module eth_random is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[27] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[26] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[25] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[24] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[23] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[22] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[21] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[20] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[19] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[18] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[17] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[16] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[15] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[14] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[13] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[12] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[11] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[10] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[9] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[8] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[7] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[6] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_cpsr[5] in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_icache_clean_done in module zap_cp15_cb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_fb_branch_src_address[offset] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][20] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][19] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][18] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][17] in module zap_btb is either unconnected or has no load
+Resolution: To avoid this warning, move constraints listed in [.Xil/zap_soc_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+WARNING: [Synth 8-5866] 'keep_hierarchy' attribute is found on instance 'u_ddr_core' of module 'ddr3_core'. So gated clock conversion will not be possible for this module.
+WARNING: [Synth 8-5866] 'keep_hierarchy' attribute is found on instance 'u_ddr3_calib_dqs_window' of module 'ddr3_calib_dqs_window'. So gated clock conversion will not be possible for this module.
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[31] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[30] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[29] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[28] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[27] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[26] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[25] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[24] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[23] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[22] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[21] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[20] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[19] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[18] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[17] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[16] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[15] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[14] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[13] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[12] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[11] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[10] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[9] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[8] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[7] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[6] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[5] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[4] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[3] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[2] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[1] driven by constant 0
+WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[0] driven by constant 0
+WARNING: [Synth 8-3936] Found unconnected internal register 'xprod_ab_reg' and it is trimmed from '34' to '32' bits. [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/rtl/zap_shifter_multiply.sv:125]
+Synthesis finished with 0 errors, 0 critical warnings and 181 warnings.
+495 Infos, 142 Warnings, 0 Critical Warnings and 0 Errors encountered.
+WARNING: [Opt 31-278] Could not optimize cascaded clock buffer cell: clk2ddr3_BUFG_inst
+WARNING: [Opt 31-278] Could not optimize cascaded clock buffer cell: clk2ddr3_BUFG_inst
+WARNING: [Opt 31-278] Could not optimize cascaded clock buffer cell: clk2ddr3_BUFG_inst
+WARNING: [Opt 31-278] Could not optimize cascaded clock buffer cell: clk2ddr3_BUFG_inst
+51 Infos, 4 Warnings, 0 Critical Warnings and 0 Errors encountered.
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors, 42 Warnings
+WARNING: [Place 30-461] A non-muxed BUFG 'clk2ddr3_BUFG_inst' is driven by another global buffer 'u_pll/clkout0_o_BUFG_inst'. Remove non-muxed BUFG if it is not desired.
+81 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
+556 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+WARNING: [Route 35-468] The router encountered 2 pins that are both setup-critical and hold-critical and tried to fix hold violations at the expense of setup slack. Such pins are:
+WARNING: [Route 35-328] Router estimated timing not met.
+18 Infos, 2 Warnings, 0 Critical Warnings and 0 Errors encountered.
+WARNING: [Timing 38-436] There are set_bus_skew constraint(s) in this design. Please run report_bus_skew to ensure that bus skew requirements are met.
+9 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.

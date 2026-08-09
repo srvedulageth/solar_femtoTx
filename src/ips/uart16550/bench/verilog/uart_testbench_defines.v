@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
 ////                                                              ////
-////  uart_testbench_defines.v                                    ////
+////  uart_intbench_defines.v                                    ////
 ////                                                              ////
 ////  This file is part of the "uart16550" project                ////
 ////  http://www.opencores.org/projects/uart16550/                ////

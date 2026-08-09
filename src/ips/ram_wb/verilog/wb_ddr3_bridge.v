@@ -22,7 +22,6 @@ module wb_ddr3_bridge #(
     input                   stb_i,
     input   [2:0]           cti_i,
     output  reg             ack_o,
-    input                   ethmac_rd_i,
 
     // ---------------- DDR3 core "inport" interface ----------------
     output  reg  [15:0]     inport_wr_o,        // byte strobes (16 bytes)
@@ -258,7 +257,7 @@ module wb_ddr3_bridge #(
                     // Don't accept a new request until the master drops CYC/STB.
                     // Prevents re-latching the same beat when master deasserts one cycle late.
                         ack_o  <= 1'b0;
-                        if(ethmac_rd_i == 'b 1) begin
+                        if(cti_i == 3'b 010) begin //Burst
                             state <= S_RD_AGAIN;
                         end
                         else begin

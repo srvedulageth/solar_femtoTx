@@ -65,8 +65,9 @@
 //
 
 
+`ifndef SYNTHESIS
 `include "timescale.v"
-
+`endif
 
 module uart_sync_flops
 (

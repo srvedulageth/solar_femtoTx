@@ -67,6 +67,9 @@ module testcase;
     reg     [7999: 0] tim;
     reg     [7999: 0] severe_err_msg;
     reg     [7999: 0] msg;
+    //reg [7:0]     tim[0:1000];
+    //reg [7:0]     severe_err_msg[0:1000];
+    //reg [7:0]     msg[0:1000];
     integer           val;
     // Testcase reporting events & signals
     event             testcase_log_written;
@@ -196,6 +199,10 @@ module testcase;
 
 // Testcase (DEPENDENT) code
 //###########################
+
+  //testbench_utilities testbench_utilities();
+  //uart_wb_utilities uart_wb_utilities();
+  //uart_device_utilities uart_device_utilities();
 
   // Initialization
   task testcase_init;

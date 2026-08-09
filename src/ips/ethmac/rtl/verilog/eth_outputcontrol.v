@@ -66,7 +66,9 @@
 //
 //
 
-//`include "ethmac_timescale.v"
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module eth_outputcontrol(Clk, Reset, InProgress, ShiftedBit, BitCounter, WriteOp, NoPre, MdcEn_n, Mdo, MdoEn);
 

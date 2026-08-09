@@ -239,7 +239,9 @@
 
 
 `include "ethmac_defines.v"
-//`include "timescale.v"
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 
 module ethmac
@@ -350,7 +352,9 @@ output  mbist_so_o;       // bist scan serial out
 input [`ETH_MBIST_CTRL_WIDTH - 1:0] mbist_ctrl_i;       // bist chain shift control
 `endif
 
+`ifdef WISHBONE_DEBUG
 wire    [31:0]  wb_dbg_dat0;
+`endif
 
 wire     [7:0]  r_ClkDiv;
 wire            r_MiiNoPre;
@@ -632,7 +636,9 @@ eth_registers ethreg1
   .StartTxDone(StartTxDone),
   .TxClk(mtx_clk_pad_i),
   .RxClk(mrx_clk_pad_i),
+`ifdef WISHBONE_DEBUG
   .dbg_dat(wb_dbg_dat0),
+`endif
   .SetPauseTimer(SetPauseTimer)
   
 );

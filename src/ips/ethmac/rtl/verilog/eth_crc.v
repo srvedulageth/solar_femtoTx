@@ -74,7 +74,9 @@
 //
 
 
-//`include "ethmac_timescale.v"
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module eth_crc (Clk, Reset, Data, Enable, Initialize, Crc, CrcError);
 

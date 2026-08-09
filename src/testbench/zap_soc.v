@@ -191,6 +191,7 @@ wire ethmac_m_wb_cyc_o;
 wire ethmac_m_wb_stb_o;
 wire ethmac_m_wb_ack_i;
 wire ethmac_m_wb_err_i;
+wire [2:0] ethmac_m_wb_cti_o;
 
 `ifdef DUAL_UART
 reg             data_wb_cyc_uart [1:0], data_wb_cyc_timer [1:0];
@@ -460,7 +461,7 @@ ethmac ethmac(
 
   .m_wb_err_i(1'b 0), //Not Used
 
-  .m_wb_cti_o(), //Not Used
+  .m_wb_cti_o(ethmac_m_wb_cti_o),
   .m_wb_bte_o(), //Not Used
 
   //TX
@@ -537,8 +538,8 @@ wire ethmac_ram_we;
 wire [3:0] ethmac_ram_sel;
 wire ethmac_ram_cyc;
 wire ethmac_ram_stb;
+wire [2:0] ethmac_ram_cti;
 wire ethmac_ram_ack;
-wire ethmac_rd_o;
 
 //Wishbone Arbiter ...
 wb_arb2 #(
@@ -557,7 +558,7 @@ wb_arb2 #(
   .m0_sel_i(data_wb_sel),
   .m0_cyc_i(data_wb_cyc_ethmac_ram),
   .m0_stb_i(data_wb_stb_ethmac_ram),
-  .m0_cti_i(3'b 000),
+  .m0_cti_i(data_wb_cti),
   .m0_ack_o(data_wb_ack_ethmac_ram),
 
   // M1: EthMAC master
@@ -568,10 +569,8 @@ wb_arb2 #(
   .m1_sel_i(ethmac_m_wb_sel_o),
   .m1_cyc_i(ethmac_m_wb_cyc_o),
   .m1_stb_i(ethmac_m_wb_stb_o),
-  .m1_cti_i(3'b 000),
+  .m1_cti_i(ethmac_m_wb_cti_o),
   .m1_ack_o(ethmac_m_wb_ack_i),
-
-  .ethmac_rd_o(ethmac_rd_o),
 
   // Slave: 8K RAM
   .s_adr_o (ethmac_ram_adr),
@@ -581,7 +580,7 @@ wb_arb2 #(
   .s_sel_o (ethmac_ram_sel),
   .s_cyc_o (ethmac_ram_cyc),
   .s_stb_o (ethmac_ram_stb),
-  .s_cti_o (), //NOT USED
+  .s_cti_o (ethmac_ram_cti),
   .s_ack_i (ethmac_ram_ack)
 );
 
@@ -847,10 +846,8 @@ u_wb_ddr3_bridge (
     .sel_i(ethmac_ram_sel),
     .cyc_i(ethmac_ram_cyc),
     .stb_i(ethmac_ram_stb),
-    .cti_i(3'd 0), //NOT USED
+    .cti_i(ethmac_ram_cti),
     .ack_o(ethmac_ram_ack),
-
-    .ethmac_rd_i(ethmac_rd_o),
 
     // ---------------- DDR3 core "inport" interface ----------------
     .inport_wr_o(ddr3_core_ram_wr),        // byte strobes (16 bytes)

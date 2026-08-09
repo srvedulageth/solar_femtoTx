@@ -163,7 +163,9 @@
 //
 
 `include "ethmac_defines.v"
-//`include "ethmac_timescale.v"
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 
 module eth_registers( DataIn, Address, Rw, Cs, Clk, Reset, DataOut, 
@@ -178,7 +180,9 @@ module eth_registers( DataIn, Address, Rw, Cs, Clk, Reset, DataOut,
                       LinkFail, r_MAC, WCtrlDataStart, RStatStart,
                       UpdateMIIRX_DATAReg, Prsd, r_TxBDNum, int_o,
                       r_HASH0, r_HASH1, r_TxPauseTV, r_TxPauseRq, RstTxPauseRq, TxCtrlEndFrm,
+`ifdef WISHBONE_DEBUG
                       dbg_dat,
+`endif
                       StartTxDone, TxClk, RxClk, SetPauseTimer
                     );
 
@@ -269,7 +273,9 @@ input        TxClk;
 input        RxClk;
 input        SetPauseTimer;
 
+`ifdef WISHBONE_DEBUG
 input [31:0] dbg_dat; // debug data input
+`endif
 
 reg          irq_txb;
 reg          irq_txe;
@@ -282,7 +288,11 @@ reg          irq_rxc;
 reg SetTxCIrq_txclk;
 reg SetTxCIrq_sync1, SetTxCIrq_sync2, SetTxCIrq_sync3;
 reg SetTxCIrq;
-reg ResetTxCIrq_sync1, ResetTxCIrq_sync2;
+`ifdef UNUSED
+reg ResetTxCIrq_sync1;
+`endif
+
+reg ResetTxCIrq_sync2;
 
 reg SetRxCIrq_rxclk;
 reg SetRxCIrq_sync1, SetRxCIrq_sync2, SetRxCIrq_sync3;
@@ -844,6 +854,7 @@ assign TXCTRLOut[31:`ETH_TX_CTRL_WIDTH_2 + 16] = 0;
 
 
 // Reading data from registers
+/*
 always @ (Address       or Read           or MODEROut       or INT_SOURCEOut  or
           INT_MASKOut   or IPGTOut        or IPGR1Out       or IPGR2Out       or
           PACKETLENOut  or COLLCONFOut    or CTRLMODEROut   or MIIMODEROut    or
@@ -851,6 +862,8 @@ always @ (Address       or Read           or MODEROut       or INT_SOURCEOut  or
           MIISTATUSOut  or MAC_ADDR0Out   or MAC_ADDR1Out   or TX_BD_NUMOut   or
           HASH0Out      or HASH1Out       or TXCTRLOut       
          )
+*/
+always @(*)
 begin
   if(Read)  // read
     begin
@@ -876,7 +889,10 @@ begin
         `ETH_HASH0_ADR        :  DataOut=HASH0Out;
         `ETH_HASH1_ADR        :  DataOut=HASH1Out;
         `ETH_TX_CTRL_ADR      :  DataOut=TXCTRLOut;
+
+`ifdef WISHBONE_DEBUG
         `ETH_DBG_ADR          :  DataOut=dbg_dat;
+`endif
         default:             DataOut=32'h0;
       endcase
     end
@@ -993,6 +1009,7 @@ begin
     SetTxCIrq <= SetTxCIrq_sync2 & ~SetTxCIrq_sync3;
 end
 
+`ifdef UNUSED
 always @ (posedge TxClk or posedge Reset)
 begin
   if(Reset)
@@ -1000,6 +1017,7 @@ begin
   else
     ResetTxCIrq_sync1 <= SetTxCIrq_sync2;
 end
+`endif
 
 always @ (posedge TxClk or posedge Reset)
 begin

@@ -1,3 +1,4 @@
+
 //
 // A simple interrupt controller.
 //
@@ -7,11 +8,15 @@
 // 0x8 - INT_CLEAR  - Write 1 to a particular bit to clear the interrupt
 //                    status.
 
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
+
 module vic #(
-        parameter [31:0]        SOURCES                    = 32'd4,
-        parameter [31:0]        INTERRUPT_PENDING_REGISTER = 32'h0,
-        parameter [31:0]        INTERRUPT_MASK_REGISTER    = 32'h4,
-        parameter [31:0]        INTERRUPT_CLEAR_REGISTER   = 32'h8
+        parameter [31:0]       SOURCES                    = 32'd4,
+        parameter [3:0]        INTERRUPT_PENDING_REGISTER = 'h0,
+        parameter [3:0]        INTERRUPT_MASK_REGISTER    = 'h4,
+        parameter [3:0]        INTERRUPT_CLEAR_REGISTER   = 'h8
 ) (
 
 // Clock and reset.
@@ -48,6 +53,7 @@ output  reg                  o_irq
 reg [31:0] INT_STATUS;
 reg [31:0] INT_MASK;
 reg [31:0] wbstate;
+reg [31:0] UNUSED;
 
 // Wishbone states.
 localparam WBIDLE       = 0;
@@ -101,10 +107,14 @@ begin
 
                                 `INT_MASK: // INT_MASK
                                 begin
-                                        if ( i_wb_sel[0] ) INT_MASK[7:0]   <= i_wb_dat >> 0;
-                                        if ( i_wb_sel[1] ) INT_MASK[15:8]  <= i_wb_dat >> 8;
-                                        if ( i_wb_sel[2] ) INT_MASK[23:16] <= i_wb_dat >> 16;
-                                        if ( i_wb_sel[3] ) INT_MASK[31:24] <= i_wb_dat >> 24;
+                                        //if ( i_wb_sel[0] ) INT_MASK[7:0]   <= i_wb_dat >> 0;
+                                        //if ( i_wb_sel[1] ) INT_MASK[15:8]  <= i_wb_dat >> 8;
+                                        //if ( i_wb_sel[2] ) INT_MASK[23:16] <= i_wb_dat >> 16;
+                                        //if ( i_wb_sel[3] ) INT_MASK[31:24] <= i_wb_dat >> 24;
+                                        if ( i_wb_sel[0] ) INT_MASK[7:0]   <= i_wb_dat[07:00];
+                                        if ( i_wb_sel[1] ) INT_MASK[15:8]  <= i_wb_dat[15:08];
+                                        if ( i_wb_sel[2] ) INT_MASK[23:16] <= i_wb_dat[23:16];
+                                        if ( i_wb_sel[3] ) INT_MASK[31:24] <= i_wb_dat[31:24];
 
                                 end
 
@@ -120,8 +130,12 @@ begin
 
                                 default:
                                 begin
+`ifdef SYNTHESIS
+                                        UNUSED <= 'h 0;
+`else
                                         $display($time, " Error : Attemting to write to illegal register in %m at address %x", i_wb_adr);
                                         $finish;
+`endif
                                 end
 
                                 endcase
@@ -132,13 +146,17 @@ begin
                         WBREAD:
                         begin
                                 case(i_wb_adr)
-                                `INT_STATUS:            o_wb_dat <= `INT_STATUS;
-                                `INT_MASK:              o_wb_dat <= `INT_MASK;
+                                `INT_STATUS:            o_wb_dat <= {28'h0, `INT_STATUS};
+                                `INT_MASK:              o_wb_dat <= {28'h0, `INT_MASK};
 
                                 default:
                                 begin
+`ifdef SYNTHESIS
+                                        o_wb_dat <= 'h 0;
+`else
                                         $display($time, " Error : Attempting to read from illegal register in %m at adress %x", i_wb_adr);
                                         $finish;
+`endif
                                 end
                                 endcase
 

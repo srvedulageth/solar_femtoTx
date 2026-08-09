@@ -72,7 +72,9 @@
 //
 //
 
-//`include "ethmac_timescale.v"
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 
 module eth_shiftreg(Clk, Reset, MdcEn_n, Mdi, Fiad, Rgad, CtrlData, WriteOp, ByteSelect, 

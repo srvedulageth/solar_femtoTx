@@ -72,7 +72,9 @@
 //
 
 `include "ethmac_defines.v"
-//`include "ethmac_timescale.v"
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module eth_spram_256x32(
 	// Generic synchronous single-port RAM interface
@@ -130,7 +132,7 @@ module eth_spram_256x32(
     .CLK     (clk),
     .WE      (we),
     .RST     (rst)
-    );*/
+    );
 
    RAMB4_S8 ram0
      (
@@ -174,8 +176,58 @@ module eth_spram_256x32(
       .CLK     (clk),
       .WE      (we[3]),
       .RST     (rst)
-      );
+      );*/
 
+   wire [31:0] doa_int;
+   wire        en_a   = ce;
+   wire [3:0]  wea_a  = we;
+   // Tie OE outside the primitive (BRAM DO is always driven)
+   assign dato = oe ? doa_int : 32'h0000_0000;
+
+   RAMB36E1 #(
+      .READ_WIDTH_A (36),           // 1-36
+      .WRITE_WIDTH_A(36),           // 1-36
+      .DOA_REG      (0),            // 0 = unregistered output
+      .EN_ECC_READ  ("FALSE"),
+      .EN_ECC_WRITE ("FALSE"),
+      .RAM_MODE     ("TDP"),        // True Dual Port (use only port A)
+      .WRITE_MODE_A ("READ_FIRST")  // Match original behavior; change if needed
+   ) u_bram36_spram32 (
+      // Port A (used)
+      .CLKARDCLK    (clk),
+      .ENARDEN      (en_a),
+      .REGCEAREGCE  (1'b1),
+      .RSTRAMARSTRAM(1'b0),         // external reset not used for memory content
+      .RSTREGARSTREG(1'b0),         // no output register => tie low
+      .WEA          (wea_a),        // Byte write enables (4 bits for 32-bit)
+      .ADDRARDADDR  ({3'b000, addr[7:0], 5'b00000}), // 16-bit address bus mapping
+      .DIADI        (di),
+      .DIPADIP      (4'b0000),
+      .DOADO        (doa_int),
+      .DOPADOP      (),
+
+      // Port B (unused)
+      .CLKBWRCLK    (1'b0),
+      .ENBWREN      (1'b0),
+      .REGCEB       (1'b0),
+      .RSTRAMB      (1'b0),
+      .RSTREGB      (1'b0),
+      .WEBWE        (8'b0000_0000),
+      .ADDRBWRADDR  (16'h0000),
+      .DIBDI        (32'h0000_0000),
+      .DIPBDIP      (4'b0000),
+      .DOBDO        (),
+      .DOPBDOP      (),
+
+      .INJECTDBITERR(),
+      .INJECTSBITERR(),
+
+      // ECC and cascade (unused)
+      .CASCADEINA   (1'b0), .CASCADEINB(1'b0),
+      .CASCADEOUTA  (),     .CASCADEOUTB(),
+      .DBITERR      (),     .SBITERR    (),
+      .ECCPARITY    (),     .RDADDRECC  ()
+   );
 `else   // !ETH_XILINX_RAMB4
  `ifdef  ETH_VIRTUAL_SILICON_RAM
   `ifdef ETH_BIST

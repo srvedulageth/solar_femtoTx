@@ -142,7 +142,9 @@
 //
 
 // synopsys translate_off
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 // synopsys translate_on
 
 `include "uart_defines.v"
@@ -207,9 +209,9 @@ always @(posedge clk or posedge wb_rst_i) // synchronous FIFO
 begin
 	if (wb_rst_i)
 	begin
-		top		<= #1 0;
-		bottom		<= #1 1'b0;
-		count		<= #1 0;
+		top		<= #1 'h 0;
+		bottom		<= #1 'h 0;
+		count		<= #1 'h 0;
 		fifo[0] <= #1 0;
 		fifo[1] <= #1 0;
 		fifo[2] <= #1 0;
@@ -229,9 +231,9 @@ begin
 	end
 	else
 	if (fifo_reset) begin
-		top		<= #1 0;
-		bottom		<= #1 1'b0;
-		count		<= #1 0;
+		top		<= #1 'h 0;
+		bottom		<= #1 'h 0;
+		count		<= #1 'h 0;
 		fifo[0] <= #1 0;
 		fifo[1] <= #1 0;
 		fifo[2] <= #1 0;

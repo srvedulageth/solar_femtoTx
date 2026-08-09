@@ -132,7 +132,9 @@
 //
 //
 // synopsys translate_off
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 // synopsys translate_on
 
 `include "uart_defines.v"

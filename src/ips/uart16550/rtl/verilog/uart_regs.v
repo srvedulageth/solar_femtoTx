@@ -1,226 +1,8 @@
-//////////////////////////////////////////////////////////////////////
-////                                                              ////
-////  uart_regs.v                                                 ////
-////                                                              ////
-////                                                              ////
-////  This file is part of the "UART 16550 compatible" project    ////
-////  http://www.opencores.org/cores/uart16550/                   ////
-////                                                              ////
-////  Documentation related to this project:                      ////
-////  - http://www.opencores.org/cores/uart16550/                 ////
-////                                                              ////
-////  Projects compatibility:                                     ////
-////  - WISHBONE                                                  ////
-////  RS232 Protocol                                              ////
-////  16550D uart (mostly supported)                              ////
-////                                                              ////
-////  Overview (main Features):                                   ////
-////  Registers of the uart 16550 core                            ////
-////                                                              ////
-////  Known problems (limits):                                    ////
-////  Inserts 1 wait state in all WISHBONE transfers              ////
-////                                                              ////
-////  To Do:                                                      ////
-////  Nothing or verification.                                    ////
-////                                                              ////
-////  Author(s):                                                  ////
-////      - gorban@opencores.org                                  ////
-////      - Jacob Gorban                                          ////
-////      - Igor Mohor (igorm@opencores.org)                      ////
-////                                                              ////
-////  Created:        2001/05/12                                  ////
-////  Last Updated:   (See log for the revision history           ////
-////                                                              ////
-////                                                              ////
-//////////////////////////////////////////////////////////////////////
-////                                                              ////
-//// Copyright (C) 2000, 2001 Authors                             ////
-////                                                              ////
-//// This source file may be used and distributed without         ////
-//// restriction provided that this copyright statement is not    ////
-//// removed from the file and that any derivative work contains  ////
-//// the original copyright notice and the associated disclaimer. ////
-////                                                              ////
-//// This source file is free software; you can redistribute it   ////
-//// and/or modify it under the terms of the GNU Lesser General   ////
-//// Public License as published by the Free Software Foundation; ////
-//// either version 2.1 of the License, or (at your option) any   ////
-//// later version.                                               ////
-////                                                              ////
-//// This source is distributed in the hope that it will be       ////
-//// useful, but WITHOUT ANY WARRANTY; without even the implied   ////
-//// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR      ////
-//// PURPOSE.  See the GNU Lesser General Public License for more ////
-//// details.                                                     ////
-////                                                              ////
-//// You should have received a copy of the GNU Lesser General    ////
-//// Public License along with this source; if not, download it   ////
-//// from http://www.opencores.org/lgpl.shtml                     ////
-////                                                              ////
-//////////////////////////////////////////////////////////////////////
-//
-// CVS Revision History
-//
-// $Log: not supported by cvs2svn $
-// Revision 1.41  2004/05/21 11:44:41  tadejm
-// Added synchronizer flops for RX input.
-//
-// Revision 1.40  2003/06/11 16:37:47  gorban
-// This fixes errors in some cases when data is being read and put to the FIFO at the same time. Patch is submitted by Scott Furman. Update is very recommended.
-//
-// Revision 1.39  2002/07/29 21:16:18  gorban
-// The uart_defines.v file is included again in sources.
-//
-// Revision 1.38  2002/07/22 23:02:23  gorban
-// Bug Fixes:
-//  * Possible loss of sync and bad reception of stop bit on slow baud rates fixed.
-//   Problem reported by Kenny.Tung.
-//  * Bad (or lack of ) loopback handling fixed. Reported by Cherry Withers.
-//
-// Improvements:
-//  * Made FIFO's as general inferrable memory where possible.
-//  So on FPGA they should be inferred as RAM (Distributed RAM on Xilinx).
-//  This saves about 1/3 of the Slice count and reduces P&R and synthesis times.
-//
-//  * Added optional baudrate output (baud_o).
-//  This is identical to BAUDOUT* signal on 16550 chip.
-//  It outputs 16xbit_clock_rate - the divided clock.
-//  It's disabled by default. Define UART_HAS_BAUDRATE_OUTPUT to use.
-//
-// Revision 1.37  2001/12/27 13:24:09  mohor
-// lsr[7] was not showing overrun errors.
-//
-// Revision 1.36  2001/12/20 13:25:46  mohor
-// rx push changed to be only one cycle wide.
-//
-// Revision 1.35  2001/12/19 08:03:34  mohor
-// Warnings cleared.
-//
-// Revision 1.34  2001/12/19 07:33:54  mohor
-// Synplicity was having troubles with the comment.
-//
-// Revision 1.33  2001/12/17 10:14:43  mohor
-// Things related to msr register changed. After THRE IRQ occurs, and one
-// character is written to the transmit fifo, the detection of the THRE bit in the
-// LSR is delayed for one character time.
-//
-// Revision 1.32  2001/12/14 13:19:24  mohor
-// MSR register fixed.
-//
-// Revision 1.31  2001/12/14 10:06:58  mohor
-// After reset modem status register MSR should be reset.
-//
-// Revision 1.30  2001/12/13 10:09:13  mohor
-// thre irq should be cleared only when being source of interrupt.
-//
-// Revision 1.29  2001/12/12 09:05:46  mohor
-// LSR status bit 0 was not cleared correctly in case of reseting the FCR (rx fifo).
-//
-// Revision 1.28  2001/12/10 19:52:41  gorban
-// Scratch register added
-//
-// Revision 1.27  2001/12/06 14:51:04  gorban
-// Bug in LSR[0] is fixed.
-// All WISHBONE signals are now sampled, so another wait-state is introduced on all transfers.
-//
-// Revision 1.26  2001/12/03 21:44:29  gorban
-// Updated specification documentation.
-// Added full 32-bit data bus interface, now as default.
-// Address is 5-bit wide in 32-bit data bus mode.
-// Added wb_sel_i input to the core. It's used in the 32-bit mode.
-// Added debug interface with two 32-bit read-only registers in 32-bit mode.
-// Bits 5 and 6 of LSR are now only cleared on TX FIFO write.
-// My small test bench is modified to work with 32-bit mode.
-//
-// Revision 1.25  2001/11/28 19:36:39  gorban
-// Fixed: timeout and break didn't pay attention to current data format when counting time
-//
-// Revision 1.24  2001/11/26 21:38:54  gorban
-// Lots of fixes:
-// Break condition wasn't handled correctly at all.
-// LSR bits could lose their values.
-// LSR value after reset was wrong.
-// Timing of THRE interrupt signal corrected.
-// LSR bit 0 timing corrected.
-//
-// Revision 1.23  2001/11/12 21:57:29  gorban
-// fixed more typo bugs
-//
-// Revision 1.22  2001/11/12 15:02:28  mohor
-// lsr1r error fixed.
-//
-// Revision 1.21  2001/11/12 14:57:27  mohor
-// ti_int_pnd error fixed.
-//
-// Revision 1.20  2001/11/12 14:50:27  mohor
-// ti_int_d error fixed.
-//
-// Revision 1.19  2001/11/10 12:43:21  gorban
-// Logic Synthesis bugs fixed. Some other minor changes
-//
-// Revision 1.18  2001/11/08 14:54:23  mohor
-// Comments in Slovene language deleted, few small fixes for better work of
-// old tools. IRQs need to be fix.
-//
-// Revision 1.17  2001/11/07 17:51:52  gorban
-// Heavily rewritten interrupt and LSR subsystems.
-// Many bugs hopefully squashed.
-//
-// Revision 1.16  2001/11/02 09:55:16  mohor
-// no message
-//
-// Revision 1.15  2001/10/31 15:19:22  gorban
-// Fixes to break and timeout conditions
-//
-// Revision 1.14  2001/10/29 17:00:46  gorban
-// fixed parity sending and tx_fifo resets over- and underrun
-//
-// Revision 1.13  2001/10/20 09:58:40  gorban
-// Small synopsis fixes
-//
-// Revision 1.12  2001/10/19 16:21:40  gorban
-// Changes data_out to be synchronous again as it should have been.
-//
-// Revision 1.11  2001/10/18 20:35:45  gorban
-// small fix
-//
-// Revision 1.10  2001/08/24 21:01:12  mohor
-// Things connected to parity changed.
-// Clock devider changed.
-//
-// Revision 1.9  2001/08/23 16:05:05  mohor
-// Stop bit bug fixed.
-// Parity bug fixed.
-// WISHBONE read cycle bug fixed,
-// OE indicator (Overrun Error) bug fixed.
-// PE indicator (Parity Error) bug fixed.
-// Register read bug fixed.
-//
-// Revision 1.10  2001/06/23 11:21:48  gorban
-// DL made 16-bit long. Fixed transmission/reception bugs.
-//
-// Revision 1.9  2001/05/31 20:08:01  gorban
-// FIFO changes and other corrections.
-//
-// Revision 1.8  2001/05/29 20:05:04  gorban
-// Fixed some bugs and synthesis problems.
-//
-// Revision 1.7  2001/05/27 17:37:49  gorban
-// Fixed many bugs. Updated spec. Changed FIFO files structure. See CHANGES.txt file.
-//
-// Revision 1.6  2001/05/21 19:12:02  gorban
-// Corrected some Linter messages.
-//
-// Revision 1.5  2001/05/17 18:34:18  gorban
-// First 'stable' release. Should be sythesizable now. Also added new header.
-//
-// Revision 1.0  2001-05-17 21:27:11+02  jacob
-// Initial revision
-//
-//
 
 // synopsys translate_off
+`ifndef SYNTHESIS
 `include "timescale.v"
+`endif
 // synopsys translate_on
 
 `include "uart_defines.v"
@@ -396,6 +178,7 @@ wire serial_in = loopback ? serial_out : srx_pad;
 assign stx_pad_o = loopback ? 1'b1 : serial_out;
 
 // Receiver Instance
+wire rf_overrun, rf_push_pulse;
 uart_receiver receiver(clk, wb_rst_i, lcr, rf_pop, serial_in, enable, 
 	counter_t, rf_count, rf_data_out, rf_error_bit, rf_overrun, rx_reset, lsr_mask, rstate, rf_push_pulse);
 
@@ -406,7 +189,7 @@ always @(dl or dlab or ier or iir or scratch
 begin
 	case (wb_addr_i)
 		`UART_REG_RB   : wb_dat_o = dlab ? dl[`UART_DL1] : rf_data_out[10:3];
-		`UART_REG_IE	: wb_dat_o = dlab ? dl[`UART_DL2] : ier;
+		`UART_REG_IE	: wb_dat_o = dlab ? dl[`UART_DL2] : {4'h0, ier};
 		`UART_REG_II	: wb_dat_o = {4'b1100,iir};
 		`UART_REG_LC	: wb_dat_o = lcr;
 		`UART_REG_LS	: wb_dat_o = lsr;

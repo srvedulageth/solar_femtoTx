@@ -1,3 +1,6 @@
 obj/
 Save/token
 src/testbench/syn/solar_femtoTX
+src/ips/uart16550_git/
+src/testbench/syn/solar_ms3/
+src/testbench/syn/t1

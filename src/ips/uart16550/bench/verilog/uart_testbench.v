@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 ////                                                              ////
 ////  uart_testbench.v                                            ////
 ////                                                              ////
@@ -268,7 +268,6 @@ wb_master_model         #(`UART_DATA_WIDTH, `UART_ADDR_WIDTH, 4) i_wb_master_mod
     .wbm_err_i          (wbs_err_o), // inactive (1'b0)
     .wbm_rty_i          (wbs_rty_o)  // inactive (1'b0)
 );
-
 
 initial
 begin:system

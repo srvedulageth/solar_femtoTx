@@ -248,7 +248,9 @@
 //
 
 `include "ethmac_defines.v"
-//`include "ethmac_timescale.v"
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 
 module eth_wishbone

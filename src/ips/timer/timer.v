@@ -1,13 +1,18 @@
 /*
+  A generic timer module.
 */
+
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module timer #(
 
         // Register addresses.
-        parameter       [31:0]  TIMER_ENABLE_REGISTER = 32'h0,
-        parameter       [31:0]  TIMER_LIMIT_REGISTER  = 32'h4,
-        parameter       [31:0]  TIMER_INTACK_REGISTER = 32'h8,
-        parameter       [31:0]  TIMER_START_REGISTER  = 32'hC
+        parameter       [3:0]  TIMER_ENABLE_REGISTER = 4'h0,
+        parameter       [3:0]  TIMER_LIMIT_REGISTER  = 4'h4,
+        parameter       [3:0]  TIMER_INTACK_REGISTER = 4'h8,
+        parameter       [3:0]  TIMER_START_REGISTER  = 4'hC
 
 ) (
 
@@ -36,6 +41,7 @@ reg [31:0] DEVEN;
 reg [31:0] DEVPR;
 reg [31:0] DEVAK;
 reg [31:0] DEVST;
+reg [31:0] UNUSED;
 
 `define DEVEN TIMER_ENABLE_REGISTER
 `define DEVPR TIMER_LIMIT_REGISTER
@@ -108,41 +114,61 @@ begin
                                 case(i_wb_adr)
                                 `DEVEN: // DEVEN
                                 begin
-                                        if ( i_wb_sel[0] ) DEVEN[7:0]   <= i_wb_dat >> 0;
-                                        if ( i_wb_sel[1] ) DEVEN[15:8]  <= i_wb_dat >> 8;
-                                        if ( i_wb_sel[2] ) DEVEN[23:16] <= i_wb_dat >> 16;
-                                        if ( i_wb_sel[3] ) DEVEN[31:24] <= i_wb_dat >> 24;
+                                        //if ( i_wb_sel[0] ) DEVEN[7:0]   <= i_wb_dat >> 0;
+                                        //if ( i_wb_sel[1] ) DEVEN[15:8]  <= i_wb_dat >> 8;
+                                        //if ( i_wb_sel[2] ) DEVEN[23:16] <= i_wb_dat >> 16;
+                                        //if ( i_wb_sel[3] ) DEVEN[31:24] <= i_wb_dat >> 24;
+                                        if ( i_wb_sel[0] ) DEVEN[7:0]   <= i_wb_dat[07:00];
+                                        if ( i_wb_sel[1] ) DEVEN[15:8]  <= i_wb_dat[15:08];
+                                        if ( i_wb_sel[2] ) DEVEN[23:16] <= i_wb_dat[23:16];
+                                        if ( i_wb_sel[3] ) DEVEN[31:24] <= i_wb_dat[31:24];
                                 end
 
                                 `DEVPR: // DEVPR
                                 begin
-                                        if ( i_wb_sel[0] ) DEVPR[7:0]   <= i_wb_dat >> 0;
-                                        if ( i_wb_sel[1] ) DEVPR[15:8]  <= i_wb_dat >> 8;
-                                        if ( i_wb_sel[2] ) DEVPR[23:16] <= i_wb_dat >> 16;
-                                        if ( i_wb_sel[3] ) DEVPR[31:24] <= i_wb_dat >> 24;
+                                        //if ( i_wb_sel[0] ) DEVPR[7:0]   <= i_wb_dat >> 0;
+                                        //if ( i_wb_sel[1] ) DEVPR[15:8]  <= i_wb_dat >> 8;
+                                        //if ( i_wb_sel[2] ) DEVPR[23:16] <= i_wb_dat >> 16;
+                                        //if ( i_wb_sel[3] ) DEVPR[31:24] <= i_wb_dat >> 24;
+                                        if ( i_wb_sel[0] ) DEVPR[7:0]   <= i_wb_dat[07:00];
+                                        if ( i_wb_sel[1] ) DEVPR[15:8]  <= i_wb_dat[15:08];
+                                        if ( i_wb_sel[2] ) DEVPR[23:16] <= i_wb_dat[23:16];
+                                        if ( i_wb_sel[3] ) DEVPR[31:24] <= i_wb_dat[31:24];
 
                                 end
 
                                 `DEVAK: // DEVAK
                                 begin
-                                        if ( i_wb_sel[0] ) DEVPR[7:0]   <= i_wb_dat >> 0;
-                                        if ( i_wb_sel[1] ) DEVPR[15:8]  <= i_wb_dat >> 8;
-                                        if ( i_wb_sel[2] ) DEVPR[23:16] <= i_wb_dat >> 16;
-                                        if ( i_wb_sel[3] ) DEVPR[31:24] <= i_wb_dat >> 24;
+                                        //if ( i_wb_sel[0] ) DEVPR[7:0]   <= i_wb_dat >> 0;
+                                        //if ( i_wb_sel[1] ) DEVPR[15:8]  <= i_wb_dat >> 8;
+                                        //if ( i_wb_sel[2] ) DEVPR[23:16] <= i_wb_dat >> 16;
+                                        //if ( i_wb_sel[3] ) DEVPR[31:24] <= i_wb_dat >> 24;
+                                        if ( i_wb_sel[0] ) DEVPR[7:0]   <= i_wb_dat[07:00];
+                                        if ( i_wb_sel[1] ) DEVPR[15:8]  <= i_wb_dat[15:08];
+                                        if ( i_wb_sel[2] ) DEVPR[23:16] <= i_wb_dat[23:16];
+                                        if ( i_wb_sel[3] ) DEVPR[31:24] <= i_wb_dat[31:24];
                                 end
 
                                 `DEVST: // DEVST
                                 begin
-                                        if ( i_wb_sel[0] ) DEVST[7:0]   <= i_wb_dat >> 0;
-                                        if ( i_wb_sel[1] ) DEVST[15:8]  <= i_wb_dat >> 8;
-                                        if ( i_wb_sel[2] ) DEVST[23:16] <= i_wb_dat >> 16;
-                                        if ( i_wb_sel[3] ) DEVST[31:24] <= i_wb_dat >> 24;
+                                        //if ( i_wb_sel[0] ) DEVST[7:0]   <= i_wb_dat >> 0;
+                                        //if ( i_wb_sel[1] ) DEVST[15:8]  <= i_wb_dat >> 8;
+                                        //if ( i_wb_sel[2] ) DEVST[23:16] <= i_wb_dat >> 16;
+                                        //if ( i_wb_sel[3] ) DEVST[31:24] <= i_wb_dat >> 24;
+                                        if ( i_wb_sel[0] ) DEVST[7:0]   <= i_wb_dat[07:00];
+                                        if ( i_wb_sel[1] ) DEVST[15:8]  <= i_wb_dat[15:08];
+                                        if ( i_wb_sel[2] ) DEVST[23:16] <= i_wb_dat[23:16];
+                                        if ( i_wb_sel[3] ) DEVST[31:24] <= i_wb_dat[31:24];
                                 end
 
                                 default:
                                 begin
+`ifdef SYNTHESIS
+                                         UNUSED <= 'h 0;
+`else
                                         $display($time, " Error : Illegal register write in %m.");
                                         $finish;
+`endif
                                 end
 
                                 endcase
@@ -155,12 +181,15 @@ begin
                                 case(i_wb_adr)
                                 `DEVEN: o_wb_dat <= DEVEN;
                                 `DEVPR: o_wb_dat <= DEVPR;
-                                `DEVAK: o_wb_dat <= done;
+                                `DEVAK: o_wb_dat <= {32{done}};
                                 `DEVST: o_wb_dat <= 32'd0;
-                               default:
-                                        begin
+                                default: begin
+`ifdef SYNTHESIS
+                                         o_wb_dat <= 'h 0;
+`else
                                                 $display($time, " Error : Illegal register read in %m.");
                                                 $finish;
+`endif
                                         end
                                 endcase
 
