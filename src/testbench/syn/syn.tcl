@@ -75,7 +75,7 @@ add_files -scan_for_includes {
 ../../zap_rtl/zap_tlb_check.sv \
 ../../zap_rtl/zap_tlb_fsm.sv \
 ../../zap_rtl/zap_tlb.sv \
-../../zap_rtl/zap_wb_merger.sv \
+../../zap_rtl/zap_wb_merger_gpt.sv \
 ../../zap_rtl/zap_writeback.sv \
 ../../zap_rtl/zap_top.sv \
 ../../ips/misc/wb_arb2.v \

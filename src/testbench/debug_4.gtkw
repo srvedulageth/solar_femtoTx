@@ -1,0 +1,118 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Thu Aug 20 17:01:56 2026
+[*]
+[dumpfile] "/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/zap.vcd"
+[dumpfile_mtime] "Thu Aug 20 16:47:55 2026"
+[dumpfile_size] 8145087652
+[savefile] "/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/debug_4.gtkw"
+[timestart] 0
+[size] 1832 971
+[pos] -1 -1
+*-31.031008 517230 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] zap_test.
+[treeopen] zap_test.eth_phy.
+[treeopen] zap_test.u_chip_top.
+[treeopen] zap_test.u_chip_top.ethmac.rxethmac1.
+[treeopen] zap_test.u_chip_top.ram_wb.
+[treeopen] zap_test.u_chip_top.u_phy.
+[treeopen] zap_test.u_chip_top.u_zap_top.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_code_cache.u_zap_cache_tag_ram.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_generate_with_cache_mmu.u_data_cache.
+[treeopen] zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.
+[treeopen] zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_fetch_main.
+[treeopen] zap_test.u_chip_top.uart_gen[0].
+[sst_width] 290
+[signals_width] 324
+[sst_expanded] 1
+[sst_vpaned_height] 625
+@28
+zap_test.mrx_clk_pad_i
+zap_test.mrxdv_pad_i
+@22
+zap_test.mrxd_pad_i[3:0]
+@28
+zap_test.mrxerr_pad_i
+zap_test.u_chip_top.ethmac.rxethmac1.RxValid
+zap_test.u_chip_top.ethmac.rxethmac1.rxaddrcheck1.RxAbort
+@200
+-
+@28
+zap_test.mtx_clk_pad_i
+@22
+zap_test.mtxd_pad_o[3:0]
+@28
+zap_test.mtxen_pad_o
+zap_test.mtxerr_pad_o
+@200
+-
+@22
+zap_test.u_chip_top.ethmac.ethreg1.INT_SOURCEOut[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_dcache_en
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_icache_en
+zap_test.u_chip_top.u_zap_top.u_zap_core.o_mmu_en
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_cp15_cb.r1[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wen
+@22
+zap_test.u_chip_top.u_zap_top.u_zap_core.u_zap_writeback.u_zap_register_file.i_wr_addr_a[5:0]
+@200
+-
+@22
+zap_test.u_chip_top.ethmac.ethreg1.HASH0Out[31:0]
+zap_test.u_chip_top.ethmac.ethreg1.HASH1Out[31:0]
+@28
+zap_test.u_chip_top.ddr3_init_done
+zap_test.u_chip_top.calib_done
+zap_test.u_chip_top.calib_pass
+zap_test.u_chip_top.u_arb.m0_cyc_i
+zap_test.u_chip_top.u_arb.m0_ack_o
+zap_test.u_chip_top.u_arb.m0_we_i
+@22
+zap_test.u_chip_top.u_arb.m0_adr_i[31:0]
+zap_test.u_chip_top.u_arb.m0_dat_i[31:0]
+zap_test.u_chip_top.u_arb.m0_dat_o[31:0]
+@200
+-
+@22
+zap_test.u_chip_top.u_zap_top.o_wb_adr[31:0]
+zap_test.u_chip_top.u_zap_top.o_wb_dat[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.o_wb_we
+@200
+-
+@28
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.i_clk
+zap_test.u_chip_top.u_zap_top.o_wb_cyc
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.i_c_wb_cyc
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.i_d_wb_cyc
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.o_wb_wen
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.i_c_wb_wen
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.i_d_wb_wen
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.i_wb_ack
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.o_c_wb_ack
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.o_d_wb_ack
+@200
+-
+@22
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.i_c_wb_adr[31:0]
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.i_d_wb_adr[31:0]
+@28
+zap_test.u_chip_top.u_zap_top.l_merger_for_core_with_cache_mmu.u_zap_wb_merger.o_wb_cyc
+zap_test.u_chip_top.u_vic.i_wb_cyc
+@200
+-
+@22
+zap_test.u_chip_top.u_vic.i_wb_adr[3:0]
+zap_test.u_chip_top.u_vic.i_wb_sel[3:0]
+@28
+zap_test.u_chip_top.u_vic.i_wb_wen
+zap_test.u_chip_top.u_vic.o_wb_ack
+@22
+zap_test.u_chip_top.u_vic.o_wb_dat[31:0]
+@200
+-
+[pattern_trace] 1
+[pattern_trace] 0

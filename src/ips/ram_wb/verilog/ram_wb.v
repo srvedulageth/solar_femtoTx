@@ -20,19 +20,19 @@ module ram_wb ( dat_i, dat_o, adr_i, we_i, sel_i, cyc_i, stb_i, ack_o, cti_i, cl
   input [dat_width-1:0]          dat_i;   
   output [dat_width-1:0]         dat_o;
   input [adr_width-1:0] adr_i;
-  input 		 we_i;
-  input [3:0] 		 sel_i;
-  input 		 cyc_i;
-  input 		 stb_i;
-  output reg 		 ack_o;
-  input [2:0] 		 cti_i;
+  input 		we_i;
+  input [3:0] 		sel_i;
+  input 		cyc_i;
+  input 		stb_i;
+  output reg 		ack_o;
+  input [2:0] 		cti_i;
   
   // clock
-  input 		 clk_i;
+  input 		clk_i;
   // async reset
-  input 		 rst_i;
+  input 		rst_i;
   
-  wire [31:0] 		 wr_data;
+  wire [31:0] 		wr_data;
   wire [31:0]           dat_out;
 
   reg  [31:0]           data_out;
@@ -62,7 +62,8 @@ module ram_wb ( dat_i, dat_o, adr_i, we_i, sel_i, cyc_i, stb_i, ack_o, cti_i, cl
     );
  
   // ack_o
-  always @ (negedge clk_i or posedge rst_i) begin
+  //always @ (negedge clk_i or posedge rst_i) begin
+  always @ (posedge clk_i or posedge rst_i) begin
     if (rst_i) begin
       ack_o <= 1'b0;
       data_out <= 'h 0;

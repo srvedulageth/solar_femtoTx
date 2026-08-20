@@ -34,7 +34,7 @@ sv work ../zap_rtl/zap_sync_fifo.sv
 sv work ../zap_rtl/zap_tlb_check.sv
 sv work ../zap_rtl/zap_tlb_fsm.sv
 sv work ../zap_rtl/zap_tlb.sv
-sv work ../zap_rtl/zap_wb_merger.sv
+sv work ../zap_rtl/zap_wb_merger_gpt.sv
 sv work ../zap_rtl/zap_writeback.sv
 sv work ../zap_rtl/zap_top.sv
 
@@ -82,7 +82,7 @@ verilog work ../ips/ethmac/rtl/verilog/ethmac.v
 
 verilog work ../ips/timer/timer.v
 verilog work ../ips/vic/vic.v
-verilog work ./uart_tx_dumper.v
+verilog work ../ips/uart_tx_dumper/uart_tx_dumper.v
 
 verilog work ../ips/ram_wb/verilog/wb_ddr3_bridge.v
 verilog work ../ips/ddr3/core_ddr3_controller/examples/arty_a7/artix7_pll.v

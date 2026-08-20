@@ -1,8 +1,10 @@
-/*
-*/
+
+`ifndef SYNTHESIS
+`include "timescale.v"
+`endif
 
 module uart_tx_dumper ( input wire i_clk, input wire i_line,
-                        output reg UART_SR_DAV = 1'd0, output reg [7:0] UART_SR = 1'd0 );
+                        output reg UART_SR_DAV = 1'd0, output reg [7:0] UART_SR = 8'd0 );
 
 localparam UART_WAIT_FOR_START = 0;
 localparam UART_RX             = 1;
@@ -42,7 +44,7 @@ begin
                         uart_ctr <= uart_ctr + 1;
 
                         if ( uart_ctr + 1 == 2 )
-                                uart_sr <= uart_sr >> 1 | i_line << 7;
+                                uart_sr <= uart_sr >> 1 | ({8{i_line}} << 7);
 
                         if ( uart_ctr + 1 == 16 )
                         begin

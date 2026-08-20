@@ -23,8 +23,10 @@ SECTIONS
 
   .bss :
   {
+    __bss_start = .;
     *(.bss*)
     *(COMMON)
+    __bss_end = ALIGN(4);
   } > BRAM
 
   . = ALIGN(4);

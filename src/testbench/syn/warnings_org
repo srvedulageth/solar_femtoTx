@@ -1,13 +1,10 @@
 WARNING: [Common 17-576] 'retiming' is deprecated. Please use -global_retiming option
-WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/rtl/zap_fetch_main.sv:184]
-WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/rtl/zap_mode16_decoder_main.sv:171]
-WARNING: [Synth 8-6014] Unused sequential element UNUSED_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/timer.v:167]
-WARNING: [Synth 8-6014] Unused sequential element dummy_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/rtl/zap_tlb_check.sv:78]
-WARNING: [Synth 8-6014] Unused sequential element UNUSED_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/vic.v:134]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/zap_rtl/zap_fetch_main.sv:184]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/zap_rtl/zap_mode16_decoder_main.sv:171]
+WARNING: [Synth 8-6014] Unused sequential element UNUSED_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/ips/timer/timer.v:167]
+WARNING: [Synth 8-6014] Unused sequential element dummy_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/zap_rtl/zap_tlb_check.sv:78]
+WARNING: [Synth 8-6014] Unused sequential element UNUSED_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/ips/vic/vic.v:134]
 WARNING: [Synth 8-6014] Unused sequential element wr_accept_q_reg was removed.  [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/ips/ddr3/core_ddr3_controller/src_v/ddr3_dfi_seq.v:157]
-WARNING: [Synth 8-7129] Port cti_i[2] in module wb_ddr3_bridge is either unconnected or has no load
-WARNING: [Synth 8-7129] Port cti_i[1] in module wb_ddr3_bridge is either unconnected or has no load
-WARNING: [Synth 8-7129] Port cti_i[0] in module wb_ddr3_bridge is either unconnected or has no load
 WARNING: [Synth 8-7129] Port inport_error_i in module wb_ddr3_bridge is either unconnected or has no load
 WARNING: [Synth 8-7129] Port inport_resp_id_i[15] in module wb_ddr3_bridge is either unconnected or has no load
 WARNING: [Synth 8-7129] Port inport_resp_id_i[14] in module wb_ddr3_bridge is either unconnected or has no load
@@ -105,6 +102,9 @@ WARNING: [Synth 8-7129] Port i_rd_addr[tag][20] in module zap_btb is either unco
 WARNING: [Synth 8-7129] Port i_rd_addr[tag][19] in module zap_btb is either unconnected or has no load
 WARNING: [Synth 8-7129] Port i_rd_addr[tag][18] in module zap_btb is either unconnected or has no load
 WARNING: [Synth 8-7129] Port i_rd_addr[tag][17] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][16] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][15] in module zap_btb is either unconnected or has no load
+WARNING: [Synth 8-7129] Port i_rd_addr[tag][14] in module zap_btb is either unconnected or has no load
 Resolution: To avoid this warning, move constraints listed in [.Xil/zap_soc_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
 WARNING: [Synth 8-5866] 'keep_hierarchy' attribute is found on instance 'u_ddr_core' of module 'ddr3_core'. So gated clock conversion will not be possible for this module.
 WARNING: [Synth 8-5866] 'keep_hierarchy' attribute is found on instance 'u_ddr3_calib_dqs_window' of module 'ddr3_calib_dqs_window'. So gated clock conversion will not be possible for this module.
@@ -140,9 +140,9 @@ WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[3] driven by consta
 WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[2] driven by constant 0
 WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[1] driven by constant 0
 WARNING: [Synth 8-3917] design zap_tlb has port o_wb_dat_nxt[0] driven by constant 0
-WARNING: [Synth 8-3936] Found unconnected internal register 'xprod_ab_reg' and it is trimmed from '34' to '32' bits. [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/rtl/zap_shifter_multiply.sv:125]
-Synthesis finished with 0 errors, 0 critical warnings and 181 warnings.
-495 Infos, 142 Warnings, 0 Critical Warnings and 0 Errors encountered.
+WARNING: [Synth 8-3936] Found unconnected internal register 'xprod_ab_reg' and it is trimmed from '34' to '32' bits. [/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/zap_rtl/zap_shifter_multiply.sv:125]
+Synthesis finished with 0 errors, 0 critical warnings and 178 warnings.
+496 Infos, 142 Warnings, 0 Critical Warnings and 0 Errors encountered.
 WARNING: [Opt 31-278] Could not optimize cascaded clock buffer cell: clk2ddr3_BUFG_inst
 WARNING: [Opt 31-278] Could not optimize cascaded clock buffer cell: clk2ddr3_BUFG_inst
 WARNING: [Opt 31-278] Could not optimize cascaded clock buffer cell: clk2ddr3_BUFG_inst
@@ -150,10 +150,10 @@ WARNING: [Opt 31-278] Could not optimize cascaded clock buffer cell: clk2ddr3_BU
 51 Infos, 4 Warnings, 0 Critical Warnings and 0 Errors encountered.
 INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors, 42 Warnings
 WARNING: [Place 30-461] A non-muxed BUFG 'clk2ddr3_BUFG_inst' is driven by another global buffer 'u_pll/clkout0_o_BUFG_inst'. Remove non-muxed BUFG if it is not desired.
-81 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
-556 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
-WARNING: [Route 35-468] The router encountered 2 pins that are both setup-critical and hold-critical and tried to fix hold violations at the expense of setup slack. Such pins are:
+76 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
+171 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+WARNING: [Route 35-468] The router encountered 4 pins that are both setup-critical and hold-critical and tried to fix hold violations at the expense of setup slack. Such pins are:
 WARNING: [Route 35-328] Router estimated timing not met.
-18 Infos, 2 Warnings, 0 Critical Warnings and 0 Errors encountered.
+16 Infos, 2 Warnings, 0 Critical Warnings and 0 Errors encountered.
 WARNING: [Timing 38-436] There are set_bus_skew constraint(s) in this design. Please run report_bus_skew to ensure that bus skew requirements are met.
 9 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
