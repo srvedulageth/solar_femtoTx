@@ -257,13 +257,13 @@ module wb_ddr3_bridge #(
                     // Don't accept a new request until the master drops CYC/STB.
                     // Prevents re-latching the same beat when master deasserts one cycle late.
                         ack_o  <= 1'b0;
-                        if(cti_i == 3'b 010) begin //Burst
-                            state <= S_RD_AGAIN;
-                        end
-                        else begin
-                          if (!wb_req) begin
-                              state <= S_IDLE;
-                          end
+
+                        if(cti_i == 3'b010 && !lat_we_i) begin
+                            state <= S_RD_AGAIN;        // burst READ only
+                        end else if(cti_i == 3'b010 && lat_we_i && wb_req) begin
+                            state <= S_IDLE;            // burst WRITE → go idle for next beat
+                        end else if(!wb_req) begin
+                            state <= S_IDLE;
                         end
                     end
 

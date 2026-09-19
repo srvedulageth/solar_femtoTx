@@ -20,6 +20,7 @@
 
 #include "uart.h"
 #include "ethmac_zap.h"
+#include "ethmac_shared.h"
 
 void eth_demo_init(void);
 void eth_print_phy_status(void);
@@ -30,8 +31,10 @@ void phy_autoneg_and_wait(void);
 void phy_verify(int pa);
 void mdio_burner(int pa);
 void eth_transmit(void);
-void net_poll(void);
+//void net_poll_drain(unsigned budget);
+void net_poll_drain();
 void net_init(void);
+void test_burst_write(void);
 
 void irq_handler ()
 {
@@ -60,11 +63,13 @@ int main(void)
         // Just bringup the UART TX and RX - enable interrupts and exit.
         UARTInit();
 
-        //UARTPrintBanner();
+#ifdef DEBUG_2
+        UARTPrintBanner();
+#endif
 
         eth_demo_init();
 
-/*
+#ifdef DEBUG_2
         phy_hw_reset();
         phy_scan_all();
         phy_autoneg_and_wait();
@@ -72,22 +77,30 @@ int main(void)
         phy_verify(1);
         //phy_verify(2);
         mdio_burner(1);
-*/
+#endif
 
         //eth_transmit();
         //net_init();
-
         //UARTWrite("Net up. Try: ping 192.168.1.20\r\n");
+
+        volatile uint32_t x = *(volatile uint32_t*)0x20000000; //FOR MMU Testing ....
+
+        test_burst_write();
 
         // Respond to ARP + PING forever
         for (;;) {
-            net_poll();
+            if (rx_poll_scheduled) {
+               //eth_writel(0x11111111, ETH_MAC_HASH0);
+               // Drain up to a budget; prevents livelock under heavy RX
+               net_poll_drain();
+            }
 
             // Example: fire a UDP packet to Windows: 192.168.1.10:9000
             // const char msg[] = "hello from FPGA";
             // udp_send_to_ip(htonl(PC_IP), 9000, msg, sizeof(msg)-1);
 
             // small idle if you want
+            for (volatile unsigned k = 0; k < 2; ++k) __asm__ volatile("" ::: "memory");
         }
 
         UARTEnableRXInterrupt();
@@ -156,4 +169,20 @@ int UARTTransmitEmpty (void) {
 /* Get a character from uart */
 char UARTGetChar (void) {
         return *UART0_RBR;
+}
+
+void test_burst_write(void) {
+    volatile uint32_t *p = (volatile uint32_t *)0x1098C480u;
+
+    /* Write to cache line at 0x1098C480 */
+    for(int i = 0; i < 8; i++)
+        p[i] = 0x11111111u * (i+1);
+
+    /* Force eviction by accessing same cache set repeatedly */
+    /* Each address is +0x400 = same cache set, different tag */
+    for(int j = 1; j <= 36; j++) {
+        volatile uint32_t *q = (volatile uint32_t *)(0x1098C480u + j * 0x400u);
+        volatile uint32_t dummy = q[0];
+        (void)dummy;
+    }
 }
