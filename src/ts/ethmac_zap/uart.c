@@ -110,12 +110,14 @@ int main(void)
 }
 
 /* Sets up rate as 1 baud = 16 CPU clocks. Also resets TX and RX logic */
+//19200  baud: DLAB1 = 0x46 and DLAB2 = 1.
+//115200 baud: DLAB1 = 0x36 and DLAB2 = 0.
 void UARTInit()
 {
         // Set up frequency of operation. 1 bit time = 16 CPU clocks.
         *UART0_LCR        = (*UART0_LCR) | (1 << 7);
-        *UART0_DLAB1      = 0x46;
-        *UART0_DLAB2      = 1;
+        *UART0_DLAB1      = 0x36;
+        *UART0_DLAB2      = 0;
         *UART0_LCR        = (*UART0_LCR) & ~(1 << 7);
 
         // Enable TX and RX.

@@ -56,10 +56,14 @@ static int phy_wait_link(unsigned timeout_ms){
     for (unsigned t=0;t<timeout_ms;t++){
         (void)phy_read(PHY_BMSR);                    // latch-clear
         int b = phy_read(PHY_BMSR);
+
         if ((b & BMSR_AN_COMPLETE) && (b & BMSR_LINK_STATUS))
             return 0;
         // TODO: platform sleep 1 ms if available
         // zap_sleep_ms(1);
+
+       /* ~1ms delay at 100MHz */
+       for (volatile int d = 0; d < 10000; d++);
     }
     return -1;
 }
