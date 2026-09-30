@@ -304,6 +304,16 @@ always @* begin:blk1
   end
 end
 
+wire [2:0]       c_wb_megr_cti;
+wire             c_wb_megr_cyc;
+wire             d_wb_megr_cyc;
+wire             c_wb_megr_ack;
+wire             d_wb_megr_ack;
+wire             c_wb_megr_wen;
+wire             d_wb_megr_wen;
+wire  [31:0]     c_wb_megr_adr;
+wire  [31:0]     d_wb_megr_adr;
+
 // =========================
 // Processor core.
 // =========================
@@ -341,7 +351,18 @@ u_zap_top
         .i_wb_ack (data_wb_ack),
         .i_wb_err (1'd0),
         .o_wb_sel (data_wb_sel),
-        .o_wb_bte ()             // Always zero (Linear)
+        .o_wb_bte (),             // Always zero (Linear)
+
+        .c_wb_cti(c_wb_megr_cti),
+        .c_wb_cyc(c_wb_megr_cyc),
+        .d_wb_cyc(d_wb_megr_cyc),
+        .c_wb_ack(c_wb_megr_ack),
+        .d_wb_ack(d_wb_megr_ack),
+        .c_wb_wen(c_wb_megr_wen),
+        .d_wb_wen(d_wb_megr_wen),
+        .c_wb_adr(c_wb_megr_adr),
+        .d_wb_adr(d_wb_megr_adr)
+
 `ifndef SYNTHESIS
         ,
         .o_trace(),
