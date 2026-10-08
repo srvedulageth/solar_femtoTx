@@ -37,7 +37,8 @@ module wb_ddr3_bridge #(
 
     input                   init_done_i,         // optional: tie to 1 if not used
 
-    output  reg [2:0]       state
+    output  reg [2:0]       state,
+    output  reg             lat_we_i
 );
 
     // ------------------------------------------------------------
@@ -78,7 +79,7 @@ module wb_ddr3_bridge #(
     reg [31:0] lat_wb_byte_addr;
     reg [31:0] lat_dat_i;
     reg [3:0]  lat_sel_i;
-    reg        lat_we_i;
+    //reg        lat_we_i;
 
     // Output data register
     reg [31:0] dat_o_r;
