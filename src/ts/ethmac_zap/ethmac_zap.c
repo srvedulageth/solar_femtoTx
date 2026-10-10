@@ -239,3 +239,25 @@ int eth_tx_enqueue(const void *buf, unsigned len) {
 
     return 0;
 }
+
+int ddr_quick_test(void) {
+    uint32_t errors = 0;
+
+    for (uint32_t off = 0; off < DDR_SIZE; off += 0x100000) {
+        uint32_t addr = DDR_BASE + off;
+        uint32_t p0 = addr ^ 0xA5A5A5A5u;
+        uint32_t p1 = addr ^ 0x5A5A5A5Au;
+
+        ddr_write32(addr + 0x00, p0);
+        ddr_write32(addr + 0x04, p1);
+        ddr_write32(addr + 0x08, 0x00000000u);
+        ddr_write32(addr + 0x0C, 0xFFFFFFFFu);
+
+        if (ddr_read32(addr + 0x00) != p0) errors++;
+        if (ddr_read32(addr + 0x04) != p1) errors++;
+        if (ddr_read32(addr + 0x08) != 0x00000000u) errors++;
+        if (ddr_read32(addr + 0x0C) != 0xFFFFFFFFu) errors++;
+    }
+
+    return errors == 0 ? 0 : -1;
+}

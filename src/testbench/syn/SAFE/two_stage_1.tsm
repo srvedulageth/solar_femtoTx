@@ -1,0 +1,30 @@
+# Multi-stage TSM targeting split address busses
+# First Stage Match: 0x00000254
+# Second Stage Match: 0x108035B0
+
+state state_wait_first:
+    if ((zap_wb_adr_dbg_6 == 2'h0)  && 
+        (zap_wb_adr_dbg_4 == 10'h000) && 
+        (zap_wb_adr_dbg_2 == 10'h000) && 
+        (zap_wb_adr_dbg   == 7'h4A)   && 
+        (zap_wb_adr_dbg_5     == 1'b1)    && 
+        (zap_wb_adr_dbg_1     == 1'b0)    && 
+        (zap_wb_adr_dbg_3     == 1'b0)) then
+        goto state_wait_second;
+    else
+        goto state_wait_first;
+    endif
+
+state state_wait_second:
+    if ((zap_wb_adr_dbg_6 == 2'h0)  && 
+        (zap_wb_adr_dbg_4 == 10'h042) && 
+        (zap_wb_adr_dbg_2 == 10'h00D) && 
+        (zap_wb_adr_dbg   == 7'h36)   && 
+        (zap_wb_adr_dbg_5     == 1'b0)    && 
+        (zap_wb_adr_dbg_1     == 1'b0)    && 
+        (zap_wb_adr_dbg_3     == 1'b0)) then
+        trigger;
+    else
+        goto state_wait_second;
+    endif
+

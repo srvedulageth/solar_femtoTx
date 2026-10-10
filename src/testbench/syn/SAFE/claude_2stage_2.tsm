@@ -1,0 +1,29 @@
+########################################
+## Two-stage trigger for ZAP Linux boot
+## State0: wait for jump_to_linux (0x00000254)
+## State1: wait for gunzip return (0x10800984)
+########################################
+
+state state0:
+    zap_wb_adr_dbg_6 == 2'h0 and
+    zap_wb_adr_dbg_4 == 10'h000 and
+    (zap_wb_adr_dbg_2 == 10'h000) and
+    (zap_wb_adr_dbg == 7'h4A) and
+    (zap_wb_adr_dbg_5 == 1'b1) and
+    (zap_wb_adr_dbg_1 == 1'b0) and
+    (zap_wb_adr_dbg_3 == 1'b0):
+        goto state1;
+    default:
+        goto state0;
+
+state state1:
+    (zap_wb_adr_dbg_6 == 2'h0) and
+    (zap_wb_adr_dbg_4 == 10'h108) and
+    (zap_wb_adr_dbg_2 == 10'h002) and
+    (zap_wb_adr_dbg == 7'h30) and
+    (zap_wb_adr_dbg_5 == 1'b1) and
+    (zap_wb_adr_dbg_1 == 1'b0) and
+    (zap_wb_adr_dbg_3 == 1'b0):
+        trigger;
+    default:
+        goto state1;

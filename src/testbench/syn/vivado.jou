@@ -1,0 +1,61 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Tue Oct  6 20:17:43 2026
+# Process ID         : 2604624
+# Current directory  : /home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn
+# Command line       : vivado
+# Log file           : /home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/vivado.log
+# Journal file       : /home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/vivado.jou
+# Running On         : vedulas-Latitude-7400
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.5 LTS
+# Processor Detail   : Intel(R) Core(TM) i7-8665U CPU @ 1.90GHz
+# CPU Frequency      : 2300.892 MHz
+# CPU Physical cores : 4
+# CPU Logical cores  : 8
+# Host memory        : 33455 MB
+# Swap memory        : 8589 MB
+# Total Virtual      : 42045 MB
+# Available Virtual  : 35713 MB
+#-----------------------------------------------------------
+start_gui
+open_project /home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/solar_ms3/solar_ms3.xpr
+open_hw_manager
+connect_hw_server -allow_non_jtag
+open_hw_target
+set_property PROGRAM.FILE {/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/zap_soc_top.bit} [get_hw_devices xc7a100t_0]
+set_property PROBES.FILE {/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/debug_nets.ltx} [get_hw_devices xc7a100t_0]
+set_property FULL_PROBES.FILE {/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/debug_nets.ltx} [get_hw_devices xc7a100t_0]
+current_hw_device [get_hw_devices xc7a100t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a100t_0] 0]
+set_property PROBES.FILE {/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/debug_nets.ltx} [get_hw_devices xc7a100t_0]
+set_property FULL_PROBES.FILE {/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/debug_nets.ltx} [get_hw_devices xc7a100t_0]
+set_property PROGRAM.FILE {/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/zap_soc_top.bit} [get_hw_devices xc7a100t_0]
+program_hw_devices [get_hw_devices xc7a100t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a100t_0] 0]
+display_hw_ila_data [ get_hw_ila_data hw_ila_data_1 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}] -trigger_now
+wait_on_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]
+display_hw_ila_data [upload_hw_ila_data [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq7'hXX [get_hw_probes i_c_wb_megr_adr_dbg -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq10'hXXX [get_hw_probes i_c_wb_megr_adr_dbg_2 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq2'hX [get_hw_probes i_c_wb_megr_adr_dbg_6 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq10'hXXX [get_hw_probes i_c_wb_megr_adr_dbg_4 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq1'bX [get_hw_probes i_c_wb_megr_adr_dbg_5 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq1'bX [get_hw_probes i_c_wb_megr_adr_dbg_3 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq1'b1 [get_hw_probes i_d_wb_cyc_zap_megr_dbg -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq2'h0 [get_hw_probes i_d_wb_megr_adr_dbg_6 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq10'h109 [get_hw_probes i_d_wb_megr_adr_dbg_4 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq10'h231 [get_hw_probes i_d_wb_megr_adr_dbg_2 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq7'h14 [get_hw_probes i_d_wb_megr_adr_dbg -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq1'b0 [get_hw_probes i_d_wb_megr_adr_dbg_5 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq1'b0 [get_hw_probes i_d_wb_megr_adr_dbg_3 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+set_property TRIGGER_COMPARE_VALUE eq1'b0 [get_hw_probes i_d_wb_megr_adr_dbg_1 -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]
+wait_on_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]
+display_hw_ila_data [upload_hw_ila_data [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]]
+run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7a100t_0] -filter {CELL_NAME=~"u_ila_0"}]
+save_wave_config {/home/vedulas/solar_femtoTX_ms3/solar_femtoTx/src/testbench/syn/solar_ms3/solar_ms3.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wcfg}

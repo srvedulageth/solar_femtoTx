@@ -1,0 +1,35 @@
+State 0:
+zap_wb_adr_dbg_6[31:30] == 0x0
+AND
+zap_wb_adr_dbg_4[29:20] == 0x000
+AND
+zap_wb_adr_dbg_2[19:10] == 0x000
+AND
+zap_wb_adr_dbg[9:3]   == 0x4A
+AND
+zap_wb_adr_dbg_5[2]     == 1
+AND
+zap_wb_adr_dbg_1[1]     == 0
+AND
+zap_wb_adr_dbg_3[0]     == 0
+
+If TRUE  → goto State 1
+If FALSE → goto State 0
+
+State 1:
+zap_wb_adr_dbg_6[31:30] == 0x0
+AND
+zap_wb_adr_dbg_4[29:20] == 0x108
+AND
+zap_wb_adr_dbg_2[19:10] == 0x002
+AND
+zap_wb_adr_dbg[9:3]   == 0x30
+AND
+zap_wb_adr_dbg_5[2]     == 1
+AND
+zap_wb_adr_dbg_1[1]     == 0
+AND
+zap_wb_adr_dbg_3[0]     == 0
+
+If TRUE  → TRIGGER
+If FALSE → goto State 1

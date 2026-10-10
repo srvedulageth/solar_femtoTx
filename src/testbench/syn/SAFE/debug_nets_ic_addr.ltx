@@ -1,0 +1,1271 @@
+{
+    "ltx_root": {
+        "version": 4,
+        "minor": 0,
+        "ltx_data": [
+            {
+                "name": "EDA_PROBESET",
+                "active": true,
+                "debug_cores": [
+                    {
+                        "type": "XSDB_V3",
+                        "name": "dbg_hub",
+                        "spec": "labtools_xsdbm_v3",
+                        "clk_input_freq_hz": "400000002"
+                    },
+                    {
+                        "type": "ILA_V3",
+                        "name": "u_ila_0",
+                        "spec": "labtools_ila_v6",
+                        "core_location": {
+                            "user_chain": 1,
+                            "slave_index": 0,
+                            "bscan_switch_index": 0
+                        },
+                        "uuid": "23e7d65a79bc59f7bc47406c1714dfae",
+                        "pins": [
+                            {
+                                "name": "probe0",
+                                "id": 0,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 0,
+                                "nets": [
+                                    {
+                                        "name": "clk2ddr3",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe1",
+                                "id": 1,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 1,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_ack_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe2",
+                                "id": 2,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 2,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_cyc_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 3,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_adr_dbg_1",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_adr_dbg_1[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 4,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 1,
+                                "rightIndex": 10,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_adr_dbg_2",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[19]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[18]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[17]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[16]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[15]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[14]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[13]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[12]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[11]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_2[10]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 5,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 11,
+                                "rightIndex": 11,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_adr_dbg_3",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_adr_dbg_3[1]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 6,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 12,
+                                "rightIndex": 21,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_adr_dbg_4",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[29]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[28]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[27]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[26]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[25]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[24]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[23]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[22]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[21]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_4[20]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 7,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 22,
+                                "rightIndex": 22,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_adr_dbg_5",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_adr_dbg_5[2]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 8,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 23,
+                                "rightIndex": 24,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_adr_dbg_6",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_adr_dbg_6[31]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg_6[30]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 9,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 25,
+                                "rightIndex": 31,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_adr_dbg",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_adr_dbg[9]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg[8]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg[7]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg[6]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg[5]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg[4]"
+                                            },
+                                            {
+                                                "name": "zap_wb_adr_dbg[3]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 10,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "o_pc_1",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "o_pc_1[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 11,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 1,
+                                "rightIndex": 10,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "o_pc_2",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "o_pc_2[19]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[18]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[17]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[16]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[15]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[14]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[13]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[12]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[11]"
+                                            },
+                                            {
+                                                "name": "o_pc_2[10]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 12,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 11,
+                                "rightIndex": 11,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "o_pc_3",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "o_pc_3[1]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 13,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 12,
+                                "rightIndex": 21,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "o_pc_4",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "o_pc_4[29]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[28]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[27]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[26]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[25]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[24]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[23]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[22]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[21]"
+                                            },
+                                            {
+                                                "name": "o_pc_4[20]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 14,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 22,
+                                "rightIndex": 22,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "o_pc_5",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "o_pc_5[2]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 15,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 23,
+                                "rightIndex": 24,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "o_pc_6",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "o_pc_6[31]"
+                                            },
+                                            {
+                                                "name": "o_pc_6[30]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 16,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 25,
+                                "rightIndex": 31,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "o_pc",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "o_pc[9]"
+                                            },
+                                            {
+                                                "name": "o_pc[8]"
+                                            },
+                                            {
+                                                "name": "o_pc[7]"
+                                            },
+                                            {
+                                                "name": "o_pc[6]"
+                                            },
+                                            {
+                                                "name": "o_pc[5]"
+                                            },
+                                            {
+                                                "name": "o_pc[4]"
+                                            },
+                                            {
+                                                "name": "o_pc[3]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 17,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_din_dbg_1",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_din_dbg_1[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 18,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 1,
+                                "rightIndex": 10,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_din_dbg_2",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_din_dbg_2[19]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[18]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[17]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[16]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[15]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[14]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[13]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[12]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[11]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_2[10]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 19,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 11,
+                                "rightIndex": 11,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_din_dbg_3",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_din_dbg_3[1]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 20,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 12,
+                                "rightIndex": 21,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_din_dbg_4",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_din_dbg_4[29]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[28]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[27]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[26]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[25]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[24]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[23]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[22]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[21]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_4[20]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 21,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 22,
+                                "rightIndex": 22,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_din_dbg_5",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_din_dbg_5[2]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 22,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 23,
+                                "rightIndex": 24,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_din_dbg_6",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_din_dbg_6[31]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg_6[30]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 23,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 25,
+                                "rightIndex": 31,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_din_dbg",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_din_dbg[9]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg[8]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg[7]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg[6]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg[5]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg[4]"
+                                            },
+                                            {
+                                                "name": "zap_wb_din_dbg[3]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe6",
+                                "id": 24,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 6,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_we_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 25,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_dout_dbg_1",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_dout_dbg_1[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 26,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 1,
+                                "rightIndex": 10,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_dout_dbg_2",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[19]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[18]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[17]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[16]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[15]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[14]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[13]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[12]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[11]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_2[10]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 27,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 11,
+                                "rightIndex": 11,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_dout_dbg_3",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_dout_dbg_3[1]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 28,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 12,
+                                "rightIndex": 21,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_dout_dbg_4",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[29]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[28]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[27]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[26]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[25]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[24]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[23]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[22]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[21]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_4[20]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 29,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 22,
+                                "rightIndex": 22,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_dout_dbg_5",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_dout_dbg_5[2]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 30,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 23,
+                                "rightIndex": 24,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_dout_dbg_6",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_dout_dbg_6[31]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg_6[30]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 31,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 25,
+                                "rightIndex": 31,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "zap_wb_dout_dbg",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "zap_wb_dout_dbg[9]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg[8]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg[7]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg[6]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg[5]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg[4]"
+                                            },
+                                            {
+                                                "name": "zap_wb_dout_dbg[3]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe8",
+                                "id": 32,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 8,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_cyc_zap_megr_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe9",
+                                "id": 33,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 9,
+                                "nets": [
+                                    {
+                                        "name": "i_d_wb_cyc_zap_megr_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe10",
+                                "id": 34,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 10,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_wen_zap_megr_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe11",
+                                "id": 35,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 11,
+                                "nets": [
+                                    {
+                                        "name": "i_d_wb_wen_zap_megr_dbg",
+                                        "isBus": false
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 36,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_megr_adr_dbg_1",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_1[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 37,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 1,
+                                "rightIndex": 10,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_megr_adr_dbg_2",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[19]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[18]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[17]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[16]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[15]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[14]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[13]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[12]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[11]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_2[10]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 38,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 11,
+                                "rightIndex": 11,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_megr_adr_dbg_3",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_3[1]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 39,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 12,
+                                "rightIndex": 21,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_megr_adr_dbg_4",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[29]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[28]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[27]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[26]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[25]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[24]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[23]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[22]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[21]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_4[20]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 40,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 22,
+                                "rightIndex": 22,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_megr_adr_dbg_5",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_5[2]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 41,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 23,
+                                "rightIndex": 24,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_megr_adr_dbg_6",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_6[31]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg_6[30]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 42,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 25,
+                                "rightIndex": 31,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "i_c_wb_megr_adr_dbg",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg[9]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg[8]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg[7]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg[6]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg[5]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg[4]"
+                                            },
+                                            {
+                                                "name": "i_c_wb_megr_adr_dbg[3]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

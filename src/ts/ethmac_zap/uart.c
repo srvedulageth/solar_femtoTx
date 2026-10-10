@@ -34,6 +34,8 @@ void eth_transmit(void);
 //void net_poll_drain(unsigned budget);
 void net_poll_drain();
 void net_init(void);
+void boot_linux_uart_loader(void);
+//void dram_direct_boot(void);
 
 void irq_handler ()
 {
@@ -66,56 +68,34 @@ int main(void)
         UARTPrintBanner();
 #endif
 
-        eth_demo_init();
-
+        // Test DRAM.
+        uint32_t errors = ddr_quick_test();
 #ifdef DEBUG_2
-        phy_hw_reset();
-        phy_scan_all();
-        phy_autoneg_and_wait();
-        eth_print_phy_status();
-        phy_verify(1);
-        //phy_verify(2);
-        mdio_burner(1);
+        uart_puts("DRAM Test: 0x"); uart_puthex32(errors); uart_puts("\r\n");
 #endif
 
-        //eth_transmit();
-        //net_init();
-        //UARTWrite("Net up. Try: ping 192.168.1.20\r\n");
 
-        volatile uint32_t x = *(volatile uint32_t*)0x20000000; //FOR MMU Testing ....
+        //UARTEnableRXInterrupt();
 
-        // Respond to ARP + PING forever
-        for (;;) {
-            if (rx_poll_scheduled) {
-               //eth_writel(0x11111111, ETH_MAC_HASH0);
-               // Drain up to a budget; prevents livelock under heavy RX
-               net_poll_drain();
-            }
+        //uart_puts("\nStarting UART Linux loader...\r\n");
+        boot_linux_uart_loader();
+        //dram_direct_boot();
 
-            // Example: fire a UDP packet to Windows: 192.168.1.10:9000
-            // const char msg[] = "hello from FPGA";
-            // udp_send_to_ip(htonl(PC_IP), 9000, msg, sizeof(msg)-1);
-
-            // small idle if you want
-            for (volatile unsigned k = 0; k < 2; ++k) __asm__ volatile("" ::: "memory");
-        }
-
-        UARTEnableRXInterrupt();
-
-        // Never return — idle
-        for (;;)
-           __asm__ volatile("" ::: "memory");
+        while (1)
+        ;
 
         return 0;
 }
 
 /* Sets up rate as 1 baud = 16 CPU clocks. Also resets TX and RX logic */
+//19200  baud: DLAB1 = 0x46 and DLAB2 = 1.
+//115200 baud: DLAB1 = 0x36 and DLAB2 = 0.
 void UARTInit()
 {
         // Set up frequency of operation. 1 bit time = 16 CPU clocks.
         *UART0_LCR        = (*UART0_LCR) | (1 << 7);
-        *UART0_DLAB1      = 0x46;
-        *UART0_DLAB2      = 1;
+        *UART0_DLAB1      = 0x36;
+        *UART0_DLAB2      = 0;
         *UART0_LCR        = (*UART0_LCR) & ~(1 << 7);
 
         // Enable TX and RX.
@@ -163,7 +143,17 @@ int UARTTransmitEmpty (void) {
                 return 0;
 }
 
-/* Get a character from uart */
+/* Get a character from uart
 char UARTGetChar (void) {
         return *UART0_RBR;
 }
+*/
+
+char UARTGetChar(void)
+{
+    while (((*UART0_LSR) & (1 << UART_LS_DR)) == 0)
+        ;
+
+    return (char)(*UART0_RBR);
+}
+

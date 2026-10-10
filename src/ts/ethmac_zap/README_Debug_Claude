@@ -1,0 +1,159 @@
+# Decompressor addresses (zImage at 0x10800000)
+# -----------------------------------------------
+# 0x10800020  zImage entry point
+# 0x10800958  decompress_kernel after string scan
+# 0x10807984  "Uncompressing Linux..." string
+# 0x1098CC0C  relocated decompressor base
+# 0x1098D49C  top of relocated block (first write)
+# 0x108008FC   decompress_kernel function
+
+
+
+Complete Boot Sequence
+Stage	PC/Address	Description
+1	0x10800000	zImage uploaded here via UART
+2	0x10400000	DTB uploaded here via UART
+3	0x00000254	jump_to_linux() — last bootloader instruction
+4	0x10800020	zImage entry point — branch EA000005
+5	0x1080003C	Branch target — decompressor begins
+6	0x10800080	mov r0, pc — original instruction
+7	0x10800084	mov r0, #0x10000000 — our RAM base patch
+8	0x10800088	Setup stack pointer
+9	0x10800094	mov r1, r8 — pass DTB to fdt_check
+10	0x10800098	bl fdt_check_mem_start
+11	0x10806940	Inside fdt_check_mem_start
+12	0x1080009C	add r4, r0, #0x8000 — zreladdr = 0x10008000
+13	0x108000A0	Relocation check
+14	0x10800108	bcs 0x16C — no relocation needed
+15	0x1080016C	Skip relocation — continue setup
+16	0x108001B8	BSS clear loop
+17	0x108001DC	blne 0x260 — cache_on if needed
+18	0x108001F0	bl decompress_kernel ← trigger point
+19	0x10800900	Inside decompress_kernel
+20	0x10800930	putstr("Uncompressing Linux...")
+21	0x10800980	bl gunzip
+22	0x10803180	Inside gunzip — malloc, setup
+23	0x108031F0	Check gzip magic byte 1 (0x1F)
+24	0x108031FC	Check gzip magic byte 2 (0x8B) ← failing here!
+25	0x108032F4	Decompression loop ← NOT reached
+26	0x10008000	D-cache writes — kernel decompressed ← NOT reached
+27	0x10800890	ldr pc, =0x10008000 — final jump
+28	0x10008000	Kernel entry — I-cache fetch ← GOAL
+
+
+python3 send_uart_blob.py --port /dev/ttyUSB1 --baud 115200 --zimage /home/vedulas/linux-zap-arm/arch/arm/boot/zImage --dtb /home/vedulas/linux-zap-arm/arch/arm/boot/dts/zap_minimal.dtb
+
+python3 split_addr.py 0x10008000
+
+1. After 'jump_to_linux' PC changed to 0x10800020 and reads from
+   0x10800020, 24, 28,  0x1080003C to 0x108000A0 
+   All these are I-Cache Reads.
+2. Next 0x1080693C to 0x10806948 I-Cache Reads.
+3. Here One D-Cache Write to address 0x1098d49C and data is 0x00000000
+4. Here onwards I-Cache is reading 0x108069XX ...
+   and D-Cache is writing 0x1098dXXX.
+
+   0x1098d4A4 D-Cache Write Data 0x0000FFFC
+   0x1098d4A8 D-Cache Write Data 0xFFFFFFFC
+   0x1098d4AC D-Cache Write Data 0x11000000
+   0x1098d4B0 D-Cache Write Data 0x600000D3
+   0x1098d4B4 D-Cache Write Data 0x00000000
+   0x1098d4B8 D-Cache Write Data 0x0000B7DC
+   0x1098d4BC D-Cache Write Data 0x1080009C
+
+   0x1098d494 D-Cache Write Data 0x00000000
+
+   0x1098d46C D-Cache Write Data 0x11000000
+   0x1098d470 D-Cache Write Data 0x10000000
+   0x1098d47C D-Cache Write Data 0x1080699C
+
+   0x1098d464 D-Cache Write Data 0x00000000
+
+   0x1098d450 D-Cache Write Data 0x11000000
+   0x1098d454 D-Cache Write Data 0x10807C90
+   0x1098d458 D-Cache Write Data 0x0000FFFC
+   0x1098d45C D-Cache Write Data 0x108068CC
+
+   0x1098d440 D-Cache Write Data 0x11000000
+   0x1098d444 D-Cache Write Data 0x10807C90
+   0x1098d448 D-Cache Write Data 0x0000FFFC
+   0x1098d44C D-Cache Write Data 0xFFFFFFFF
+
+   0x1098d450 D-Cache Write Data 0x11000000
+   0x1098d454 D-Cache Write Data 0x600000D3
+   0x1098d458 D-Cache Write Data 0x00000000
+   0x1098d45C D-Cache Write Data 0x108068CC
+
+   0x1098d43C D-Cache Write Data 0x10805508
+
+what is happening? Why we are NOT seeing any UART messages?
+
+0x10800020 0x10800020 0x10800020  I-Cache Reads. Data read is 0xEA000005 0x016F2818 0x00000000
+0x1080003c to 0x10800094 I-Cache Reads. From 0x1080003c data read is 0xE10F9000
+First D-Cache Read to 0x10800244 and here it got Xs from the memory.
+
+
+1. After triggering 0x10800020, I-Cache reads 0x24, 0x28 and then Jumps to 0x3c.
+   These I-Cache reads continue upto 0x108000A0. 
+2. In between, D-Cache reads 0x10800244
+3. I-Cache continues reads from 0x10806940 and D-Cache writes from 0x1098d4a4
+
+
+With Trigger 0x108000DC
+The last D-Cache read was to address 0x1d18enbc and the data read is 0xdbffcf77.
+After this again the loop started at 0x10800148 and continued beypond 0x10800168.
+Until now the loop use to get repeated at 0x10800168.
+
+Now the PC went beyond 0x10800168 upto 0x10800174.
+Then PC started at 0x10800140 and went upto 0x10800154
+
+
+Now it is just waiting here looping 
+0 4 8 0x10800140 ... 0x10800174. I am also seeing that PC is going upto 0x1c (from 0x00)
+before starting the loop 0x10800140 ... 0x10800174
+
+
+With Trigger 0x108000DC
+1. I can see that D-Cache read from 0x10004420 and the data read is 0x10800c1e
+2. There are many D-Cache reads from 0x1080240 to 0x1080027C
+3. I-Cache reads from 0x10800100 to 0x1080013C
+4. Then D-Cache read to 0x10004424
+5. D-Cache reads from 0x1098c440 to 0x1098c47C
+6. I-Cache reads from 0x10800140 to 0x1080017C
+7. D-Cache reads from 0x1098c480 to 0x1098c4bC
+8. D-Cache read to 0x10006594
+9. D-Cache writes from 0x96591a00 to 0x96591a1c
+10. D-Cache writes from 0x965919e0 to 0x965919fc
+11. D-Cache writes from 0x965919c0 to 0x965919dc
+12. D-Cache writes from 0x965919c0 to 0x965919dc
+13. D-Cache writes from 0x965919a0 to 0x965919bc
+14. D-Cache reads from 0x1098c400 to 0x1098c43c
+15. D-Cache writes from 0x96591980 to 0x9659199c
+16. D-Cache writes from 0x96591960 to 0x9659197c
+17. D-Cache reads from 0x1098c8c0 to 0x1098c3fc
+
+
+With Patch (mov r0, 0x10000000 @ldr)
+After 0x108001F0
+1. I-Cache reads upto 0x1080001FC
+2. D-Cache reads from 0x1098c480 to 0x1098c4bC
+3. D-Cache reads from 0x1098c4c0 to 0x1098c4fc
+4. I-Cache reads from 0x10800200 to 0x1080021C
+
+
+With trigger 0x108001F0 (I-C and D-C 'x')
+1. I-Cache Reads upto 0x108001FC
+2. D-Cache reads from 0x1098c480 to 0x1098c4bC
+3. D-Cache reads from 0x1098c4c0 to 0x1098c4fc
+4. I-Cache reads from 0x10800200 to 0x1080023C
+5. I-Cache reads from 0x10800900 to 0x1080093C
+6. D-Cache writes from 0x1098c480 to 0x1098c4bC (Data Writtent: 0x1098C470 0x1098c4bc 0x10807cdc 0x1098c4b8 0x1098c4a8 0x10800898 ...)
+7. D-Cache reads from 0x1098d480 to 0x1098d4bC
+8. D-Cache reads from 0x10800980 to 0x108009bC
+9. D-Cache writes from 0x10800940 to 0x1080097C
+10. D-Cache writes from 0x1098d480 to 0x1098d4bC
+11. D-Cache Reads from 0x1098c480 to 0x1098c4bC (Data Read:     0x1098C470 0x0018c4bc 0x00007cdc 0x0018c4b8 0x0018c4a8 0x00000898 ...)
+
+The data written is different from data read!!!
+do we need to check enables?
+

@@ -1,0 +1,76 @@
+void net_poll_drain(unsigned budget) {
+    unsigned done = 0;
+
+    while (done < budget) {
+        volatile uint32_t *bd = (volatile uint32_t*)(ETH_BD_BASE + rx_tail*8u);
+        uint32_t st = bd[0];
+
+        if (st & BD_E_R) break;                 // not ready yet
+
+        uint16_t len  = (uint16_t)(st >> 16);   // actual frame length
+        uint32_t ptr  = bd[1];
+
+        // Ensure CPU sees fresh data
+        dcache_inval_range((void*)ptr, len);
+
+        // --- process directly from BRAM (zero-copy) ---
+        if (len >= sizeof(struct eth_hdr_t)) {
+            const uint8_t *pkt = (const uint8_t*)ptr;
+            const uint32_t *pkt1 = (const uint32_t*)ptr;
+            const struct eth_hdr_t *eth = (const struct eth_hdr_t*)pkt;
+
+            //uint16_t etype = ntohs(eth->type);
+            uint16_t etype = load_ethertype(pkt1);   // this should be 0x0806 for ARP
+            uart_puts("net_mini etype= 0x"); uart_puthex16(etype); uart_puts("\r\n");
+
+            if (etype == ETH_P_ARP) {
+                if (len >= sizeof(struct eth_hdr_t)+sizeof(struct arp_pkt_t )) {
+                    //const struct arp_pkt_t* arp = (const struct arp_pkt_t*)(pkt + sizeof(*eth));
+                    struct arp_pkt_t info;
+                    arp_load_info(pkt + sizeof(struct eth_hdr_t), &info);
+
+                    uart_puts("net_mini oper=0x"); uart_puthex16(info.oper); uart_puts(" "); uart_puts("\r\n");
+
+                    if (info.oper==1) {
+                      //eth_writel(info.tpa, ETH_MAC_HASH0); eth_writel(MY_IP, ETH_MAC_HASH1);
+                      uart_puts("tpa=0x"); uart_puthex32(info.tpa); uart_puts(" \r\n"); uart_puts("\r\n"); 
+                      if (info.tpa == MY_IP) {
+                        //send_arp_reply(eth->src, arp->spa, arp->tpa);
+                        send_arp_reply(eth->src, info.spa, info.tpa);
+                      }
+                    }
+                }
+            } else if (etype == ETH_P_IP) {
+                if (len >= sizeof(struct eth_hdr_t)+sizeof(struct ip_hdr_t)) {
+                    const struct ip_hdr_t* ip = (const struct ip_hdr_t*)(pkt + sizeof(*eth));
+                    if (ip->ver_ihl == 0x45 && ip->proto == IPPROTO_ICMP && ip->daddr == htonl(MY_IP)) {
+                        unsigned ihl = 20;
+                        if (len >= sizeof(*eth)+ihl+sizeof(struct icmp_hdr_t)) {
+                            const struct icmp_hdr_t* icmp = (const struct icmp_hdr_t*)(pkt + sizeof(*eth) + ihl);
+                            unsigned icmp_len = ntohs(ip->tot_len) - ihl;
+                            if (icmp->type == ICMP_ECHO_REQUEST) {
+                                send_icmp_echo_reply(eth->src, ip->saddr, (const uint8_t*)icmp, icmp_len);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // ----------------------------------------------
+
+        // Re-arm BD (capacity back in [31:16])
+        uint16_t wrap = (uint16_t)(st & BD_WRAP);
+        bd[0] = ((uint32_t)RX_BUF_SIZE << 16) | (wrap | BD_IRQ | BD_E_R);
+
+        // advance ring
+        rx_tail = (rx_tail == RX_BD_FIRST + RX_BD_COUNT - 1) ? RX_BD_FIRST : (rx_tail + 1);
+        done++;
+    }
+
+    // Finished draining → allow new interrupts
+    rx_poll_scheduled = 0;
+
+    // If you masked RX in the ISR, unmask here:
+    // uint32_t mask = eth_readl(ETH_INT_MASK);
+    // eth_writel(mask | (ETH_INT_RXB | ETH_INT_RXF), ETH_INT_MASK); // if 1=en
+}

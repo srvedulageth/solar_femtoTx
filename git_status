@@ -1,0 +1,6 @@
+	modified:   src/ips/ram_wb/verilog/wb_ddr3_bridge.v
+	modified:   src/testbench/syn/zap_soc.v
+	modified:   src/testbench/zap_soc.v
+	modified:   src/zap_rtl/zap_cp15_cb.sv
+	modified:   src/zap_rtl/zap_top.sv
+	modified:   src/zap_rtl/zap_wb_merger_gpt.sv

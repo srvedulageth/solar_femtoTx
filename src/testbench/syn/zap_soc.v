@@ -127,8 +127,8 @@ localparam VIC_HI                       = 32'hFFFFFFBF;
 localparam ETHMAC_LO                    = 32'hFFFFE000; //Internal Slave Ram of EthMAC total 2K bytes
 localparam ETHMAC_HI                    = 32'hFFFFEFFF;
 
-localparam ETHMAC_BUF_RAM_LO            = 32'h10000000;
-localparam ETHMAC_BUF_RAM_HI            = 32'h1FFFFFFF; //Total 256MB, accessed both by processor and ethmac...
+localparam DRAM_BUF_LO                  = 32'h10000000;
+localparam DRAM_BUF_HI                  = 32'h1FFFFFFF; //Total 256MB, accessed both by processor and ethmac...
 
 // Internal signals.
 wire            clk_ddr;
@@ -264,8 +264,12 @@ assign          uart_in = UART0_RXD;
 
 wire            data_wb_cyc;
 wire            data_wb_stb;
-reg [31:0]      data_wb_din;
-reg             data_wb_ack;
+wire [31:0]     data_wb_din;
+wire            data_wb_ack;
+
+reg [31:0]      data_wb_din_hold;
+reg [31:0]      selected_din;
+reg             selected_ack;
 
 wire ram_ack_o;
 
@@ -292,10 +296,10 @@ reg             data_wb_stb_uart [0:0], data_wb_stb_timer [0:0];
 wire [31:0]     data_wb_din_uart [0:0], data_wb_din_timer [0:0];
 wire            data_wb_ack_uart [0:0], data_wb_ack_timer [0:0];
 `endif
-reg             data_wb_cyc_ram, data_wb_cyc_vic, data_wb_cyc_ethmac, data_wb_cyc_ethmac_ram;
-reg             data_wb_stb_ram, data_wb_stb_vic, data_wb_stb_ethmac, data_wb_stb_ethmac_ram;
-wire [31:0]     data_wb_din_ram, data_wb_din_vic, data_wb_din_ethmac, data_wb_din_ethmac_ram;
-wire            data_wb_ack_ram, data_wb_ack_vic, data_wb_ack_ethmac, data_wb_ack_ethmac_ram;
+reg             data_wb_cyc_ram, data_wb_cyc_vic, data_wb_cyc_ethmac, data_wb_cyc_dram;
+reg             data_wb_stb_ram, data_wb_stb_vic, data_wb_stb_ethmac, data_wb_stb_dram;
+wire [31:0]     data_wb_din_ram, data_wb_din_vic, data_wb_din_ethmac, data_wb_din_dram;
+wire            data_wb_ack_ram, data_wb_ack_vic, data_wb_ack_ethmac, data_wb_ack_dram;
 
 wire [3:0]      data_wb_sel;
 wire            data_wb_we;
@@ -337,60 +341,84 @@ always @* begin:blk1
   data_wb_cyc_ethmac = 0;
   data_wb_stb_ethmac = 0;
 
-  data_wb_cyc_ethmac_ram = 0;
-  data_wb_stb_ethmac_ram = 0;
+  data_wb_cyc_dram = 0;
+  data_wb_stb_dram = 0;
 
   if(data_wb_adr >= UART0_LO && data_wb_adr <= UART0_HI) begin        // UART0 access
     data_wb_cyc_uart[0] = data_wb_cyc;
     data_wb_stb_uart[0] = data_wb_stb;
-    data_wb_ack        = data_wb_ack_uart[0];
-    data_wb_din        = data_wb_din_uart[0];
+    selected_ack        = data_wb_ack_uart[0];
+    selected_din        = data_wb_din_uart[0];
   end
   else if(data_wb_adr >= TIMER0_LO && data_wb_adr <= TIMER0_HI) begin  // Timer0 access
     data_wb_cyc_timer[0] = data_wb_cyc;
     data_wb_stb_timer[0] = data_wb_stb;
-    data_wb_ack          = data_wb_ack_timer[0];
-    data_wb_din          = data_wb_din_timer[0];
+    selected_ack         = data_wb_ack_timer[0];
+    selected_din         = data_wb_din_timer[0];
   end
   else if(data_wb_adr >= VIC_LO && data_wb_adr <= VIC_HI) begin       // VIC access.
     data_wb_cyc_vic   = data_wb_cyc;
     data_wb_stb_vic   = data_wb_stb;
-    data_wb_ack       = data_wb_ack_vic;
-    data_wb_din       = data_wb_din_vic;
+    selected_ack      = data_wb_ack_vic;
+    selected_din      = data_wb_din_vic;
   end
 `ifdef DUAL_UART
   else if(data_wb_adr >= UART1_LO && data_wb_adr <= UART1_HI) begin    // UART1 access
     data_wb_cyc_uart[1] = data_wb_cyc;
     data_wb_stb_uart[1] = data_wb_stb;
-    data_wb_ack        = data_wb_ack_uart[1];
-    data_wb_din        = data_wb_din_uart[1];
+    selected_ack        = data_wb_ack_uart[1];
+    selected_din        = data_wb_din_uart[1];
   end
   else if(data_wb_adr >= TIMER1_LO && data_wb_adr <= TIMER1_HI) begin  // Timer1 access
     data_wb_cyc_timer[1] = data_wb_cyc;
     data_wb_stb_timer[1] = data_wb_stb;
-    data_wb_ack          = data_wb_ack_timer[1];
-    data_wb_din          = data_wb_din_timer[1];
+    selected_ack         = data_wb_ack_timer[1];
+    selected_din         = data_wb_din_timer[1];
   end
 `endif
   else if(data_wb_adr >= ETHMAC_LO && data_wb_adr <= ETHMAC_HI) begin  // EthMAC 0 Slave Address Space ...
     data_wb_cyc_ethmac = data_wb_cyc;
     data_wb_stb_ethmac = data_wb_stb;
-    data_wb_ack        = data_wb_ack_ethmac;
-    data_wb_din        = data_wb_din_ethmac;
+    selected_ack       = data_wb_ack_ethmac;
+    selected_din       = data_wb_din_ethmac;
   end
-  else if(data_wb_adr >= ETHMAC_BUF_RAM_LO && data_wb_adr <= ETHMAC_BUF_RAM_HI) begin  // EthMAC 0 Master Address Space ...
-    data_wb_cyc_ethmac_ram = data_wb_cyc;
-    data_wb_stb_ethmac_ram = data_wb_stb;
-    data_wb_ack        = data_wb_ack_ethmac_ram;
-    data_wb_din        = data_wb_din_ethmac_ram;
+  else if(data_wb_adr >= DRAM_BUF_LO && data_wb_adr <= DRAM_BUF_HI) begin  // DRAM Address Space ...
+    data_wb_cyc_dram   = data_wb_cyc;
+    data_wb_stb_dram   = data_wb_stb;
+    selected_ack       = data_wb_ack_dram;
+    selected_din       = data_wb_din_dram;
   end
   else begin // External RAM access.
     data_wb_cyc_ram  = data_wb_cyc;
     data_wb_stb_ram  = data_wb_stb;
-    data_wb_ack      = data_wb_ack_ram;
-    data_wb_din      = data_wb_din_ram;
+    selected_ack     = data_wb_ack_ram;
+    selected_din     = data_wb_din_ram;
   end
 end
+
+wire wb_read_ack = data_wb_cyc && data_wb_stb && !data_wb_we && selected_ack;
+
+always @(posedge i_clk) begin
+    if (i_reset)
+        data_wb_din_hold <= 32'h0000_0000;
+    else if (wb_read_ack)
+        data_wb_din_hold <= selected_din;
+end
+
+assign data_wb_din = wb_read_ack ? selected_din : data_wb_din_hold;
+assign data_wb_ack = selected_ack;
+
+wire [2:0]       c_wb_megr_cti;
+wire             c_wb_megr_cyc;
+wire             d_wb_megr_cyc;
+wire             c_wb_megr_ack;
+wire             d_wb_megr_ack;
+wire             c_wb_megr_wen;
+wire             d_wb_megr_wen;
+wire  [31:0]     c_wb_megr_adr;
+wire  [31:0]     d_wb_megr_adr;
+wire  [31:0]     wb_megr_adr_c;
+wire  [31:0]     wb_megr_adr_d;
 
 // =========================
 // Processor core.
@@ -429,7 +457,20 @@ u_zap_top
         .i_wb_ack (data_wb_ack),
         .i_wb_err (1'd0),
         .o_wb_sel (data_wb_sel),
-        .o_wb_bte ()             // Always zero (Linear)
+        .o_wb_bte (),             // Always zero (Linear)
+
+        .c_wb_cti(c_wb_megr_cti),
+        .c_wb_cyc(c_wb_megr_cyc),
+        .d_wb_cyc(d_wb_megr_cyc),
+        .c_wb_ack(c_wb_megr_ack),
+        .d_wb_ack(d_wb_megr_ack),
+        .c_wb_wen(c_wb_megr_wen),
+        .d_wb_wen(d_wb_megr_wen),
+        .c_wb_adr(c_wb_megr_adr),
+        .d_wb_adr(d_wb_megr_adr),
+        .wb_adr_c(wb_megr_adr_c),
+        .wb_adr_d(wb_megr_adr_d)
+
 `ifndef SYNTHESIS
         ,
         .o_trace(),
@@ -619,15 +660,15 @@ ram_wb
             );
 
 //EthMAC TX/RX/BDS RAM ...
-wire [31:0] ethmac_ram_adr;
-wire [31:0] ethmac_ram_dat_i;
-wire [31:0] ethmac_ram_dat_o;
-wire ethmac_ram_we;
-wire [3:0] ethmac_ram_sel;
-wire ethmac_ram_cyc;
-wire ethmac_ram_stb;
-wire [2:0] ethmac_ram_cti;
-wire ethmac_ram_ack;
+wire [31:0] arb_ram_adr;
+wire [31:0] arb_ram_dat_i;
+wire [31:0] arb_ram_dat_o;
+wire arb_ram_we;
+wire [3:0] arb_ram_sel;
+wire arb_ram_cyc;
+wire arb_ram_stb;
+wire [2:0] arb_ram_cti;
+wire arb_ram_ack;
 
 //Wishbone Arbiter ...
 wb_arb2 #(
@@ -641,13 +682,13 @@ wb_arb2 #(
   // M0: CPU
   .m0_adr_i(data_wb_adr),
   .m0_dat_i(data_wb_dout),
-  .m0_dat_o(data_wb_din_ethmac_ram),
+  .m0_dat_o(data_wb_din_dram),
   .m0_we_i (data_wb_we),
   .m0_sel_i(data_wb_sel),
-  .m0_cyc_i(data_wb_cyc_ethmac_ram),
-  .m0_stb_i(data_wb_stb_ethmac_ram),
+  .m0_cyc_i(data_wb_cyc_dram),
+  .m0_stb_i(data_wb_stb_dram),
   .m0_cti_i(data_wb_cti),
-  .m0_ack_o(data_wb_ack_ethmac_ram),
+  .m0_ack_o(data_wb_ack_dram),
 
   // M1: EthMAC master
   .m1_adr_i(ethmac_m_wb_adr_o),
@@ -661,15 +702,15 @@ wb_arb2 #(
   .m1_ack_o(ethmac_m_wb_ack_i),
 
   // Slave: 8K RAM
-  .s_adr_o (ethmac_ram_adr),
-  .s_dat_o (ethmac_ram_dat_i),
-  .s_dat_i (ethmac_ram_dat_o),
-  .s_we_o  (ethmac_ram_we),
-  .s_sel_o (ethmac_ram_sel),
-  .s_cyc_o (ethmac_ram_cyc),
-  .s_stb_o (ethmac_ram_stb),
-  .s_cti_o (ethmac_ram_cti),
-  .s_ack_i (ethmac_ram_ack)
+  .s_adr_o (arb_ram_adr),
+  .s_dat_o (arb_ram_dat_i),
+  .s_dat_i (arb_ram_dat_o),
+  .s_we_o  (arb_ram_we),
+  .s_sel_o (arb_ram_sel),
+  .s_cyc_o (arb_ram_cyc),
+  .s_stb_o (arb_ram_stb),
+  .s_cti_o (arb_ram_cti),
+  .s_ack_i (arb_ram_ack)
 );
 
 `ifdef SYNTHESIS
@@ -781,11 +822,34 @@ wire  [ 15:0] ddr3_ram_req_id;
 
 wire          ddr3_ram_accept;
 wire          ddr3_ram_ack;
+reg           ddr3_ram_ack_r, ddr3_ram_ack_r1;
 wire          ddr3_ram_error;
 wire [ 15:0]  ddr3_ram_resp_id;
 wire [127:0]  ddr3_ram_read_data;
+reg [127:0]   ddr3_ram_read_data_r;
 
 wire [2:0]    wb_ddr3_br_state;
+wire          lat_we_i;
+
+always @(posedge i_clk) begin
+  if(i_reset) begin
+    ddr3_ram_ack_r <= 'h 0;
+    ddr3_ram_ack_r1 <= 'h 0;
+  end
+  else begin
+    ddr3_ram_ack_r <= ddr3_ram_ack;
+    ddr3_ram_ack_r1 <= ddr3_ram_ack_r;
+  end
+end
+
+always @(posedge i_clk) begin
+  if(i_reset) begin
+    ddr3_ram_read_data_r <= 'h 0;
+  end
+  else if (!lat_we_i && ddr3_ram_ack_r) begin
+    ddr3_ram_read_data_r <= ddr3_ram_read_data;
+  end
+end
 
 assign ddr3_ram_wr = (calib_done == 0) ? ddr3_calib_ram_wr : ddr3_core_ram_wr;
 assign ddr3_ram_rd = (calib_done == 0) ? ddr3_calib_ram_rd : ddr3_core_ram_rd;
@@ -801,14 +865,14 @@ assign ddr3_ram_req_id = (calib_done == 0) ? ddr3_calib_ram_req_id : ddr3_core_r
 
 assign ddr3_calib_ram_accept = ((calib_done == 0) & ddr3_ram_accept);
 assign ddr3_core_ram_accept = ((calib_done == 1) & ddr3_ram_accept);
-assign ddr3_calib_ram_ack = ((calib_done == 0) & ddr3_ram_ack);
-assign ddr3_core_ram_ack = ((calib_done == 1) & ddr3_ram_ack);
+assign ddr3_calib_ram_ack = ((calib_done == 0) & ddr3_ram_ack_r1);
+assign ddr3_core_ram_ack = ((calib_done == 1) & ddr3_ram_ack_r1);
 assign ddr3_calib_ram_error = ((calib_done == 0) & ddr3_ram_error);
 assign ddr3_core_ram_error = ((calib_done == 1) & ddr3_ram_error);
 assign ddr3_calib_ram_resp_id = (calib_done == 0) ? ddr3_ram_resp_id : 'h 0;
 assign ddr3_core_ram_resp_id = (calib_done == 1) ? ddr3_ram_resp_id : 'h 0;
-assign ddr3_calib_ram_read_data = (calib_done == 0) ? ddr3_ram_read_data : 'h 0;
-assign ddr3_core_ram_read_data = (calib_done == 1) ? ddr3_ram_read_data : 'h 0;
+assign ddr3_calib_ram_read_data = (calib_done == 0) ? ddr3_ram_read_data_r : 'h 0;
+assign ddr3_core_ram_read_data = (calib_done == 1) ? ddr3_ram_read_data_r : 'h 0;
 
 //-----------------------------------------------------------------
 // DDR PHY
@@ -933,15 +997,15 @@ u_wb_ddr3_bridge (
     .rst_i(i_reset),      // synchronous active-high
 
     // ---------------- Wishbone Slave ----------------
-    .dat_i(ethmac_ram_dat_i),
-    .dat_o(ethmac_ram_dat_o),
-    .adr_i(ethmac_ram_adr),
-    .we_i(ethmac_ram_we),
-    .sel_i(ethmac_ram_sel),
-    .cyc_i(ethmac_ram_cyc),
-    .stb_i(ethmac_ram_stb),
-    .cti_i(ethmac_ram_cti),
-    .ack_o(ethmac_ram_ack),
+    .dat_i(arb_ram_dat_i),
+    .dat_o(arb_ram_dat_o),
+    .adr_i(arb_ram_adr),
+    .we_i(arb_ram_we),
+    .sel_i(arb_ram_sel),
+    .cyc_i(arb_ram_cyc),
+    .stb_i(arb_ram_stb),
+    .cti_i(arb_ram_cti),
+    .ack_o(arb_ram_ack),
 
     // ---------------- DDR3 core "inport" interface ----------------
     .inport_wr_o(ddr3_core_ram_wr),        // byte strobes (16 bytes)
@@ -958,7 +1022,8 @@ u_wb_ddr3_bridge (
 
     .init_done_i(ddr3_init_done),         // optional: tie to 1 if not used
 
-    .state(wb_ddr3_br_state)
+    .state(wb_ddr3_br_state),
+    .lat_we_i(lat_we_i)
 ); //u_wb_ddr3_bridge (
 
 ddr3_calib_dqs_window
@@ -1035,13 +1100,35 @@ u_ddr3_calib_dqs_window (
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data1_w_dbg = zap_soc.u_phy.rd_data1_w;
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data2_w_dbg = zap_soc.u_phy.rd_data2_w;
 (* MARK_DEBUG = "true" *) wire [15:0] ddr3_rd_data3_w_dbg = zap_soc.u_phy.rd_data3_w;
-*/
 
 (* MARK_DEBUG = "true" *) wire ddr3_init_done_dbg = ddr3_init_done;
 (* MARK_DEBUG = "true" *) wire calib_done_dbg = calib_done;
 (* MARK_DEBUG = "true" *) wire calib_pass_dbg = calib_pass;
+*/
+
 (* MARK_DEBUG = "true" *) wire mmu_en_dbg = zap_soc.u_zap_top.cpu_mmu_en;
 (* MARK_DEBUG = "true" *) wire dc_en_dbg = zap_soc.u_zap_top.cpu_dc_en;
 (* MARK_DEBUG = "true" *) wire ic_en_dbg = zap_soc.u_zap_top.cpu_ic_en;
 
+(* MARK_DEBUG = "true" *) wire [31:0] o_pc = zap_soc.u_zap_top.u_zap_core.u_zap_writeback.o_pc;
+
+(* MARK_DEBUG = "true" *) wire [2:0] zap_wb_cti_dbg = data_wb_cti;
+(* MARK_DEBUG = "true" *) wire zap_wb_ack_dbg = data_wb_ack;
+(* MARK_DEBUG = "true" *) wire zap_wb_cyc_dbg = data_wb_cyc;
+(* MARK_DEBUG = "true" *) wire zap_wb_we_dbg = data_wb_we;
+(* MARK_DEBUG = "true" *) wire [31:0] zap_wb_adr_dbg = data_wb_adr;
+(* MARK_DEBUG = "true" *) wire [31:0] zap_wb_din_dbg = data_wb_din;
+(* MARK_DEBUG = "true" *) wire [31:0] zap_wb_dout_dbg = data_wb_dout;
+
+(* MARK_DEBUG = "true" *) wire i_c_wb_cyc_zap_megr_dbg = c_wb_megr_cyc;
+(* MARK_DEBUG = "true" *) wire i_d_wb_cyc_zap_megr_dbg = d_wb_megr_cyc;
+(* MARK_DEBUG = "true" *) wire i_c_wb_ack_zap_megr_dbg = c_wb_megr_ack;
+(* MARK_DEBUG = "true" *) wire i_d_wb_ack_zap_megr_dbg = d_wb_megr_ack;
+(* MARK_DEBUG = "true" *) wire i_c_wb_wen_zap_megr_dbg = c_wb_megr_wen;
+(* MARK_DEBUG = "true" *) wire i_d_wb_wen_zap_megr_dbg = d_wb_megr_wen;
+(* MARK_DEBUG = "true" *) wire [31:0] i_c_wb_megr_adr_dbg = wb_megr_adr_c;
+(* MARK_DEBUG = "true" *) wire [31:0] i_d_wb_megr_adr_dbg = wb_megr_adr_d;
+
+//(* MARK_DEBUG = "true" *) wire [31:0] ddr3_core_ram_addr_dbg = ddr3_core_ram_addr;
+//(* MARK_DEBUG = "true" *) wire [15:0] ddr3_core_ram_wr_dbg = ddr3_core_ram_wr;
 endmodule // zap_soc

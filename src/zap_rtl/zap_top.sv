@@ -130,7 +130,19 @@ parameter logic [31:0] CODE_CACHE_LINE          =  32'd64    // Ccahe line size 
         output  logic  [1:0]     o_wb_bte,
         input   logic            i_wb_ack,
         input   logic  [31:0]    i_wb_dat,
-        input   logic            i_wb_err
+        input   logic            i_wb_err,
+
+        output        [2:0]      c_wb_cti,
+        output  wire             c_wb_cyc,
+        output  wire             d_wb_cyc,
+        output  wire             c_wb_ack,
+        output  wire             d_wb_ack,
+        output  wire             c_wb_wen,
+        output  wire             d_wb_wen,
+        output  wire  [31:0]     c_wb_adr,
+        output  wire  [31:0]     d_wb_adr,
+        output  wire  [31:0]     wb_adr_c,
+        output  wire  [31:0]     wb_adr_d
 );
 
 assign o_wb_bte = 2'b00; // Linear Burst.
@@ -176,22 +188,22 @@ logic            cpu_instr_stb;
 logic            cpu_dc_we, cpu_dc_stb;
 logic [3:0]      cpu_dc_sel;
 logic            c_wb_stb;
-logic            c_wb_cyc;
-logic            c_wb_wen;
+//logic            c_wb_cyc;
+//logic            c_wb_wen;
 logic [3:0]      c_wb_sel;
 logic [31:0]     c_wb_dat;
-logic [31:0]     c_wb_adr;
-logic [2:0]      c_wb_cti;
-logic            c_wb_ack;
+//logic [31:0]     c_wb_adr;
+//logic [2:0]      c_wb_cti;
+//logic            c_wb_ack;
 logic            c_wb_err;
 logic            d_wb_stb;
-logic            d_wb_cyc;
-logic            d_wb_wen;
+//logic            d_wb_cyc;
+//logic            d_wb_wen;
 logic [3:0]      d_wb_sel;
 logic [31:0]     d_wb_dat;
-logic [31:0]     d_wb_adr;
+//logic [31:0]     d_wb_adr;
 logic [2:0]      d_wb_cti;
-logic            d_wb_ack;
+//logic            d_wb_ack;
 logic            d_wb_err;
 logic [63:0]     dc_rreg_idx, dc_wreg_idx;
 logic [5:0]      dc_rreg_idx_bin;
@@ -476,7 +488,10 @@ begin : l_merger_for_core_with_cache_mmu
         .o_wb_adr  (wb_adr   ),
         .o_wb_cti  (wb_cti   ),
         .i_wb_ack  (wb_ack   ),
-        .i_wb_err  (wb_err   )
+        .i_wb_err  (wb_err   ),
+
+        .o_wb_adr_c  (wb_adr_c  ),
+        .o_wb_adr_d  (wb_adr_d  )
 
         );
 end : l_merger_for_core_with_cache_mmu

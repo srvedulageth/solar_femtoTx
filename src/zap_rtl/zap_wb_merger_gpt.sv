@@ -84,7 +84,10 @@ module zap_wb_merger #(
     output logic [2:0]  o_wb_cti,
 
     input  logic        i_wb_ack,
-    input  logic        i_wb_err
+    input  logic        i_wb_err,
+
+    output logic [31:0] o_wb_adr_c,
+    output logic [31:0] o_wb_adr_d
 );
 
     `include "zap_defines.svh"
@@ -495,6 +498,9 @@ module zap_wb_merger #(
                     o_wb_dat <= 32'h0000_0000;
                     o_wb_adr <= 32'h0000_0000;
 
+                    o_wb_adr_c <= 32'h0000_0000;
+                    o_wb_adr_c <= 32'h0000_0000;
+
                     o_wb_cti <= CTI_EOB;
                 end
                 else
@@ -517,6 +523,7 @@ module zap_wb_merger #(
                         o_wb_sel <= i_c_wb_sel;
                         o_wb_dat <= i_c_wb_dat;
                         o_wb_adr <= i_c_wb_adr;
+                        o_wb_adr_c <= i_c_wb_adr;
 
                         o_wb_cti <= i_c_wb_cti;
                     end
@@ -531,6 +538,7 @@ module zap_wb_merger #(
                         o_wb_sel <= i_d_wb_sel;
                         o_wb_dat <= i_d_wb_dat;
                         o_wb_adr <= i_d_wb_adr;
+                        o_wb_adr_d <= i_d_wb_adr;
 
                         o_wb_cti <= i_d_wb_cti;
                     end

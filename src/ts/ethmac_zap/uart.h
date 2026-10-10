@@ -32,6 +32,7 @@
         #define UART0_LCR     ((char*)0xFFFFFFE3)
         #define UART0_LSR     ((char*)0xFFFFFFE5)
         #define VIC_INT_CLEAR ( (int*)0xFFFFFFA8)
+        #define UART_LS_DR    0
 
         // Initialization functions.
         void UARTInit(void);

@@ -169,16 +169,16 @@ create_debug_core u_ila_0 ila
 set_property C_DATA_DEPTH 16384 [get_debug_cores u_ila_0]
 set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
 set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
-set_property C_ADV_TRIGGER false [get_debug_cores u_ila_0]
+set_property C_ADV_TRIGGER true [get_debug_cores u_ila_0]
 set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
-set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
-set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
-set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
-startgroup
+#set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
+#set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
+#set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
+#startgroup
 set_property C_EN_STRG_QUAL true [get_debug_cores u_ila_0 ]
 set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0 ]
 set_property ALL_PROBE_SAME_MU_CNT 2 [get_debug_cores u_ila_0 ]
-endgroup
+#endgroup
 
 #connect_debug_port u_ila_0/clk [get_nets [list SYS_CLK_IBUF_BUFG ]]
 connect_debug_port u_ila_0/clk [get_nets [list clk_ddr ]]
@@ -190,28 +190,77 @@ connect_debug_port u_ila_0/probe0 [get_nets [list clk2ddr3 ]]
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe1]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-connect_debug_port u_ila_0/probe1 [get_nets [list calib_done_dbg ]]
+connect_debug_port u_ila_0/probe1 [get_nets [list zap_wb_ack_dbg ]]
 
 create_debug_port u_ila_0 probe
 set_property port_width 1 [get_debug_ports u_ila_0/probe2]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
-connect_debug_port u_ila_0/probe2 [get_nets [list calib_pass_dbg ]]
+connect_debug_port u_ila_0/probe2 [get_nets [list zap_wb_cyc_dbg ]]
 
 create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe3]
+set_property port_width 32 [get_debug_ports u_ila_0/probe3]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
-connect_debug_port u_ila_0/probe3 [get_nets [list mmu_en_dbg ]]
+connect_debug_port u_ila_0/probe3 [get_nets {zap_wb_adr_dbg[*]}]
 
 create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe4]
+set_property port_width 32 [get_debug_ports u_ila_0/probe4]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
-connect_debug_port u_ila_0/probe4 [get_nets [list dc_en_dbg ]]
+connect_debug_port u_ila_0/probe4 [get_nets {o_pc[*]}]
 
 create_debug_port u_ila_0 probe
-set_property port_width 1 [get_debug_ports u_ila_0/probe5]
+set_property port_width 32 [get_debug_ports u_ila_0/probe5]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
-connect_debug_port u_ila_0/probe5 [get_nets [list ic_en_dbg ]]
+connect_debug_port u_ila_0/probe5 [get_nets {zap_wb_din_dbg[*]}]
 
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe6]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list zap_wb_we_dbg ]]
+
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe7]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list i_c_wb_cyc_zap_megr_dbg ]]
+
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe8]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
+connect_debug_port u_ila_0/probe8 [get_nets [list i_d_wb_cyc_zap_megr_dbg ]]
+
+#create_debug_port u_ila_0 probe
+#set_property port_width 1 [get_debug_ports u_ila_0/probe9]
+#set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
+#connect_debug_port u_ila_0/probe9 [get_nets [list i_c_wb_ack_zap_megr_dbg ]]
+#
+#create_debug_port u_ila_0 probe
+#set_property port_width 1 [get_debug_ports u_ila_0/probe10]
+#set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
+#connect_debug_port u_ila_0/probe10 [get_nets [list i_d_wb_ack_zap_megr_dbg ]]
+
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe9]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
+connect_debug_port u_ila_0/probe9 [get_nets [list i_c_wb_wen_zap_megr_dbg ]]
+
+create_debug_port u_ila_0 probe
+set_property port_width 1 [get_debug_ports u_ila_0/probe10]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
+connect_debug_port u_ila_0/probe10 [get_nets [list i_d_wb_wen_zap_megr_dbg ]]
+
+#create_debug_port u_ila_0 probe
+#set_property port_width 3 [get_debug_ports u_ila_0/probe12]
+#set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
+#connect_debug_port u_ila_0/probe12 [get_nets {zap_wb_cti_dbg[*]}]
+
+create_debug_port u_ila_0 probe
+set_property port_width 32 [get_debug_ports u_ila_0/probe11]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
+connect_debug_port u_ila_0/probe11 [get_nets {i_c_wb_megr_adr_dbg[*]}]
+
+create_debug_port u_ila_0 probe
+set_property port_width 32 [get_debug_ports u_ila_0/probe12]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
+connect_debug_port u_ila_0/probe12 [get_nets {i_d_wb_megr_adr_dbg[*]}]
 
 
 #Debug

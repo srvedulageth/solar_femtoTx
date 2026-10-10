@@ -1,0 +1,17 @@
+# State 1: Wait for jump_to_linux
+# Only check [9:3] == 0x4A (unique to 0x254)
+state state_stage1:
+    if (zap_wb_adr_dbg == 7'h4A) then
+        goto state_stage2;
+    else
+        goto state_stage1;
+    endif
+
+# State 2: Wait for gunzip return
+# Only check [29:20] == 0x108 (unique to 0x108xxxxx)
+state state_stage2:
+    if (zap_wb_adr_dbg_4 == 10'h108) then
+        trigger;
+    else
+        goto state_stage2;
+    endif

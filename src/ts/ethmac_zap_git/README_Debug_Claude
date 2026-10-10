@@ -1,0 +1,53 @@
+# Decompressor addresses (zImage at 0x10800000)
+# -----------------------------------------------
+# 0x10800020  zImage entry point
+# 0x10800958  decompress_kernel after string scan
+# 0x10807984  "Uncompressing Linux..." string
+# 0x1098CC0C  relocated decompressor base
+# 0x1098D49C  top of relocated block (first write)
+# 0x108008FC   decompress_kernel function
+
+
+1. After 'jump_to_linux' PC changed to 0x10800020 and reads from
+   0x10800020, 24, 28,  0x1080003C to 0x108000A0 
+   All these are I-Cache Reads.
+2. Next 0x1080693C to 0x10806948 I-Cache Reads.
+3. Here One D-Cache Write to address 0x1098d49C and data is 0x00000000
+4. Here onwards I-Cache is reading 0x108069XX ...
+   and D-Cache is writing 0x1098dXXX.
+
+   0x1098d4A4 D-Cache Write Data 0x0000FFFC
+   0x1098d4A8 D-Cache Write Data 0xFFFFFFFC
+   0x1098d4AC D-Cache Write Data 0x11000000
+   0x1098d4B0 D-Cache Write Data 0x600000D3
+   0x1098d4B4 D-Cache Write Data 0x00000000
+   0x1098d4B8 D-Cache Write Data 0x0000B7DC
+   0x1098d4BC D-Cache Write Data 0x1080009C
+
+   0x1098d494 D-Cache Write Data 0x00000000
+
+   0x1098d46C D-Cache Write Data 0x11000000
+   0x1098d470 D-Cache Write Data 0x10000000
+   0x1098d47C D-Cache Write Data 0x1080699C
+
+   0x1098d464 D-Cache Write Data 0x00000000
+
+   0x1098d450 D-Cache Write Data 0x11000000
+   0x1098d454 D-Cache Write Data 0x10807C90
+   0x1098d458 D-Cache Write Data 0x0000FFFC
+   0x1098d45C D-Cache Write Data 0x108068CC
+
+   0x1098d440 D-Cache Write Data 0x11000000
+   0x1098d444 D-Cache Write Data 0x10807C90
+   0x1098d448 D-Cache Write Data 0x0000FFFC
+   0x1098d44C D-Cache Write Data 0xFFFFFFFF
+
+   0x1098d450 D-Cache Write Data 0x11000000
+   0x1098d454 D-Cache Write Data 0x600000D3
+   0x1098d458 D-Cache Write Data 0x00000000
+   0x1098d45C D-Cache Write Data 0x108068CC
+
+   0x1098d43C D-Cache Write Data 0x10805508
+
+what is happening? Why we are NOT seeing any UART messages?
+
